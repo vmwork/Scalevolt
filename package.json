@@ -4,14 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --config ./frontend/vite.config.js",
-    "build": "vite build --config ./frontend/vite.config.js",
-    "preview": "vite preview --config ./frontend/vite.config.js"
+    "dev": "vite --config ./vue-frontend/vite.config.js",
+    "build": "vite build --config ./vue-frontend/vite.config.js",
+    "preview": "vite preview --config ./vue-frontend/vite.config.js"
   },
   "dependencies": {
     "@intercom/messenger-js-sdk": "^0.0.14",
     "@stripe/stripe-js": "^4.8.0",
-    "axios": "^1.7.7",
+    "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",

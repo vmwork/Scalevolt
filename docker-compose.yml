@@ -1,0 +1,20 @@
+version: '3'
+services:
+  node-backend:
+    build: ./node-backend
+    ports:
+      - "4242:4242"
+    env_file:
+      - ./node-backend/.env
+    depends_on:
+      - python-recs
+    # If you need to call the Python service by name in Node, use "python-recs" as the hostname
+    # environment:
+    #   PYTHON_SERVICE_URL: http://python-recs:8000  (example if you want to pass it in)
+
+  python-recs:
+    build: ./python-recs
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./python-recs/.env  # Or you can pass DB info here
