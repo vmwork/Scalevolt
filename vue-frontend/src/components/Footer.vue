@@ -18,15 +18,17 @@
         </ul>
       </div>
 
-      <!-- About Us Section -->
-      <div class="footer-section">
-        <h3>Про Нас</h3>
-        <ul>
-          <li><a href="#">Компанія</a></li>
-          <li><a href="#">Наша Команда</a></li>
-          <li><a href="#"></a></li>
-        </ul>
-      </div>
+<!-- About Us Section -->
+<div class="footer-section">
+  <h3>Про Нас</h3>
+  <ul>
+    <li><a href="#">Компанія</a></li>
+    <li><a href="#">Наша Команда</a></li>
+    <li>
+      <router-link to="/customer-cases">Кейси клієнтів</router-link>
+    </li>
+  </ul>
+</div>
 
       <!-- Policies Section -->
       <div class="footer-section">

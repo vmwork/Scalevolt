@@ -139,3 +139,23 @@ const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+
+// 5)
+app.get('/api/personalized-recs/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const pythonServiceUrl = 'http://localhost:8000/recommendations'; 
+    // or the actual domain/IP of your Python container
+
+    const response = await axios.post(pythonServiceUrl, {
+      user_id: userId
+    });
+
+    res.json(response.data); // response.data should have { recommendations: [...] }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching recommendations');
+  }
+});

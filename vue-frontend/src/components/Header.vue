@@ -245,7 +245,10 @@ export default {
   background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
-  margin: 0;          /* Remove default margins */
+  margin: 0;  
+  height: 110px; /* Match logo height + padding */
+
+  /* Remove default margins */
   /* Optional global padding
      padding: 20px; 
   */
@@ -260,7 +263,9 @@ export default {
   display: grid;
   grid-template-columns: auto 2fr auto; 
   align-items: center;
-  width: 100%;         /* Let it span the full screen width */
+  width: 100%; 
+  height: 110px;
+  /* Let it span the full screen width */
   padding: 10px 20px;  /* Some horizontal padding */
   box-sizing: border-box;
   gap: 20px;           /* Space between columns */
@@ -351,6 +356,7 @@ export default {
 
 /* Logo Styles */
 .logo-container {
+  height: 90px;
   display: flex;
   align-items: center;
 }

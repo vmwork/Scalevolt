@@ -4,7 +4,7 @@
     <nav class="breadcrumbs">
       <span>Home</span>
       <span> &gt; </span>
-      <span>Earphones &amp; Headphones</span>
+      <span>{{ product?.type || 'Unknown Category' }}</span>
       <span> &gt; </span>
       <span>{{ product?.title || 'Unknown Product' }}</span>
     </nav>
@@ -12,7 +12,7 @@
     <div v-if="product" class="product-wrapper">
       <!-- Image Gallery Section -->
       <div class="image-section">
-        <!-- Thumbnails (vertical) -->
+        <!-- Thumbnails -->
         <div class="thumbnail-list">
           <img
             v-for="(img, i) in product.images"
@@ -40,22 +40,12 @@
         <h1 class="product-title">{{ product.title }}</h1>
         <p class="product-quantity">Net Qty: {{ product.quantity }}</p>
 
-        <!-- Price Section -->
+        <!-- Price -->
         <div class="price-container">
-          <span class="current-price">
-            ₹{{ product.currentPrice }}
-          </span>
-          <span class="discount-tag">
-            {{ product.discount }}% Off
-          </span>
-          <br />
-          <span class="original-price">
-            <s>₹{{ product.originalPrice }}</s>
-          </span>
-          <span class="tax-info">(incl. of all taxes)</span>
+          <span class="current-price">₹{{ product.price }}</span>
         </div>
 
-        <!-- Payment Offers (Example) -->
+        <!-- Payment Offers -->
         <div class="payment-offers">
           <p>Get it for ₹{{ product.bankOfferPrice }} on bank payment offers</p>
           <a href="#">View all offers &gt;</a>
@@ -73,10 +63,24 @@
           <a href="#">View all coupons &gt;</a>
         </div>
 
-        <!-- Add to Cart Button -->
-        <button class="add-to-cart-btn">Add To Cart</button>
+       <!-- Add to Cart Button or Quantity Selector -->
+<div class="cart-control">
+  <button 
+    v-if="!showQuantitySelector" 
+    class="add-to-cart-btn" 
+    @click="showQuantitySelector = true"
+  >
+    Add To Cart
+  </button>
+  <div v-else class="quantity-selector">
+    <button class="quantity-btn" @click="decrementQuantity">-</button>
+    <span class="quantity-value">{{ quantity }}</span>
+    <button class="quantity-btn" @click="incrementQuantity">+</button>
+    <button class="add-to-cart-btn" @click="addToCart">Add To Cart</button>
+  </div>
+</div>
 
-        <!-- Additional Info (Icons, Delivery, etc.) -->
+        <!-- Additional Info -->
         <div class="extra-info">
           <div class="info-icon">
             <img src="/images/ProductPage/return-icon.png" alt="7 Days Exchange" />
@@ -118,102 +122,128 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useCartStore } from '@/stores/cart';
-import { productService } from '@/services/productService';
+import productService from '@/services/productService';
 
 export default {
   name: "ProductPage",
-  props: ["id"],
+  setup() {
+    const route = useRoute();
+    const cartStore = useCartStore();
 
-  data() {
-    return {
-      product: null,
-      selectedImage: null,
-      placeholderImage: "/images/placeholder.png",
-    };
-  },
+    const product = ref(null);
+    const selectedImage = ref(null);
+    const placeholderImage = ref("/images/placeholder.png");
+    const quantity = ref(1); // Track quantity
+    const showQuantitySelector = ref(false); // Track whether to show quantity selector
 
-  created() {
-    // Hardcode TWO example products for demonstration
-    // So that '/product/1' and '/product/7' both work
     const mockProducts = [
       {
-        id: "1",
-        title: "OnePlus Bullets Z2 Bluetooth Wireless In Ear Earphones",
-        quantity: "1 piece",
-        currentPrice: 1799,
-        originalPrice: 2299,
-        discount: 21,
-        bankOfferPrice: 1599,
-        images: [
-          "/images/earphone1-thumb1.jpg",
-          "/images/earphone1-thumb2.jpg",
-          "/images/earphone1-thumb3.jpg",
-          "/images/earphone1-thumb4.jpg",
-        ],
-        brand: "OnePlus",
-        type: "Neckband",
-        model: "Bullets Z2",
+        id: 1,
+        title: 'Сонячна Панель JA Solar 560kW',
+        price: 1000,
+        bankOfferPrice: 950,
         offers: [
-          { id: 1, bank: "SBI", detail: "Flat 10% off using SBI Bank debit cards" },
-          { id: 2, bank: "Kotak", detail: "Flat 12% discount with Kotak Credit Card" },
-          { id: 3, bank: "SBI", detail: "Flat 10% off using SBI Bank debit cards" },
-          { id: 4, bank: "IndusInd", detail: "Get 10% upto ₹300 off with IndusInd Bank cards" },
-          { id: 5, bank: "Federal Bank", detail: "Get 10% discount with Federal Bank Credit Card" },
+          { id: 1, bank: 'HDFC', detail: '5% off on credit card' },
+          { id: 2, bank: 'ICICI', detail: '10% cashback' },
         ],
+        images: ['/images/1.jpg', '/images/2.jpg'],
+        brand: 'JA Solar',
+        quantity: '1 piece',
+        model: 'JA560Model',
+        type: 'Solar Panel',
       },
       {
-        id: "7",
-        title: "OnePlus Bullets Z2 (Sanchiz Edition)",
-        quantity: "1 piece",
-        currentPrice: 1999,
-        originalPrice: 2599,
-        discount: 23,
-        bankOfferPrice: 1699,
-        images: [
-          "/images/earphone7-thumb1.jpg",
-          "/images/earphone7-thumb2.jpg",
-        ],
-        brand: "OnePlus",
-        type: "Neckband",
-        model: "Bullets Z2 Sanchiz",
+        id: 2,
+        title: 'Сонячна Панель Jinko Tiger 560kW',
+        price: 1200,
+        bankOfferPrice: 1150,
         offers: [
-          { id: 1, bank: "SBI", detail: "Flat 10% off with SBI Bank debit cards" },
-          { id: 2, bank: "ICICI", detail: "Get 12% discount with ICICI Bank Credit Card" },
+          { id: 1, bank: 'SBI', detail: 'Flat ₹200 off' },
         ],
+        images: ['/images/3.jpg', '/images/4.jpg'],
+        brand: 'Jinko Tiger',
+        quantity: '1 piece',
+        model: 'Jinko560Model',
+        type: 'Solar Panel',
       },
     ];
 
-    setup() {
-    const cartStore = useCartStore();
-    return { cartStore };
-  },
-  async created() {
-    try {
-      const response = await productService.getProductById(this.id);
-      this.product = response.data;
-      this.selectedImage = this.product.attributes.images?.[0] || this.placeholderImage;
-    } catch (error) {
-      console.error("Product loading error:", error);
-    }
-  },
+    onMounted(async () => {
+      try {
+        const productId = route.params.id;
 
-  methods: {
-    addToCart() {
-      if (this.product) {
-        this.cartStore.addItem({
-          id: this.product.id,
-          ...this.product.attributes
-        });
-        alert(`${this.product.attributes.title} added to cart!`);
+        // Try API first
+        const response = await productService.getProductById(productId);
+        if (response?.data) {
+          product.value = {
+            id: response.data.id,
+            ...response.data.attributes,
+            images: response.data.attributes.images?.data?.map(
+              (img) => img.attributes.url
+            ) || [],
+          };
+        } else {
+          // Fallback to mock data
+          const foundMock = mockProducts.find(
+            (item) => item.id.toString() === productId
+          );
+          product.value = foundMock || null;
+        }
+
+        // Set initial image
+        selectedImage.value = product.value?.images[0] || placeholderImage.value;
+      } catch (error) {
+        console.error("Error loading product:", error);
       }
-    }
-  }
+    });
+
+    const addToCart = () => {
+      if (product.value) {
+        const cartItem = {
+          id: product.value.id,
+          title: product.value.title,
+          price: product.value.price,
+          image: product.value.images[0],
+          quantity: quantity.value, // Include quantity in cart item
+        };
+        cartStore.addItem(cartItem);
+        alert(`${product.value.title} added to cart! (Quantity: ${quantity.value})`);
+        
+        // Optionally toggle back to button or keep quantity selector visible
+        showQuantitySelector.value = true; // Keep quantity selector visible after adding
+      }
+    };
+
+    const incrementQuantity = () => {
+      quantity.value++;
+    };
+
+    const decrementQuantity = () => {
+      if (quantity.value > 1) {
+        quantity.value--;
+      }
+    };
+
+    return {
+      product,
+      selectedImage,
+      placeholderImage,
+      addToCart,
+      quantity,
+      showQuantitySelector,
+      incrementQuantity,
+      decrementQuantity,
+    };
+  },
 };
 </script>
 
+
 <style scoped>
-/* Container for the entire product page */
+/* (Unchanged) Container for the entire product page */
 .product-page-container {
   padding-top: 100px; /* Adjust based on header height */
   margin-top: -80px; /* Compensate for fixed header */
@@ -400,5 +430,57 @@ header {
   background-color: #f9f9f9;
   width: 200px;
   font-weight: 500;
+}
+
+
+/* Quantity Selector */
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #f26e9a;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.quantity-btn {
+  padding: 5px 10px;
+  background-color: #f26e9a;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 30px;
+  height: 30px;
+}
+
+.quantity-btn:hover {
+  background-color: #eb3271;
+}
+
+.quantity-value {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 5px 10px;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* Ensure the Add to Cart button in quantity selector matches the original */
+.quantity-selector .add-to-cart-btn {
+  padding: 10px 20px;
+  background-color: #f75389;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.quantity-selector .add-to-cart-btn:hover {
+  background-color: #eb3271;
 }
 </style>

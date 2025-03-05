@@ -1,11 +1,10 @@
 <template>
   <div class="product-card">
-    <!-- Wrap image in router-link -->
+    <!-- Only Image & Title Navigate to Product Page -->
     <router-link :to="productLink" class="product-image">
       <img :src="imageSrc" :alt="title || 'Product Image'" />
     </router-link>
 
-    <!-- Wrap title in router-link -->
     <router-link :to="productLink" class="product-name">
       <h2>{{ title }}</h2>
     </router-link>
@@ -17,21 +16,25 @@
 
     <h3 class="product-price">{{ price }} грн</h3>
 
-    <!-- Add to Cart Button Logic -->
-    <div v-if="cartCount === 0">
-      <button class="add-to-cart" @click="handleAddToCart">Add to Cart</button>
-    </div>
-    <div v-else class="quantity-controls">
-      <button @click="decreaseCount" class="decrement-btn">-</button>
-      <span class="quantity-number">{{ cartCount }}</span>
-      <button @click="increaseCount" class="increment-btn">+</button>
-    </div>
-  </div>
+    <!-- Transition between Add-to-Cart and +/- controls -->
+    <transition name="fade">
+      <div v-if="cartCount > 0" class="quantity-controls">
+        <button @click.stop.prevent="decreaseCount" class="decrement-btn">-</button>
+        <span class="quantity-number">{{ cartCount }}</span>
+        <button @click.stop.prevent="increaseCount" class="increment-btn">+</button>
+      </div>
+      <button v-else class="add-to-cart" @click.stop.prevent="handleAddToCart">
+        Add to Cart
+      </button>
+    </transition>
+  </div> 
 </template>
+
 
 <script>
 import { computed } from 'vue';
 import { useCartStore } from '@/stores/cart';
+
 
 export default {
   name: 'ProductCard',
@@ -68,22 +71,20 @@ export default {
     const productLink = computed(() => `/product/${props.productId}`);
 
     // Method to add product to cart
-    const addToCart = () => {
-      console.log('Adding product to cart:', props.productId);
+    const handleAddToCart = () => {
       cartStore.addToCart({
         id: props.productId,
         name: props.title,
         price: props.price,
         image: props.imageSrc,
         brand: props.brand,
-        uniqueKey: props.productId, // Ensure uniqueKey is consistent
         quantity: 1,
       });
-    };
 
-    // Method to handle adding to cart
-    const handleAddToCart = () => {
-      addToCart();
+      // Force UI to update instantly by modifying a reactive property
+      cartStore.$patch((state) => {
+        state.cartItems = [...state.cartItems];
+      });
     };
 
     // Method to increase quantity
@@ -107,66 +108,115 @@ export default {
 };
 </script>
 
+
+
 <style scoped>
+/* Product Card Container */
 .product-card {
   border: 1px solid #e0e0e0;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 15px; /* Increased padding for better spacing */
+  border-radius: 10px; /* Slightly rounded edges */
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); /* Slightly stronger shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: white;
+  max-width: 250px; /* Ensures uniform card size */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* Card Hover Effect */
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Product Image */
 .product-image img {
   width: 100%;
-  height: auto;
+  height: 180px; /* Fixed height for consistency */
+  object-fit: contain; /* Prevents image distortion */
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
 }
 
+/* Product Name */
 .product-name {
   text-decoration: none;
   color: inherit;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  display: block;
 }
 
 .product-name h2 {
-  margin: 20px 0;
-  color: #000; /* Set title color to black */
+  margin: 10px 0;
+  color: #333; /* Slightly lighter black */
+  font-size: 18px;
 }
 
-/* Show the brand if it's not empty */
+/* Brand Name */
 .product-brand {
   margin-bottom: 8px;
   font-style: italic;
-  color: #555;
+  color: #777;
+  font-size: 14px;
 }
 
+/* Product Price */
 .product-price {
   font-weight: bold;
+  font-size: 18px;
+  color: #444;
+  margin-top: 5px;
 }
 
+/* Add to Cart Button */
 .add-to-cart {
   background-color: #ff4f5a;
-  color: #fff; /* Changed to white for better contrast */
+  color: #fff;
   border: none;
-  padding: 10px;
+  padding: 12px;
   border-radius: 5px;
   cursor: pointer;
-  width: 100%;
+  width: 90%;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  margin-top: 10px;
+}
+
+/* Smooth Fade Transition */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
 }
 
 .add-to-cart:hover {
   background-color: #e04350;
+  transform: scale(1.05);
 }
 
+/* Quantity Controls */
 .quantity-controls {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   margin-top: 10px;
 }
 
+/* Buttons for Increasing/Decreasing Quantity */
 .decrement-btn,
 .increment-btn {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #ff4f5a;
   color: #ff4f5a;
   background: transparent;
@@ -174,18 +224,42 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-}
-
-.quantity-number {
-  color: #000; /* Set text color to black for visibility */
-  padding: 0 15px;
-  font-size: 16px;
+  border-radius: 5px;
+  font-size: 18px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .decrement-btn:hover,
 .increment-btn:hover {
   background-color: #ff4f5a;
-  color: #fff; /* Changed to #fff for better contrast on hover */
+  color: #fff;
+}
+
+/* Quantity Number Display */
+.quantity-number {
+  color: #000;
+  padding: 0 15px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .product-card {
+    max-width: 100%;
+  }
+
+  .product-image img {
+    height: 160px;
+  }
+
+  .product-name h2 {
+    font-size: 16px;
+  }
+
+  .add-to-cart {
+    width: 100%;
+  }
 }
 </style>
+ 

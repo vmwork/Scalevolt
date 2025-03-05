@@ -270,24 +270,33 @@ h1 {
 .quantity-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 6px; /* Reduce gap to make buttons look aligned */
   margin: 15px 0;
 }
 
+/* Fixing the shadowed circle effect */
 .quantity-controls button {
-  width: 36px;
-  height: 36px;
-  background-color: #f0f0f0;
+  width: 40px; /* Slightly increased width */
+  height: 40px; /* Ensures a perfect circle */
+  background-color: #f5f5f5;
   color: #333;
-  border: none;
-  border-radius: 50%;
+  border: 1px solid #ddd; /* Added a subtle border */
+  border-radius: 50%; /* Makes it perfectly circular */
   cursor: pointer;
-  font-size: 1.5rem;
-  transition: background-color 0.2s ease;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Softer shadow */
 }
 
+/* Hover Effect */
 .quantity-controls button:hover {
   background-color: #e0e0e0;
+  transform: scale(1.05); /* Slight zoom effect */
 }
 
 .quantity-input {

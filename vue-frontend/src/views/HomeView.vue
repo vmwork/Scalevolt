@@ -88,7 +88,7 @@
     <div class="page-container">
       <section class="category-section">
         <div class="section-header">
-          <h2>Досліджуйте категорії</h2>
+          <h2>Оренда</h2>
           <router-link to="/categories" class="see-all-button"
             >See All</router-link
           >
@@ -175,7 +175,7 @@ export default {
         },
         {
           id: 6,
-          name: 'Системи кріплення',
+          name: 'Портативна електростанція',
           slug: 'mounting-systems',
           image: '/images/HomeView/solar-mount-system.png',
         },
@@ -222,21 +222,21 @@ export default {
       newCategories: [
         {
           id: 1,
-          name: 'Сонячні Панелі',
+          name: 'Переносні електростанції',
           slug: 'solar-panels',
           image: '/images/HomeView/solar-panel.png',
         },
         {
           id: 2,
-          name: 'Зарядки',
+          name: 'Cонячні генератори',
           slug: 'charging',
           image: '/images/HomeView/Charging-station-ND-EVC-UR40.jpg',
         },
         {
           id: 3,
-          name: 'Батареї',
-          slug: 'batteries',
-          image: '/images/HomeView/літіюм-батареї.png',
+          name: 'Портативні сонячні панелі',
+          slug: 'portable-solar-panels',
+          image: '/images/Categories/portable.solar.panels/Портативні-Сонячні-панелі-Jackery-SolarSaga-100W.png',
         },
         {
           id: 4,
@@ -248,15 +248,21 @@ export default {
       categories: [
         {
           id: 1,
-          name: 'Автоматичні вимикачі',
+          name: 'Генератори',
           slug: 'automatics',
-          image: '/images/HomeView/Circuit-breakers.jpg',
+          image: '/images/HomeView/генератори.png',
         },
         {
           id: 2,
-          name: 'Кабель',
+          name: 'Промислові генератори для важких навантажень (100 кВт+)',
           slug: 'cable',
-          image: '/images/HomeView/Electrical-cables-and-wires.jpg',     
+          image: '/images/HomeView/Промислові-генератори-для-важких-навантажень.png',     
+        },
+        {
+          id: 3,
+          name: 'Освітлювальні-вежі-на-сонячних-батареях',
+          slug: 'cable',
+          image: '/images/HomeView/Освітлювальні-вежі-на-сонячних-батареях.png',     
         },
       ],
       products: [],
@@ -265,8 +271,8 @@ export default {
   },
   methods: {
     getCategoryRoute(slug) {
-      return `/${slug}`
-    },
+  return `/${slug.toLowerCase().replace(/ /g, '-')}`; // Optional: Normalize the slug for consistency
+},
     async fetchAds() {
       try {
         const response = await adService.getAds({ populate: '*' })

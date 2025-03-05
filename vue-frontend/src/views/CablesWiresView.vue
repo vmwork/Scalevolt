@@ -123,9 +123,17 @@ export default {
 </script>
 
 <style scoped>
-/* Match other pages so breadcrumb isn't hidden by a fixed header */
 .catalogue-view {
-  margin-top: 80px;
+  padding-top: 120px; /* Header height + 10px buffer */
+  margin-top: 0 !important;
+}
+
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 15px;
+  padding: 20px;
+  background-color: #f9fafb;
 }
 
 /* Same class used in Breadcrumb.vue for consistent spacing */

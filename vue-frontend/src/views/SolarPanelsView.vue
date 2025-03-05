@@ -12,6 +12,13 @@
         :key="product.uniqueKey"
         class="product-card-wrapper"
       >
+
+        <!-- Wrap ProductCard in <router-link> to /product/:id -->
+          <router-link
+          :to="`/product/${product.id}`"
+          style="text-decoration: none; color: inherit;"
+        >
+
         <!-- Corrected ProductCard component tag -->
         <ProductCard
           :productId="product.id"
@@ -19,7 +26,8 @@
           :price="product.price"
           :image-src="product.image"
           :brand="product.brand"
-        />
+             />
+        </router-link>
       </div>
     </div>
   </div>
@@ -46,82 +54,82 @@ export default {
     const products = ref([
       {
         id: 1,
-        name: 'Сонячна Панель JA Solar 560kW',
+        name: 'Сонячна Панель Longi-410-Black',
         price: 1000,
-        image: '/images/1.jpg',
-        brand: 'JA Solar',
+        image: '/images/Categories/solar.panels/Longi-410-Black.png',
+        brand: 'Longi',
         categoryId: 1,
       },
       {
         id: 2,
-        name: 'Сонячна Панель Jinko Tiger 560kW',
+        name: 'Сонячна Панель Longi-420-Black',
         price: 1200,
-        image: '/images/2.jpg',
-        brand: 'Jinko Tiger',
+        image: '/images/Categories/solar.panels/Longi-420-Black.png',
+        brand: 'Longi',
         categoryId: 1,
       },
       {
         id: 3,
-        name: 'Сонячна Панель JA Solar 560kW',
+        name: 'Сонячна Панель Longi-425-Black',
         price: 1000,
-        image: '/images/3.jpg',
-        brand: 'JA Solar',
+        image: '/images/Categories/solar.panels/Longi-425-Black.png',
+        brand: 'Longi',
         categoryId: 1,
       },
       {
         id: 4,
-        name: 'Сонячна Панель Jinko Tiger 560kW',
+        name: 'Сонячна Панель Longi-530-Black',
         price: 1200,
-        image: '/images/4.jpg',
-        brand: 'Jinko Tiger',
+        image: '/images/Categories/solar.panels/Longi-530-Black.png',
+        brand: 'Longi',
         categoryId: 1,
       },
       {
         id: 5,
-        name: 'Сонячна Панель JA Solar 560kW',
+        name: 'Сонячна Панель Longi-630-Bifacial',
         price: 1000,
-        image: '/images/5.jpg',
-        brand: 'JA Solar',
+        image: '/images/Categories/solar.panels/Longi-630-Bifacial.png',
+        brand: 'Longi',
         categoryId: 1,
       },
       {
         id: 6,
-        name: 'Сонячна Панель Jinko Tiger 560kW',
+        name: 'Сонячна Панель Longi-430',
         price: 1200,
-        image: '/images/6.jpg',
-        brand: 'Jinko Tiger',
+        image: '/images/Categories/solar.panels/Longi-430.png',
+        brand: 'Longi',
         categoryId: 1,
       },
       {
         id: 7,
-        name: 'Сонячна Панель JA Solar 560kW',
+        name: 'Сонячна Панель Longi-580',
         price: 1000,
-        image: '/images/7.jpg',
-        brand: 'JA Solar',
+        image: '/images/Categories/solar.panels/Longi-580.png',
+        brand: 'Longi',
         categoryId: 1,
       },
       {
         id: 8,
-        name: 'Сонячна Панель Jinko Tiger 560kW',
+        name: 'Сонячна Панель Longi-585',
         price: 1200,
-        image: '/images/8.jpg',
-        brand: 'Jinko Tiger',
+        image: '/images/Categories/solar.panels/Longi-585.png',
+        brand: 'Longi',
         categoryId: 1,
       },
       {
         id: 9,
-        name: 'Сонячна Панель JA Solar 560kW',
+        name: 'Сонячна Панель Longi-440',
         price: 1000,
-        image: '/images/9.jpg',
-        brand: 'JA Solar',
+        image: '/images/Categories/solar.panels/Longi-440.png',
+        brand: 'Longi-440',
         categoryId: 1,
       },
       {
         id: 10,
-        name: 'Сонячна Панель Jinko Tiger 560kW',
+        name: 'Сонячна Панель Longi-455',
         price: 1200,
-        image: '/images/10.jpg',
-        brand: 'Jinko Tiger',
+        image: '/images/Categories/solar.panels/Longi-455.png',
+        brand: 'Longi',
         categoryId: 1,
       },
     ]);
@@ -160,6 +168,20 @@ export default {
 </script>
 
 <style scoped>
+
+.catalogue-view {
+  padding-top: 120px; /* Header height + 10px buffer */
+  margin-top: 0 !important;
+}
+
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 15px;
+  padding: 20px;
+  background-color: #f9fafb;
+}
+
 /* Match other pages so breadcrumb isn't hidden by a fixed header */
 .catalogue-view {
   margin-top: 80px;
