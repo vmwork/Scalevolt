@@ -1,20 +1,40 @@
-// frontend/vite.config.js
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import path from 'path'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import path from 'path';
 
 export default defineConfig({
-  // Because this file lives in "frontend",
-  // root: __dirname => the "frontend/" folder
-  root: __dirname,
   plugins: [vue()],
+  
+  server: {
+    host: 'localhost',
+    port: 5177, // Changed from 5176 to 5177
+    open: true,
+    // Removed strictPort: true to allow Vite to find an available port
+    watch: {
+      usePolling: true,
+    }
+  },
+  
   resolve: {
     alias: {
-      '@': path.join(__dirname, 'src'),
-    },
+      '@': path.resolve(__dirname, 'src'),
+      '~public': path.resolve(__dirname, 'public'),
+    }
   },
+  
   build: {
-    // Output goes to "../dist" (i.e. scalevolt-store-main/dist)
-    outDir: path.join(__dirname, '../dist'),
+    outDir: path.resolve(__dirname, '../dist'),
+    assetsDir: 'assets',
+    emptyOutDir: true,
+    
+    rollupOptions: {
+      output: {
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+      }
+    }
   },
-})
+  
+  base: './',
+});

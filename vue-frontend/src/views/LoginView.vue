@@ -58,43 +58,58 @@ export default {
   methods: {
     signInWithGoogle() {
       const provider = new GoogleAuthProvider();
+      // Get a reference to the store
+      const userStore = useUserStore();
+      
       signInWithPopup(auth, provider)
         .then((result) => {
-          const { user } = useUserStore();
-          user.value = result.user;
-          alert(`Welcome ${user.displayName}`);
+          // Use the store's setUser method instead of directly modifying user.value
+          userStore.setUser(result.user);
+          alert(`Welcome ${result.user.displayName || 'User'}`);
           this.$router.push('/');
         })
         .catch((error) => {
           console.error('Google Sign-In Error:', error);
-          alert('Failed to sign in with Google');
+          console.error('Error code:', error.code);
+          console.error('Error message:', error.message);
+          alert('Failed to sign in with Google: ' + error.message);
         });
     },
     signInWithApple() {
       const provider = new OAuthProvider('apple.com');
+      // Get a reference to the store
+      const userStore = useUserStore();
+      
       signInWithPopup(auth, provider)
         .then((result) => {
-          const { user } = useUserStore();
-          user.value = result.user;
-          alert(`Welcome ${user.displayName || user.email}`);
+          // Use the store's setUser method
+          userStore.setUser(result.user);
+          alert(`Welcome ${result.user.displayName || result.user.email || 'User'}`);
           this.$router.push('/');
         })
         .catch((error) => {
           console.error('Apple Sign-In Error:', error);
-          alert('Failed to sign in with Apple');
+          console.error('Error code:', error.code);
+          console.error('Error message:', error.message);
+          alert('Failed to sign in with Apple: ' + error.message);
         });
     },
     signInWithEmail() {
+      // Get a reference to the store
+      const userStore = useUserStore();
+      
       signInWithEmailAndPassword(auth, this.email, this.password)
         .then((result) => {
-          const { user } = useUserStore();
-          user.value = result.user;
-          alert(`Welcome ${user.email}`);
+          // Use the store's setUser method
+          userStore.setUser(result.user);
+          alert(`Welcome ${result.user.email || 'User'}`);
           this.$router.push('/');
         })
         .catch((error) => {
           console.error('Email Sign-In Error:', error);
-          alert('Failed to sign in with email');
+          console.error('Error code:', error.code);
+          console.error('Error message:', error.message);
+          alert('Failed to sign in with email: ' + error.message);
         });
     },
   },

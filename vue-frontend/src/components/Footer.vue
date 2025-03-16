@@ -27,6 +27,9 @@
     <li>
       <router-link to="/customer-cases">Кейси клієнтів</router-link>
     </li>
+    <li><a href="#">Зв'яжіться з нами</a></li>
+    <a href="mailto:scalevolt.info@gmail.com">scalevolt.info@gmail.com</a>
+
   </ul>
 </div>
 

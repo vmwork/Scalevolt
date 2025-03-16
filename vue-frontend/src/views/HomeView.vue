@@ -43,26 +43,42 @@
 
     <!-- Carousel Section -->
     <div class="page-container">
-      <section class="carousel-section">
-        <Swiper
-          :modules="[Navigation, Pagination, Autoplay]"
-          :slides-per-view="1"
-          :loop="true"
-          :autoplay="{ delay: 3000, disableOnInteraction: false }"
-          navigation
-          pagination
-          class="carousel-container"
-        >
-          <SwiperSlide v-for="(slide, index) in carouselSlides" :key="index">
-            <img :src="slide.image.toString()" :alt="slide.title" />
-            <div class="slide-content">
-              <h2>{{ slide.title }}</h2>
-              <p>{{ slide.description }}</p>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-      </section>
-    </div><!-- Close .page-container #3 -->
+    <section class="carousel-section">
+      <Swiper
+        :modules="[Navigation, Pagination, Autoplay]"
+        :slides-per-view="1"
+        :loop="true"
+        :autoplay="{ delay: 5000, disableOnInteraction: false }"
+        navigation
+        pagination
+        class="carousel-container"
+      >
+      <SwiperSlide v-for="(slide, index) in carouselSlides" :key="index">
+  <!-- Conditional rendering for video vs image -->
+  <template v-if="slide.type === 'video'">
+    <video 
+      :src="slide.src" 
+      autoplay 
+      loop 
+      muted 
+      playsinline 
+      class="carousel-video"
+    >
+    Your browser does not support the video tag.
+    </video>
+  </template>
+  <template v-else>
+    <img :src="slide.src" :alt="slide.title" />
+  </template>
+          
+  <div class="slide-content">
+    <h2>{{ slide.title }}</h2>
+    <p>{{ slide.description }}</p>
+  </div>
+</SwiperSlide>
+      </Swiper>
+    </section>
+  </div>
 
     <!-- Explore New Category Section -->
     <div class="page-container">
@@ -162,20 +178,13 @@ export default {
         },
         {
           id: 4,
-          name: 'Блок управління',
-          slug: 'voltage-controllers',
-          image: '/images/HomeView/блок-управління.png',
-        },
-
-        {
-          id: 5,
           name: 'Комплекти сонячних електростанцій',
           slug: 'Sets-of-solar-power-plants',
           image: '/images/HomeView/комплект-сонячних.png',
         },
         {
           id: 6,
-          name: 'Портативна електростанція',
+          name: 'Система монтажу сонячних панелей',
           slug: 'mounting-systems',
           image: '/images/HomeView/solar-mount-system.png',
         },
@@ -203,18 +212,28 @@ export default {
       ads: [],
       promotionCategories: [],
       carouselSlides: [
+      {
+    type: 'gif',
+    src: '/videos/carousel/Self-Sustaining-Smart-Home.gif',
+    title: 'Renewable Energy Ecosystem',
+    description: 'Explore how solar energy powers a sustainable home'
+  },
+  {
+    type: 'gif',
+    src: '/videos/carousel/ev.chargers.gif',
+    title: 'Renewable Energy Ecosystem',
+    description: 'Explore how solar energy powers a sustainable home'
+  },
+       
         {
-          image: '/images/1.jpg',
-          title: 'Slide 1',
-          description: 'Description for Slide 1',
-        },
-        {
-          image: '/images/2.jpg',
+          type: 'image',
+          src: '/images/2.jpg',
           title: 'Slide 2',
           description: 'Description for Slide 2',
         },
         {
-          image: '/images/3.jpg',
+          type: 'image',
+          src: '/images/3.jpg',
           title: 'Slide 3',
           description: 'Description for Slide 3',
         },
@@ -222,8 +241,8 @@ export default {
       newCategories: [
         {
           id: 1,
-          name: 'Переносні електростанції',
-          slug: 'solar-panels',
+          name: 'Портативна електростанції',
+          slug: 'Портативна електростанція',
           image: '/images/HomeView/solar-panel.png',
         },
         {
@@ -271,18 +290,16 @@ export default {
   },
   methods: {
     getCategoryRoute(slug) {
-  return `/${slug.toLowerCase().replace(/ /g, '-')}`; // Optional: Normalize the slug for consistency
+      return `/${slug.toLowerCase().replace(/ /g, '-')}`;
 },
-    async fetchAds() {
-      try {
+async fetchAds() {
+  try {
         const response = await adService.getAds({ populate: '*' })
         this.ads = response.data.data.map(ad => ({
           id: ad.id,
           title: ad.attributes?.title || 'No title',
           description: ad.attributes?.description || '',
-          image:
-            ad.attributes?.image?.data?.attributes?.url ||
-            '/images/default-ad.jpg',
+          image: ad.attributes?.image?.data?.attributes?.url || '/images/default-ad.jpg',
         }))
       } catch (error) {
         console.error('Error fetching ads:', error)
@@ -310,8 +327,30 @@ export default {
     },
     async fetchCarouselSlides() {
       try {
+        const response = await productService.getProducts({
+          populate: ['general_information.images', 'pricing_and_inventory'],
+        })
+        this.products = response.data.data
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchCarouselSlides() {
+      try {
+        // Optional: If you want to fetch slides dynamically from an API
         const response = await axios.get('/api/carousel-slides')
-        this.carouselSlides = response.data
+        // Merge or replace existing slides if needed
+        this.carouselSlides = [
+          {
+            type: 'video',
+            src: '/videos/sustainable-home-energy-flow.mp4',
+            title: 'Renewable Energy Ecosystem',
+            description: 'Explore how solar energy powers a sustainable home'
+          },
+          ...response.data
+        ]
       } catch (error) {
         console.error('Error fetching carousel slides:', error)
       }
@@ -389,23 +428,54 @@ Intercom({
   object-fit: cover;
 }
 
+/* General media styles for carousel */
+.carousel-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Cover the entire slide area */
+  display: block;
+}
+
+/* Specific styles for videos */
+.carousel-video {
+  object-position: center;
+  background-color: #000; /* Black background for videos with different aspect ratios */
+}
+
+/* Specific styles for GIFs - if needed */
+.carousel-gif {
+  /* Any specific styles for GIFs */
+}
+
+/* Make sure the slide container maintains a consistent aspect ratio */
+.swiper-slide {
+  height: 400px; /* Set a fixed height or use aspect-ratio */
+  overflow: hidden;
+  position: relative;
+}
+
+/* Improve the slide content styling */
 .slide-content {
   position: absolute;
   bottom: 30px;
   left: 30px;
+  max-width: 60%;
   color: #fff;
-  background: rgba(0, 0, 0, 0.5); /* Optional: background for readability */
+  background: rgba(0, 0, 0, 0.6);
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 8px;
+  z-index: 10; /* Make sure content is above the media */
 }
 
 .slide-content h2 {
-  font-size: 36px;
+  font-size: 24px;
   margin-bottom: 10px;
+  font-weight: 600;
 }
 
 .slide-content p {
-  font-size: 18px;
+  font-size: 16px;
+  line-height: 1.4;
 }
 
 /* Swiper Navigation Buttons */

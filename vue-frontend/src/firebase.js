@@ -1,29 +1,23 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDjum1_oBTAbIqbuqYHmWFl8m36rYYiM8A",
-  authDomain: "scalevolt-store.firebaseapp.com",
-  projectId: "scalevolt-store",
-  storageBucket: "scalevolt-store.firebasestorage.app",
-  messagingSenderId: "315856818260",
-  appId: "1:315856818260:web:03b3e119b0da8dcfe15dc1",
-  measurementId: "G-2N7N24NV9Y"
+  apiKey: "AIzaSyDaSNuQkcB-x7Jw0-dg_tEk5fy23-fZLwA",
+  authDomain: "sample-firebase-ai-app-a5d01.firebaseapp.com",
+  projectId: "sample-firebase-ai-app-a5d01",
+  storageBucket: "sample-firebase-ai-app-a5d01.firebasestorage.app",
+  messagingSenderId: "383695387857",
+  appId: "1:383695387857:web:51774f6d9fc52be16859f0",
+  measurementId: "G-7Q3CGMR6Z6"
 };
 
-
-import { getAuth } from 'firebase/auth';
 
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-// Initialize Firebase Authentication and export it
 const auth = getAuth(app);
-export { auth };
+const db = getFirestore(app);
+
+export { auth, db };

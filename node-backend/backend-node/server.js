@@ -8,9 +8,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Pool } from 'pg';
 import Stripe from 'stripe';
-import productRoutes from './routes/productRoutes.js';
 import axios from 'axios';
 
+// Fixed import - pick only one import style based on your project setup
+// For ES modules (if "type": "module" in package.json):
+import productRoutes from './routes/productRoutes.js';
+// OR for CommonJS (if no "type": "module" in package.json):
+// const productRoutes = require('./routes/productRoutes');
 
 // If your package.json has "type": "module",
 // __dirname is not defined by default. We can create it manually:
@@ -25,8 +29,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2022-11-15', // or any version you need
 });
 
-// Use CORS to allow requests from your frontend domain
-app.use(cors({ origin: 'http://localhost:3000' })); // Adjust as needed
+// Use CORS to allow requests from your frontend domains
+// Allowing requests from both port 3000 and 1337 since your frontend might be configured for either
+app.use(cors({ 
+  origin: ['http://localhost:3000', 'http://localhost:1337', 'http://localhost:8080'] 
+}));
 
 // Use JSON parsing middleware
 app.use(express.json());
@@ -128,29 +135,45 @@ app.get('/init-db', async (req, res) => {
   }
 });
 
-// 4) Catch-all route for client-side routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// ADD Strapi-compatible API endpoints
+// This allows your frontend to continue using the Strapi syntax without modification
+app.get('/api/products', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM products');
+    // Format response to match Strapi's format
+    const formattedProducts = {
+      data: result.rows.map(product => ({
+        id: product.id,
+        attributes: {
+          general_information: {
+            name: product.name,
+            description: product.description,
+            images: { data: [{ attributes: { url: product.image_url } }] }
+          },
+          pricing_and_inventory: {
+            price: product.price,
+            stock_quantity: product.stock
+          },
+          categories: { data: [{ attributes: { name: product.category } }] }
+        }
+      }))
+    };
+    res.json(formattedProducts);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Error fetching products' });
+  }
 });
 
-// ------------------- START SERVER ------------------- //
-
-const PORT = process.env.PORT || 4242;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-
-
-// 5)
+// 4) Personalized Recommendations Route
 app.get('/api/personalized-recs/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
-    const pythonServiceUrl = 'http://localhost:8000/recommendations'; 
+    const pythonServiceUrl = 'http://localhost:8000/recommendations';
     // or the actual domain/IP of your Python container
 
     const response = await axios.post(pythonServiceUrl, {
-      user_id: userId
+      user_id: userId,
     });
 
     res.json(response.data); // response.data should have { recommendations: [...] }
@@ -158,4 +181,66 @@ app.get('/api/personalized-recs/:userId', async (req, res) => {
     console.error(error);
     res.status(500).send('Error fetching recommendations');
   }
+});
+
+// ADD route for Strapi-compatible promotions endpoint
+app.get('/api/promotions', async (req, res) => {
+  try {
+    // Query based on any filters passed
+    const result = await pool.query('SELECT * FROM promotions WHERE active = true');
+    
+    // Format response to match Strapi's format
+    const formattedPromotions = {
+      data: result.rows.map(promo => ({
+        id: promo.id,
+        attributes: {
+          title: promo.title,
+          description: promo.description,
+          active: promo.active,
+          image: { data: { attributes: { url: promo.image_url } } }
+        }
+      }))
+    };
+    res.json(formattedPromotions);
+  } catch (error) {
+    console.error('Error fetching promotions:', error);
+    res.status(500).json({ error: 'Error fetching promotions' });
+  }
+});
+
+// ADD route for Strapi-compatible ads endpoint
+app.get('/api/ads', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM ads WHERE active = true');
+    
+    // Format response to match Strapi's format
+    const formattedAds = {
+      data: result.rows.map(ad => ({
+        id: ad.id,
+        attributes: {
+          title: ad.title,
+          description: ad.description,
+          active: ad.active,
+          image: { data: { attributes: { url: ad.image_url } } }
+        }
+      }))
+    };
+    res.json(formattedAds);
+  } catch (error) {
+    console.error('Error fetching ads:', error);
+    res.status(500).json({ error: 'Error fetching ads' });
+  }
+});
+
+// 5) Catch-all route for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// ------------------- START SERVER ------------------- //
+
+const PORT = process.env.PORT || 1337; // Change default to 1337 to match frontend expectations
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Access the API at http://localhost:${PORT}/api`);
 });

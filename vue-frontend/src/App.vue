@@ -83,10 +83,6 @@ export default {
   padding: 0;
 }
 
-.main-container {
-  padding: 0px; /* Match this padding with your header */
-}
-
 .products-container {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -163,7 +159,7 @@ header ul li img {
   justify-content: center;
 }
 
-.search-container input {
+.main-container .search-container input {
   width: 100%;
   max-width: 400px;
   padding: 8px 12px;
@@ -223,5 +219,10 @@ header h2 {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
+}
+
+/* Added styles to make room for the fixed header */
+.main-container {
+  padding-top: 120px; /* This value should match the height of your header + some padding */
 }
 </style>

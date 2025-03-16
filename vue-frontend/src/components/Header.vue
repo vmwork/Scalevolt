@@ -1,10 +1,10 @@
 <template>
-  <header class="header-container">
-    <div class="header-content">
+  <header class="header-container" ref="headerRef">
+    <div class="header-content" style="display: grid; grid-template-columns: minmax(100px, auto) minmax(500px, 1fr) minmax(100px, auto); gap: 20px;">
       <!-- LEFT SECTION -->
-      <div class="left-section">
+      <div class="left-section" style="width: auto; min-width: 100px;">
         <!-- Hamburger Menu Icon -->
-        <div class="hamburger-container" @click="toggleMenu">
+        <div class="hamburger-container" @click.stop="toggleMenu">
           <button class="hamburger-menu" aria-label="Toggle Menu">
             <span></span>
             <span></span>
@@ -12,44 +12,207 @@
           </button>
         </div>
 
-      <!-- Dropdown Menu -->
-      <div v-if="menuVisible" class="dropdown-menu">
-        <div
-          v-for="(item, index) in menuItems"
-          :key="index"
-          class="dropdown-item"
-        >
-          <router-link :to="item.link" class="menu-item">
-            <img :src="item.img" :alt="item.label" class="menu-item-icon" />
-            <span>{{ item.label }}</span>
+        <!-- Mega Menu Dropdown -->
+        <div v-if="menuVisible" class="dropdown-mega-menu" @click.stop>
+          <div class="menu-container">
+            <!-- Main Categories Column -->
+            <div class="menu-categories">
+              <!-- Solar System Category -->
+              <div class="menu-category" 
+                  :class="{ 'active': activeCategory === 'solar' }"
+                  @mouseenter="activeCategory = 'solar'">
+                <div class="category-header">
+                  <div class="category-icon-placeholder solar-color"></div>
+                  <h3>Сонячна система</h3>
+                </div>
+              </div>
+
+              <!-- EV Chargers Category -->
+              <div class="menu-category" 
+                  :class="{ 'active': activeCategory === 'ev' }"
+                  @mouseenter="activeCategory = 'ev'">
+                <div class="category-header">
+                  <div class="category-icon-placeholder ev-color"></div>
+                  <h3>Зарядні пристрої для електромобілів</h3>
+                </div>
+              </div>
+
+              <!-- Portable Power Category -->
+              <div class="menu-category" 
+                  :class="{ 'active': activeCategory === 'portable' }"
+                  @mouseenter="activeCategory = 'portable'">
+                <div class="category-header">
+                  <div class="category-icon-placeholder portable-color"></div>
+                  <h3>Портативна енергія</h3>
+                </div>
+              </div>
+
+              <!-- Generators Category -->
+              <div class="menu-category" 
+                  :class="{ 'active': activeCategory === 'generators' }"
+                  @mouseenter="activeCategory = 'generators'">
+                <div class="category-header">
+                  <div class="category-icon-placeholder generator-color"></div>
+                  <h3>Генератори</h3>
+                </div>
+              </div>
+
+              <!-- Electrical Components Category -->
+              <div class="menu-category" 
+                  :class="{ 'active': activeCategory === 'electrical' }"
+                  @mouseenter="activeCategory = 'electrical'">
+                <div class="category-header">
+                  <div class="category-icon-placeholder electrical-color"></div>
+                  <h3>Електричні компоненти</h3>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subcategories Panel -->
+            <div class="menu-subcategories">
+              <!-- Solar System Subcategories -->
+              <div class="subcategory-panel" v-if="activeCategory === 'solar'">
+                <div class="subcategory-list">
+                  <router-link 
+                    v-for="item in solarSystemItems" 
+                    :key="item.id" 
+                    :to="getCategoryRoute(item.slug)" 
+                    class="subcategory-item" 
+                    @click.stop="handleMenuItemClick">
+                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
+                    <span>{{ item.name }}</span>
+                  </router-link>
+                </div>
+                <div class="featured-category">
+                  <div class="featured-header">
+                    <h4>Популярні сонячні рішення</h4>
+                  </div>
+                  <div class="featured-image">
+                    <img src="/images/HomeView/solar-farm.png" alt="Solar Solutions" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- EV Chargers Subcategories -->
+              <div class="subcategory-panel" v-if="activeCategory === 'ev'">
+                <div class="subcategory-list">
+                  <router-link 
+                    v-for="item in evChargerItems" 
+                    :key="item.id" 
+                    :to="getCategoryRoute(item.slug)" 
+                    class="subcategory-item" 
+                    @click.stop="handleMenuItemClick">
+                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
+                    <span>{{ item.name }}</span>
+                  </router-link>
+                </div>
+                <div class="featured-category">
+                  <div class="featured-header">
+                    <h4>Топові зарядні станції</h4>
+                  </div>
+                  <div class="featured-image">
+                    <img src="/images/HomeView/ev-charger-city.png" alt="EV Charging Stations" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Portable Power Subcategories -->
+              <div class="subcategory-panel" v-if="activeCategory === 'portable'">
+                <div class="subcategory-list">
+                  <router-link 
+                    v-for="item in portablePowerItems" 
+                    :key="item.id" 
+                    :to="getCategoryRoute(item.slug)" 
+                    class="subcategory-item" 
+                    @click.stop="handleMenuItemClick">
+                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
+                    <span>{{ item.name }}</span>
+                  </router-link>
+                </div>
+                <div class="featured-category">
+                  <div class="featured-header">
+                    <h4>Портативні рішення для енергії</h4>
+                  </div>
+                  <div class="featured-image">
+                    <img src="/images/HomeView/solar-panel.png" alt="Portable Power Solutions" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Generators Subcategories -->
+              <div class="subcategory-panel" v-if="activeCategory === 'generators'">
+                <div class="subcategory-list">
+                  <router-link 
+                    v-for="item in generatorItems" 
+                    :key="item.id" 
+                    :to="getCategoryRoute(item.slug)" 
+                    class="subcategory-item" 
+                    @click.stop="handleMenuItemClick">
+                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
+                    <span>{{ item.name }}</span>
+                  </router-link>
+                </div>
+                <div class="featured-category">
+                  <div class="featured-header">
+                    <h4>Генератори для будь-яких потреб</h4>
+                  </div>
+                  <div class="featured-image">
+                    <img src="/images/HomeView/генератори.png" alt="Generators" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Electrical Components Subcategories -->
+              <div class="subcategory-panel" v-if="activeCategory === 'electrical'">
+                <div class="subcategory-list">
+                  <router-link 
+                    v-for="item in electricalItems" 
+                    :key="item.id" 
+                    :to="getCategoryRoute(item.slug)" 
+                    class="subcategory-item" 
+                    @click.stop="handleMenuItemClick">
+                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
+                    <span>{{ item.name }}</span>
+                  </router-link>
+                </div>
+                <div class="featured-category">
+                  <div class="featured-header">
+                    <h4>Електричні компоненти та кабелі</h4>
+                  </div>
+                  <div class="featured-image">
+                    <img src="/images/HomeView/Electrical-cables-and-wires.jpg" alt="Electrical Components" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logo in the center -->
+        <div class="logo-container">
+          <router-link to="/">
+            <img
+              src="/images/header/scalevolt-logo.png"
+              alt="Scalevolt Logo"
+              class="logo"
+            />
           </router-link>
         </div>
       </div>
 
-      <!-- Logo in the center -->
-      <div class="/images/header/logo-container">
-        <router-link to="/">
-          <img
-            src="/images/header/scalevolt-logo.png"
-            alt="Scalevolt Logo"
-            class="logo"
-          />
-        </router-link>
-      </div>
-    </div>
-
-
       <!-- CENTER: The search bar -->
-      <div class="search-bar-wrapper">
+      <div class="search-bar-wrapper" style="width: 100%; min-width: 500px;">
+        <!-- Use the enhanced SearchBar component -->
         <SearchBar
-          class="my-search-bar"
-          :allProducts="allProducts"
+          class="my-search-bar full-width-search"
+          :all-products="searchProducts" 
           @search-selected="handleSearchSelected"
+          style="width: 100%;"
         />
       </div>
 
-       <!-- RIGHT SECTION: Icon Links, Region Selector, etc. -->
-       <div class="right-section">
+      <!-- RIGHT SECTION: Icon Links, Region Selector, etc. -->
+      <div class="right-section" style="width: auto; min-width: 100px;">
         <ul class="icon-links">
           <li class="header-item">
             <div class="icon-text">
@@ -72,7 +235,7 @@
           </li>
 
           <!-- Region Selector -->
-          <div class="region-selector" @click="toggleRegionMenu">
+          <div class="region-selector" @click.stop="toggleRegionMenu">
             <span class="lang-code">{{ currentLocale }}</span>
             <div class="region-icon-container">
               <img src="/images/header/globe-icon.svg" alt="Region Icon" class="region-icon" />
@@ -80,7 +243,7 @@
           </div>
 
           <!-- Region Dropdown Menu -->
-          <div v-if="regionMenuVisible" class="region-dropdown">
+          <div v-if="regionMenuVisible" class="region-dropdown" @click.stop>
             <div class="region-option" @click="selectRegion('en')">
               <span class="language">English</span>
             </div>
@@ -99,144 +262,281 @@ import {
   ref,
   onMounted,
   onBeforeUnmount,
-  getCurrentInstance,
   computed,
 } from 'vue'
-import { useRoute, useRouter } from 'vue-router' // Import useRouter
-import SearchBar from '@/components/SearchBar.vue' // Adjust the path as necessary
+import { useRoute, useRouter } from 'vue-router'
+import SearchBar from '@/components/SearchBar.vue'
 import { useCartStore } from '@/stores/cart'
 import { useUserStore } from '@/stores/user'
-// 1) Import useI18n from vue-i18n
 import { useI18n } from 'vue-i18n'
-import axios from 'axios' // Import Axios
+import productService from '@/services/productService'
 
 export default {
   name: 'Header',
   components: { SearchBar },
   setup() {
     const route = useRoute()
-    const router = useRouter() // Initialize router
+    const router = useRouter()
     const menuVisible = ref(false)
     const regionMenuVisible = ref(false)
-    const selectedRegion = ref('United States') // Default region
-
-    // Initialize cartStore
+    const selectedRegion = ref('United States')
+    const searchProducts = ref([])
+    const headerRef = ref(null)
+    const searchQuery = ref('')
+    const activeCategory = ref('solar') // Default active category
+    
+    // Initialize stores and i18n
     const cartStore = useCartStore()
-
-    // Initialize userStore
     const userStore = useUserStore()
-    const user = computed(() => userStore.user)
-
-    // 2) Destructure { locale } from useI18n()
     const { locale } = useI18n()
-
-    // Cart count computed property
+    
+    // Computed properties
+    const user = computed(() => userStore.user)
     const cartCount = computed(() => cartStore.totalQuantity)
-
-    // Determine if current route is home page
     const isHomePage = computed(() => route.path === '/')
+    const currentLocale = computed(() => locale.value)
 
-    // Example array of menu items, each with label, link, and image
-    // Adjust the paths (e.g. '@/assets/icons/solar-panels.svg') as needed for your project
-    const menuItems = [
+    // Solar System Categories
+    const solarSystemItems = [
       {
-        label: 'Сонячні Панелі',
-        link: '/solar-panels',
-        img: new URL('/solar-panels.png', import.meta.url).href,
+        id: 1,
+        name: 'Сонячні Панелі',
+        slug: 'solar-panels',
+        image: '/images/HomeView/solar-farm.png',
       },
       {
-        label: 'Зарядки',
-        link: '/charging',
-        img: new URL('/ev-charger-city.webp', import.meta.url).href,
+        id: 2,
+        name: 'Батареї',
+        slug: 'batteries',
+        image: '/images/HomeView/solar-battery.png',
       },
       {
-        label: 'Автоматичні вимикачі',
-        link: '/automatic-switches',
-        img: new URL('/images/1.jpg', import.meta.url).href,
+        id: 3,
+        name: 'Інвертори',
+        slug: 'inverters',
+        image: '/images/HomeView/інвертер.png',
       },
       {
-        label: 'Кабелі електричні та дроти',
-        link: '/cables-wires',
-        img: new URL('/images/2.jpg', import.meta.url).href, // Fixed URL string
+        id: 4,
+        name: 'Комплекти сонячних електростанцій',
+        slug: 'Sets-of-solar-power-plants',
+        image: '/images/HomeView/комплект-сонячних.png',
+      },
+      {
+        id: 6,
+        name: 'Система монтажу сонячних панелей',
+        slug: 'mounting-systems',
+        image: '/images/HomeView/solar-mount-system.png',
       },
     ]
 
-    const toggleMenu = () => {
+    // EV Charger Categories
+    const evChargerItems = [
+      {
+        id: 1,
+        name: 'Зарядні пристрої для електромобілів',
+        slug: 'ev-chargers',
+        image: '/images/HomeView/otcta-стійка-02.png',
+      },
+      {
+        id: 2,
+        name: 'Кабелі та адаптери',
+        slug: 'cables-adapters',
+        image: '/images/HomeView/electric-charging-adapters.png',
+      },
+      {
+        id: 3,
+        name: 'Зарядні станції',
+        slug: 'charging-stations',
+        image: '/images/HomeView/ev-charger-city.png',
+      },
+    ]
+
+    // Portable Power Categories
+    const portablePowerItems = [
+      {
+        id: 1,
+        name: 'Портативна електростанції',
+        slug: 'portable-power-stations',
+        image: '/images/HomeView/solar-panel.png',
+      },
+      {
+        id: 2,
+        name: 'Cонячні генератори',
+        slug: 'solar-generators',
+        image: '/images/HomeView/Charging-station-ND-EVC-UR40.jpg',
+      },
+      {
+        id: 3,
+        name: 'Портативні сонячні панелі',
+        slug: 'portable-solar-panels',
+        image: '/images/Categories/portable.solar.panels/Портативні-Сонячні-панелі-Jackery-SolarSaga-100W.png',
+      },
+    ]
+
+    // Generator Categories
+    const generatorItems = [
+      {
+        id: 1,
+        name: 'Генератори',
+        slug: 'generators',
+        image: '/images/HomeView/генератори.png',
+      },
+      {
+        id: 2,
+        name: 'Промислові генератори для важких навантажень (100 кВт+)',
+        slug: 'industrial-generators',
+        image: '/images/HomeView/Промислові-генератори-для-важких-навантажень.png',     
+      },
+      {
+        id: 3,
+        name: 'Освітлювальні вежі на сонячних батареях',
+        slug: 'solar-lighting-towers',
+        image: '/images/HomeView/Освітлювальні-вежі-на-сонячних-батареях.png',     
+      },
+    ]
+
+    // Electrical Component Categories
+    const electricalItems = [
+      {
+        id: 1,
+        name: 'Автоматичні вимикачі',
+        slug: 'automatic-switches',
+        image: '/images/HomeView/інвертер.png',
+      },
+      {
+        id: 2,
+        name: 'Кабелі електричні та дроти',
+        slug: 'cables-wires',
+        image: '/images/HomeView/Electrical-cables-and-wires.jpg',
+      },
+    ]
+
+    // Example products for search
+    const allProducts = ref([
+      { id: 1, name: 'Сонячна Панель A' },
+      { id: 2, name: 'Зарядка X' },
+      { id: 3, name: 'Автоматичний вимикач Y' },
+    ])
+
+    // Helper for category routing
+    const getCategoryRoute = (slug) => {
+      return `/${slug.toLowerCase().replace(/ /g, '-')}`;
+    }
+
+    // Toggle functions
+    const toggleMenu = (event) => {
+      if (event) event.stopPropagation()
       menuVisible.value = !menuVisible.value
       // Close region menu if open
       if (regionMenuVisible.value) regionMenuVisible.value = false
     }
 
-    const toggleRegionMenu = () => {
+    const toggleRegionMenu = (event) => {
+      if (event) event.stopPropagation()
       regionMenuVisible.value = !regionMenuVisible.value
       // Close hamburger menu if open
       if (menuVisible.value) menuVisible.value = false
     }
 
-    // 3) Correctly handle locale switching inside selectRegion
-    const selectRegion = region => {
-      selectedRegion.value = region
-      regionMenuVisible.value = false
-
-      // Switch locale based on the region you pick
-      // (Assuming "Ukraine" maps to "ua" and everything else is "en")
-      if (region === 'Ukraine') {
-        locale.value = 'ua' // use your i18n locale code
-      } else {
-        locale.value = 'en'
-      }
+    // Handler functions
+    const handleMenuItemClick = () => {
+      // Close the menu when an item is clicked
+      menuVisible.value = false
     }
 
-    const closeMenusOnOutsideClick = event => {
-      const instance = getCurrentInstance()
-      if (instance && !instance.proxy.$el.contains(event.target)) {
+    const closeMenusOnOutsideClick = (event) => {
+      // Only close menus if click is outside the header element
+      if (headerRef.value && !headerRef.value.contains(event.target)) {
         menuVisible.value = false
         regionMenuVisible.value = false
       }
     }
 
-    onMounted(() => {
+    const selectRegion = (region) => {
+      locale.value = region // Use the locale code directly
+      regionMenuVisible.value = false
+    }
+
+    const performSearch = () => {
+      if (!searchQuery.value.trim()) return
+      
+      console.log(`Performing search for: ${searchQuery.value}`)
+      
+      // Simple filtering of products
+      const query = searchQuery.value.toLowerCase()
+      const results = (searchProducts.value.length > 0 ? searchProducts.value : allProducts.value)
+        .filter(p => p.name.toLowerCase().includes(query))
+      
+      console.log(`Found ${results.length} results`)
+      
+      if (results.length > 0) {
+        handleSearchSelected(results[0])
+      }
+    }
+
+    const handleSearchSelected = (product) => {
+      router.push(`/products/${product.id}`)
+    }
+
+    // Lifecycle hooks
+    onMounted(async () => {
       document.addEventListener('click', closeMenusOnOutsideClick)
+      
+      // Fetch products for search
+      try {
+        searchProducts.value = await productService.getAllProductsForSearch()
+        console.log(`Loaded ${searchProducts.value.length} products for search`)
+      } catch (error) {
+        console.error('Error loading products for search:', error)
+        searchProducts.value = allProducts.value
+        console.log('Using fallback products for search')
+      }
     })
 
     onBeforeUnmount(() => {
       document.removeEventListener('click', closeMenusOnOutsideClick)
     })
 
-    // 4) Define handleSearchSelected
-    const handleSearchSelected = product => {
-      // Navigate to the product detail page
-      // Assuming you have a route like /products/:id
-      router.push(`/products/${product.id}`)
-    }
-
-    // Example array of products for search (replace with your actual data or fetch from API)
-    const allProducts = ref([
-      { id: 1, name: 'Сонячна Панель A' },
-      { id: 2, name: 'Зарядка X' },
-      { id: 3, name: 'Автоматичний вимикач Y' },
-      // ... more products ...
-    ])
-
     return {
+      // Refs
       menuVisible,
       regionMenuVisible,
-      cartCount,
       selectedRegion,
+      searchProducts,
+      allProducts,
+      searchQuery,
+      headerRef,
+      activeCategory,
+      
+      // Computed properties
+      cartCount,
+      isHomePage,
+      user,
+      currentLocale,
+      
+      // Data
+      solarSystemItems,
+      evChargerItems,
+      portablePowerItems,
+      generatorItems,
+      electricalItems,
+      
+      // Functions
       toggleMenu,
       toggleRegionMenu,
       selectRegion,
-      isHomePage,
-      user,
-      menuItems, // Ensure menuItems is available in the template
-      handleSearchSelected, // Now defined
-      allProducts, // Pass allProducts to SearchBar
+      handleSearchSelected,
+      performSearch,
+      handleMenuItemClick,
+      getCategoryRoute,
     }
-  },
+  }
 }
 </script>
 
 <style scoped>
+/* Header Styles */
 .header-container {
   width: 100%;
   position: fixed;
@@ -246,54 +546,58 @@ export default {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   margin: 0;  
-  height: 110px; /* Match logo height + padding */
-
-  /* Remove default margins */
-  /* Optional global padding
-     padding: 20px; 
-  */
+  height: 180px; /* Match logo height + padding */
 }
 
-/* 
-  KEY CHANGE: 
-  - Added max-width: 1280px
-  - margin: 0 auto to center .header-content
-*/
 .header-content {
   display: grid;
-  grid-template-columns: auto 2fr auto; 
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   width: 100%; 
   height: 110px;
-  /* Let it span the full screen width */
-  padding: 10px 20px;  /* Some horizontal padding */
+  padding: 10px 20px;
   box-sizing: border-box;
-  gap: 20px;           /* Space between columns */
+  gap: 20px;
 }
 
-/* Left section: we want them hugging the left side (within this grid column) */
+/* Left Section */
 .left-section {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: auto;
 }
 
-/* The search bar in the middle column */
+/* Search Bar */
 .search-bar-wrapper {
-  width: 100%;        /* Fill the middle column */
-  max-width: 800px;   /* Optional cap on how wide it can grow */
-  margin: 0 auto;     /* Center it within the middle column if needed */
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 500px !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
 }
 
-/* Right section: icons, region selector, etc. hugging the right side */
+.full-width-search,
+.full-width-search .search-container,
+.full-width-search .search-input-wrapper,
+.full-width-search .search-input {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Right Section */
 .right-section {
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* optional if you want them truly at the far right */
+  justify-content: flex-end;
+  width: auto;
 }
 
-
 /* Hamburger Menu Styles */
+.hamburger-container {
+  cursor: pointer;
+}
+
 .hamburger-menu {
   background: none;
   border: none;
@@ -309,49 +613,9 @@ export default {
   display: block;
   width: 25px;
   height: 3px;
-  background-color: #333333; /* Changed from white to dark for visibility */
+  background-color: #333333;
   transition: 0.2s;
-}
-
-/* Hamburger Dropdown Menu */
-.dropdown-menu {
-  position: absolute;
-  top: 60px; /* Adjust based on header height */
-  left: 0;
-  right: 0;
-  background-color: white;
-  z-index: 999; /* Ensure it appears above other elements */
-  width: 100%;
-  padding: 20px;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  border-radius: 0; /* Remove border radius to match header's width */
-}
-
-.dropdown-item {
-  margin-bottom: 10px; /* Slight spacing between items */
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* space between the icon and label */
-  padding: 10px 20px;
-  color: #333333;
-  text-decoration: none;
-  border-radius: 5px;
-}
-
-.menu-item:hover {
-  background-color: #f0f0f0;
-  color: #007bff;
-}
-
-.menu-item-icon {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+  margin: 3px 0;
 }
 
 /* Logo Styles */
@@ -362,61 +626,68 @@ export default {
 }
 
 .logo {
-  height: 90px;
+  height: 40px;
   margin-right: 5px;
-  display: inline-block; /* Ensure the logo is visible */
+  display: inline-block;
 }
 
 /* Search Bar Styles */
 .search-container {
-  flex: 1; /* Allow the search bar to take up remaining space */
-  margin: 0 10px;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 400px !important;
+}
+
+.search-input-wrapper {
+  width: 100% !important;
+}
+
+.search-input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 400px !important;
 }
 
 .search-container input {
   width: 100%;
-  max-width: 100%; /* Remove max-width to allow full expansion */
+  max-width: 100%;
   padding: 15px 20px;
   border-radius: 15px;
   border: none;
   outline: none;
   font-size: 18px;
-  background-color: #f0f0f0; /* Slightly greyed for better contrast */
+  background-color: #f0f0f0;
   color: #333333;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
-/* (search-bar-wrapper is already above) */
 
 /* Icon Links Styles */
 .icon-links {
   display: flex;
   gap: 20px;
-  position: relative; /* To position cart count badge correctly */
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .header-item {
   display: flex;
   align-items: center;
-  position: relative; /* For cart count badge positioning */
+  position: relative;
 }
 
-.icon-link {
+.icon-text {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center icon and text vertically */
+  align-items: center;
   text-decoration: none;
   color: #333333;
 }
 
-.icon-link img {
+.icon-text img {
   width: 24px;
   height: 24px;
-}
-
-.icon-link span {
-  font-size: 12px;
-  margin-top: 2px;
 }
 
 /* Cart count badge */
@@ -429,13 +700,14 @@ export default {
   position: absolute;
   top: -5px;
   right: -10px;
-  z-index: 1002; /* Ensures it appears above dropdown menus */
+  z-index: 1002;
 }
 
+/* Region Selector */
 .region-selector {
   display: flex;
   align-items: center;
-  gap: 8px; /* space between EN and the icon */
+  gap: 8px;
   cursor: pointer;
 }
 
@@ -459,19 +731,17 @@ export default {
   height: 16px;
 }
 
-/* Region Dropdown Menu Styles */
+/* Region Dropdown Menu */
 .region-dropdown {
   position: absolute;
-  top: 60px; /* Adjust based on header height */
-  left: 0;
+  top: 110px;
   right: 0;
+  width: 200px;
   background-color: white;
-  z-index: 999;
-  width: 100%;
-  padding: 20px;
+  z-index: 99;
+  padding: 15px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
+  border-radius: 8px;
 }
 
 .region-option {
@@ -497,30 +767,276 @@ export default {
   color: #666666;
 }
 
+/* Mega Menu Styles */
+.dropdown-mega-menu {
+  position: absolute;
+  top: 110px;
+  left: 0;
+  right: 0;
+  background-color: white;
+  z-index: 99;
+  width: 100%;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.menu-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  min-height: 400px;
+}
+
+/* Categories Column */
+.menu-categories {
+  width: 300px;
+  background-color: #f8f8f8;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px 0;
+}
+
+.menu-category {
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+}
+
+.menu-category:hover, 
+.menu-category.active {
+  background-color: #f0f0f0;
+  border-left-color: #0066cc;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Colored placeholders instead of icons */
+.category-icon-placeholder {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.solar-color {
+  background-color: #ffd700; /* Gold for solar */
+}
+
+.ev-color {
+  background-color: #3498db; /* Blue for EV */
+}
+
+.portable-color {
+  background-color: #e74c3c; /* Red for portable */
+}
+
+.generator-color {
+  background-color: #27ae60; /* Green for generators */
+}
+
+.electrical-color {
+  background-color: #9b59b6; /* Purple for electrical */
+}
+
+.category-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Subcategories Panel */
+.menu-subcategories {
+  flex: 1;
+  padding: 20px;
+  background-color: white;
+}
+
+.subcategory-panel {
+  display: flex;
+  height: 100%;
+}
+
+.subcategory-list {
+  flex: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding-right: 20px;
+}
+
+.subcategory-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  transition: background-color 0.2s ease;
+}
+
+.subcategory-item:hover {
+  background-color: #f0f8ff;
+}
+
+.subcategory-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* Featured Category */
+.featured-category {
+  flex: 1;
+  border-left: 1px solid #e0e0e0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.featured-header {
+  margin-bottom: 15px;
+}
+
+.featured-header h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  font-weight: 500;
+}
+
+.featured-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featured-image img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Make sure content below header is properly spaced */
+main, .main-content {
+  padding-top: 120px;
+}
+
 /* Responsive Styles */
+@media (max-width: 1024px) {
+  .menu-container {
+    flex-direction: column;
+  }
+  
+  .menu-categories {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px 0;
+  }
+  
+  .subcategory-panel {
+    flex-direction: column;
+  }
+  
+  .featured-category {
+    border-left: none;
+    border-top: 1px solid #e0e0e0;
+    padding: 20px 0 0 0;
+    margin-top: 20px;
+  }
+}
+
 @media (max-width: 768px) {
-  .dropdown-menu,
+  .header-content {
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+  }
+  
+  .search-bar-wrapper {
+    min-width: 200px !important;
+  }
+  
+  .dropdown-mega-menu,
   .region-dropdown {
     padding: 15px;
     width: 100%;
-    top: 50px; /* Adjusted position for smaller screens */
+    top: 80px; /* Adjusted for smaller header on mobile */
   }
-
+  
+  .subcategory-list {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
   .menu-item,
   .region-option {
     padding: 8px 15px; /* Reduced padding for smaller screens */
   }
-
-  .search-container {
-    display: none; /* Hide search bar on smaller screens */
-  }
-
+  
   .icon-links {
     gap: 10px;
   }
+  
+  .logo {
+    height: 30px;
+  }
+  
+  .hamburger-menu span {
+    width: 20px;
+    height: 2px;
+  }
+}
 
-  .logo-container h2 {
-    display: none; /* Hide "Delivery" text on smaller screens */
+@media (max-width: 480px) {
+  .header-content {
+    grid-template-columns: auto 1fr auto;
+    padding: 5px 10px;
+    height: 80px;
+  }
+  
+  .header-container {
+    height: 80px;
+  }
+  
+  .logo-container {
+    height: 70px;
+  }
+  
+  .logo {
+    height: 25px;
+  }
+  
+  .search-bar-wrapper {
+    min-width: 150px !important;
+  }
+  
+  .subcategory-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .menu-category {
+    padding: 12px 15px;
+  }
+  
+  .category-header h3 {
+    font-size: 14px;
+  }
+  
+  .dropdown-mega-menu,
+  .region-dropdown {
+    top: 80px;
+  }
+  
+  .featured-image img {
+    max-height: 200px;
   }
 }
 </style>

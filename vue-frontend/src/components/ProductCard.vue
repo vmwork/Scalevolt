@@ -24,7 +24,7 @@
         <button @click.stop.prevent="increaseCount" class="increment-btn">+</button>
       </div>
       <button v-else class="add-to-cart" @click.stop.prevent="handleAddToCart">
-        Add to Cart
+        Додати в кошик
       </button>
     </transition>
   </div> 
@@ -149,12 +149,29 @@ export default {
   font-weight: bold;
   margin-top: 10px;
   display: block;
+  /* Add these new properties for text wrapping */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .product-name h2 {
   margin: 10px 0;
   color: #333; /* Slightly lighter black */
   font-size: 18px;
+  /* Add these new properties for text wrapping */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 /* Brand Name */

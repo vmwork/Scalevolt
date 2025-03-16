@@ -14,7 +14,7 @@
           <router-link
             :to="`/product/${product.id}`"
             style="text-decoration: none; color: inherit;"
-          >
+        >
             <ProductCard
               :productId="product.id"
               :title="product.name"
@@ -48,20 +48,44 @@
       // Sample products with categoryId (if needed)
       const products = ref([
         { 
-          id: 11, 
-          name: "Зарядний пристрій Delta", 
+          id: 90, 
+          name: "Портативна.електростанція.Jackery.Explorer.240-1", 
           price: 500, 
-          image: "/images/11.jpg", 
+          image: "/images/Categories/переносні.електростанції/Jackery/Портативна.електростанція.Jackery.Explorer.240-1.jpg",
           brand: "Delta",
-          categoryId: 2 // Example category ID
+          categoryId: 9 // Example category ID
         },
         { 
-          id: 12, 
-          name: "Зарядка ABB", 
+          id: 91, 
+          name: "Портативна.електростанція.Jackery.Explorer.100.Plus-1", 
           price: 700, 
-          image: "/images/12.jpg", 
+          image: "/images/Categories/переносні.електростанції/Jackery/Портативна.електростанція.Jackery.Explorer.100.Plus-1.jpg",
           brand: "ABB",
-          categoryId: 2 
+          categoryId: 9 
+        },
+        { 
+          id: 92, 
+          name: "Портативна.електростанція.Jackery.Explorer.240.v2-1", 
+          price: 700, 
+          image: "/images/Categories/переносні.електростанції/Jackery/Портативна.електростанція.Jackery.Explorer.240.v2-1.png",
+          brand: "ABB",
+          categoryId: 9 
+        },
+        { 
+          id: 93, 
+          name: "Портативна.електростанція.Jackery.Explorer.240.v2-1", 
+          price: 700, 
+          image: "/images/Categories/переносні.електростанції/Jackery/Портативна.електростанція.Jackery.Explorer.240.v2-1.png",
+          brand: "ABB",
+          categoryId: 9 
+        },
+        { 
+          id: 94, 
+          name: "Портативна.електростанція.Jackery.Explorer.240.v2-1", 
+          price: 700, 
+          image: "/images/Categories/переносні.електростанції/Jackery/Портативна.електростанція.Jackery.Explorer.240.v2-1.png",
+          brand: "ABB",
+          categoryId: 9 
         },
       ]);
   
@@ -96,7 +120,7 @@
   <style scoped>
   /* If your header is fixed at ~60px, shift content down. */
   .catalogue-view {
-    margin-top: 80px;
+    margin-top: 120px;
   }
   
   /* Optional spacing for the breadcrumb. */

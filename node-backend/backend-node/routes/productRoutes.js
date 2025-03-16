@@ -31,6 +31,35 @@ router.get('/', async (req, res) => {
   }
 });
 
+// NEW: Search products endpoint
+router.get('/search', async (req, res) => {
+  const query = req.query.q || '';
+  console.log(`Searching for products with query: "${query}"`);
+  
+  try {
+    // Using ILIKE for case-insensitive search in PostgreSQL
+    // Searching in both name and any other relevant fields
+    const result = await pool.query(
+      `SELECT * FROM products 
+       WHERE name ILIKE $1 
+       OR description ILIKE $1
+       OR CAST(id AS TEXT) ILIKE $1
+       ORDER BY name ASC
+       LIMIT 20`,
+      [`%${query}%`]
+    );
+    
+    console.log(`Found ${result.rows.length} products matching the search query`);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).json({ 
+      error: 'Error searching products',
+      message: err.message 
+    });
+  }
+});
+
 // Get product by ID
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
