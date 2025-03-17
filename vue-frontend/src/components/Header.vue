@@ -214,17 +214,18 @@
       <!-- RIGHT SECTION: Icon Links, Region Selector, etc. -->
       <div class="right-section" style="width: auto; min-width: 100px;">
         <ul class="icon-links">
-          <li class="header-item">
-            <div class="icon-text">
-              <router-link v-if="!user" to="/login" class="icon-text">
-                <img src="/images/header/profile-logo.svg" alt="Account" />
-              </router-link>
-              <router-link v-else to="#" class="icon-text">
-                <img src="/images/header/profile-logo.svg" alt="Account" />
-                <!-- <span>{{ user.displayName }}</span> -->
-              </router-link>
-            </div>
-          </li>
+          <!-- Replace the profile icon router-link in your Header component with this code -->
+<li class="header-item">
+  <div class="icon-text">
+    <router-link v-if="!user" to="/login" class="icon-text">
+      <img src="/images/header/profile-logo.svg" alt="Account" />
+    </router-link>
+    <router-link v-else to="/profile" class="icon-text">
+      <img src="/images/header/profile-logo.svg" alt="Account" />
+      <span v-if="user.displayName" class="profile-name">{{ user.displayName }}</span>
+    </router-link>
+  </div>
+</li>
           <li class="header-item">
             <div class="icon-text">
               <router-link to="/cart" class="icon-text">
@@ -234,23 +235,23 @@
             </div>
           </li>
 
-          <!-- Region Selector -->
-          <div class="region-selector" @click.stop="toggleRegionMenu">
-            <span class="lang-code">{{ currentLocale }}</span>
-            <div class="region-icon-container">
-              <img src="/images/header/globe-icon.svg" alt="Region Icon" class="region-icon" />
-            </div>
-          </div>
+<!-- Region Selector -->
+<div class="region-selector" @click.stop="toggleRegionMenu">
+  <span class="lang-code">{{ currentLocale.toUpperCase() }}</span>
+  <div class="region-icon-container">
+    <img src="/images/header/globe-icon.svg" alt="Region Icon" class="region-icon" />
+  </div>
+</div>
 
-          <!-- Region Dropdown Menu -->
-          <div v-if="regionMenuVisible" class="region-dropdown" @click.stop>
-            <div class="region-option" @click="selectRegion('en')">
-              <span class="language">English</span>
-            </div>
-            <div class="region-option" @click="selectRegion('ua')">
-              <span class="language">Українська</span>
-            </div>
-          </div>
+<!-- Region Dropdown Menu -->
+<div v-if="regionMenuVisible" class="region-dropdown" @click.stop>
+  <div class="region-option" @click="selectRegion('uk')">
+    <span class="language">Українська</span>
+  </div>
+  <div class="region-option" @click="selectRegion('pl')">
+    <span class="language">Polski</span>
+  </div>
+</div>
         </ul>
       </div>
     </div>
@@ -454,9 +455,23 @@ export default {
     }
 
     const selectRegion = (region) => {
-      locale.value = region // Use the locale code directly
-      regionMenuVisible.value = false
-    }
+      console.log('Changing locale to:', region);
+      
+      // Update the i18n locale
+      locale.value = region;
+      
+      // Store in localStorage
+      localStorage.setItem('userLocale', region);
+      
+      // Update document language
+      document.documentElement.setAttribute('lang', region);
+      
+      // Force a full page reload to make sure everything updates
+      window.location.reload();
+      
+      // Close the dropdown (this won't execute because of the reload, but keep it for safety)
+      regionMenuVisible.value = false;
+    };
 
     const performSearch = () => {
       if (!searchQuery.value.trim()) return
@@ -551,7 +566,7 @@ export default {
 
 .header-content {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(200px, 1fr) auto;
   align-items: center;
   width: 100%; 
   height: 110px;
@@ -919,124 +934,6 @@ export default {
 }
 
 .featured-image img {
-  max-width: 100%;
-  max-height: 300px;
-  object-fit: contain;
-  border-radius: 8px;
-}
 
-/* Make sure content below header is properly spaced */
-main, .main-content {
-  padding-top: 120px;
-}
-
-/* Responsive Styles */
-@media (max-width: 1024px) {
-  .menu-container {
-    flex-direction: column;
-  }
-  
-  .menu-categories {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 10px 0;
-  }
-  
-  .subcategory-panel {
-    flex-direction: column;
-  }
-  
-  .featured-category {
-    border-left: none;
-    border-top: 1px solid #e0e0e0;
-    padding: 20px 0 0 0;
-    margin-top: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .header-content {
-    grid-template-columns: auto 1fr auto;
-    gap: 10px;
-  }
-  
-  .search-bar-wrapper {
-    min-width: 200px !important;
-  }
-  
-  .dropdown-mega-menu,
-  .region-dropdown {
-    padding: 15px;
-    width: 100%;
-    top: 80px; /* Adjusted for smaller header on mobile */
-  }
-  
-  .subcategory-list {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-  
-  .menu-item,
-  .region-option {
-    padding: 8px 15px; /* Reduced padding for smaller screens */
-  }
-  
-  .icon-links {
-    gap: 10px;
-  }
-  
-  .logo {
-    height: 30px;
-  }
-  
-  .hamburger-menu span {
-    width: 20px;
-    height: 2px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header-content {
-    grid-template-columns: auto 1fr auto;
-    padding: 5px 10px;
-    height: 80px;
-  }
-  
-  .header-container {
-    height: 80px;
-  }
-  
-  .logo-container {
-    height: 70px;
-  }
-  
-  .logo {
-    height: 25px;
-  }
-  
-  .search-bar-wrapper {
-    min-width: 150px !important;
-  }
-  
-  .subcategory-list {
-    grid-template-columns: 1fr;
-  }
-  
-  .menu-category {
-    padding: 12px 15px;
-  }
-  
-  .category-header h3 {
-    font-size: 14px;
-  }
-  
-  .dropdown-mega-menu,
-  .region-dropdown {
-    top: 80px;
-  }
-  
-  .featured-image img {
-    max-height: 200px;
-  }
 }
 </style>

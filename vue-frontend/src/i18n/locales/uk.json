@@ -1,0 +1,84 @@
+{
+    "common": {
+      "home": "Головна",
+      "products": "Товари",
+      "categories": "Категорії",
+      "cart": "Кошик",
+      "profile": "Профіль",
+      "login": "Увійти",
+      "logout": "Вийти",
+      "register": "Зареєструватися",
+      "search": "Пошук"
+    },
+    "product": {
+      "price": "Ціна",
+      "quantity": "Кількість",
+      "available": "В наявності",
+      "outOfStock": "Немає в наявності",
+      "addToCart": "Додати в кошик",
+      "specifications": "Характеристики",
+      "description": "Опис",
+      "relatedProducts": "Схожі товари"
+    },
+    "cart": {
+      "yourCart": "Ваш кошик",
+      "empty": "Ваш кошик порожній",
+      "continueShopping": "Продовжити покупки",
+      "subtotal": "Проміжний підсумок",
+      "shipping": "Доставка",
+      "total": "Разом",
+      "checkout": "Оформити замовлення"
+    },
+    "checkout": {
+      "shippingAddress": "Адреса доставки",
+      "billingAddress": "Платіжна адреса",
+      "paymentMethod": "Спосіб оплати",
+      "orderSummary": "Підсумок замовлення",
+      "placeOrder": "Замовити"
+    },
+    "profile": {
+      "account_details": "Інформація про акаунт",
+      "account_settings": "Налаштування акаунту",
+      "email": "Електронна пошта",
+      "joined_date": "Дата реєстрації",
+      "email_notifications": "Сповіщення на пошту",
+      "dark_mode": "Темна тема",
+      "update_profile": "Оновити профіль",
+      "logout": "Вийти",
+      "order_history": "Історія замовлень",
+      "no_orders_yet": "У вас ще немає замовлень",
+      "start_shopping": "Почати покупки",
+      "order_number": "Номер замовлення",
+      "order_status_pending": "Очікує обробки",
+      "order_status_processing": "Обробляється",
+      "order_status_shipped": "Відправлено",
+      "order_status_delivered": "Доставлено",
+      "order_status_cancelled": "Скасовано",
+      "quantity": "Кількість",
+      "subtotal": "Проміжний підсумок",
+      "shipping": "Доставка",
+      "total": "Разом",
+      "view_details": "Деталі",
+      "reorder": "Замовити знову",
+      "load_more_orders": "Завантажити більше замовлень"
+    },
+    "solar_components": {
+      "solar_panels": "Сонячні панелі",
+      "batteries": "Акумулятори",
+      "inverters": "Інвертори",
+      "mounting_systems": "Системи кріплення",
+      "charging_stations": "Зарядні станції",
+      "cables_wires": "Кабелі та дроти",
+      "power_plants": "Комплекти сонячних електростанцій",
+      "portable_stations": "Портативні електростанції",
+      "portable_panels": "Портативні сонячні панелі"
+    },
+    "footer": {
+      "company": "Компанія",
+      "about": "Про нас",
+      "contact": "Контакти",
+      "terms": "Умови використання",
+      "privacy": "Політика конфіденційності",
+      "copyright": "© 2025 ScaleVolt. Всі права захищені."
+    }
+  }

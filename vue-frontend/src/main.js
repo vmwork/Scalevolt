@@ -4,10 +4,10 @@ import router from '@/router';
 import { createPinia } from 'pinia';
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
-import { createI18n } from 'vue-i18n';
+import { createI18n } from 'vue-i18n'; // Import createI18n instead of i18n
 import { auth } from '@/firebase';
-import en from '@/locales/en.json';
-import ua from '@/locales/ua.json';
+import uk from '@/i18n/locales/uk.json';
+import pl from '@/i18n/locales/pl.json';
 import './style.css';
 
 // ✅ Add favicon programmatically to prevent 404 errors
@@ -34,13 +34,42 @@ const setupFirebaseAuth = (app) => {
 };
 
 // ✅ Configure the i18n (Multi-language)
+const savedLocale = localStorage.getItem('userLocale') || 'uk';
+console.log('Initializing with locale:', savedLocale);
+
 const i18n = createI18n({
   legacy: false,
-  locale: 'en',
-  fallbackLocale: 'en',
-  messages: { en, ua },
-  warnHtmlMessage: false
+  locale: savedLocale,
+  fallbackLocale: 'uk',
+  messages: { uk, pl }, // Include all your languages
+  warnHtmlMessage: false,
+  numberFormats: {
+    'uk': {
+      currency: {
+        style: 'currency',
+        currency: 'UAH',
+        notation: 'standard'
+      }
+    },
+    'pl': {
+      currency: {
+        style: 'currency', 
+        currency: 'PLN',
+        notation: 'standard'
+      }
+    },
+    'ua': {
+      currency: {
+        style: 'currency',
+        currency: 'UAH',
+        notation: 'standard'
+      }
+    },
+  }
 });
+
+// Set document language attribute based on saved locale
+document.documentElement.setAttribute('lang', savedLocale);
 
 // ✅ Configure the Toast Notifications
 const toastOptions = {
@@ -69,6 +98,12 @@ const initializeApp = () => {
   try {
     const app = createApp(App);
     const pinia = createPinia();
+
+    // Load saved locale from localStorage
+    const savedLocale = localStorage.getItem('userLocale');
+    if (savedLocale) {
+      i18n.global.locale.value = savedLocale;
+    }
 
     app.use(pinia);
     app.use(router);

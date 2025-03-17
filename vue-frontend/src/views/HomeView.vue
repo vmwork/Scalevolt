@@ -215,28 +215,23 @@ export default {
       {
     type: 'gif',
     src: '/videos/carousel/Self-Sustaining-Smart-Home.gif',
-    title: 'Renewable Energy Ecosystem',
-    description: 'Explore how solar energy powers a sustainable home'
+    title: 'Сонячні Панелі',
+    description: 'Живіть своє життя від чистої сонячної енергії. Зменшуйте рахунки та захищайте довкілля за допомогою наших високоефективних панелей'
+
   },
   {
     type: 'gif',
     src: '/videos/carousel/ev.chargers.gif',
-    title: 'Renewable Energy Ecosystem',
-    description: 'Explore how solar energy powers a sustainable home'
+    title: 'Зарядні Пристрої для Електромобілів',
+    description: 'Заряджайте свій електромобіль швидко та ефективно. Наші розумні зарядні пристрої забезпечують надійне живлення, коли вам це потрібно'
+  },
+  {
+    type: 'gif',
+    src: '/videos/carousel/portable.panels.gif',
+    title: 'Портативні Сонячні Панелі',
+    description: 'Беріть енергію з собою будь-куди. Наші портативні сонячні панелі ідеальні для кемпінгу, автофургонів та пригод поза мережею'
   },
        
-        {
-          type: 'image',
-          src: '/images/2.jpg',
-          title: 'Slide 2',
-          description: 'Description for Slide 2',
-        },
-        {
-          type: 'image',
-          src: '/images/3.jpg',
-          title: 'Slide 3',
-          description: 'Description for Slide 3',
-        },
       ],
       newCategories: [
         {

@@ -62,6 +62,87 @@
         </div>
       </div>
 
+      <!-- Order History Section -->
+      <div class="profile-section order-history-section">
+        <h2>{{ t('order_history') }}</h2>
+        
+        <div v-if="isLoadingOrders" class="loading-spinner">
+          <div class="spinner"></div>
+        </div>
+        
+        <div v-else-if="orders.length === 0" class="empty-orders">
+          <p>{{ t('no_orders_yet') }}</p>
+          <button @click="$router.push('/')" class="btn-secondary">
+            {{ t('start_shopping') }}
+          </button>
+        </div>
+        
+        <div v-else class="orders-list">
+          <div v-for="order in orders" :key="order.id" class="order-card">
+            <div class="order-header">
+              <div class="order-meta">
+                <h3>{{ t('order_number') }}: #{{ order.orderNumber }}</h3>
+                <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+              </div>
+              <div class="order-status" :class="getStatusClass(order.status)">
+                {{ t(`order_status_${order.status.toLowerCase()}`) }}
+              </div>
+            </div>
+            
+            <div class="order-items">
+              <div v-for="item in order.items" :key="item.id" class="order-item">
+                <div class="item-image">
+                  <img :src="item.image || '/images/product-placeholder.png'" :alt="item.name">
+                </div>
+                <div class="item-details">
+                  <p class="item-name">{{ item.name }}</p>
+                  <p class="item-quantity">{{ t('quantity') }}: {{ item.quantity }}</p>
+                </div>
+                <div class="item-price">
+                  {{ formatPrice(item.price * item.quantity) }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="order-footer">
+              <div class="order-totals">
+                <div class="total-row">
+                  <span>{{ t('subtotal') }}:</span>
+                  <span>{{ formatPrice(calculateSubtotal(order)) }}</span>
+                </div>
+                <div class="total-row">
+                  <span>{{ t('shipping') }}:</span>
+                  <span>{{ formatPrice(order.shipping) }}</span>
+                </div>
+                <div class="total-row total-final">
+                  <span>{{ t('total') }}:</span>
+                  <span>{{ formatPrice(calculateTotal(order)) }}</span>
+                </div>
+              </div>
+              
+              <div class="order-actions">
+                <button @click="viewOrderDetails(order.id)" class="btn-text">
+                  {{ t('view_details') }}
+                </button>
+                <button 
+                  v-if="order.status === 'DELIVERED'" 
+                  @click="reorderItems(order)" 
+                  class="btn-primary btn-small"
+                >
+                  {{ t('reorder') }}
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div v-if="hasMoreOrders" class="load-more">
+            <button @click="loadMoreOrders" class="btn-text">
+              {{ t('load_more_orders') }}
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="profile-actions">
         <button @click="saveProfile" class="btn-primary">
           {{ t('update_profile') }}
@@ -79,6 +160,9 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useUserStore } from '@/stores/user';
+import { useCartStore } from '@/stores/cart';
+import OrderService from '@/services/OrderService';
+
 import { 
   getAuth, 
   signOut, 
@@ -93,6 +177,7 @@ export default {
     const { t } = useI18n();
     const router = useRouter();
     const userStore = useUserStore();
+    const cartStore = useCartStore();
     const auth = getAuth();
     const storage = getStorage();
 
@@ -108,6 +193,13 @@ export default {
     // Settings toggles
     const notificationsEnabled = ref(localStorage.getItem('notificationsEnabled') === 'true');
     const darkModeEnabled = ref(localStorage.getItem('darkModeEnabled') === 'true');
+
+    // Order history
+    const orders = ref([]);
+    const isLoadingOrders = ref(true);
+    const hasMoreOrders = ref(false);
+    const currentPage = ref(1);
+    const pageSize = ref(5);
 
     // Watch for settings changes and save to localStorage
     const saveSettings = () => {
@@ -190,6 +282,80 @@ export default {
       return new Date(timestamp).toLocaleDateString();
     };
 
+    // Order history methods
+    const loadOrders = async (page = 1) => {
+      if (!user.value) return;
+      
+      isLoadingOrders.value = true;
+      try {
+        const response = await OrderService.getUserOrders(user.value.uid, {
+          page,
+          pageSize: pageSize.value
+        });
+        
+        if (page === 1) {
+          orders.value = response.data;
+        } else {
+          orders.value = [...orders.value, ...response.data];
+        }
+        
+        hasMoreOrders.value = response.pagination.page < response.pagination.pageCount;
+        currentPage.value = page;
+      } catch (error) {
+        console.error('Failed to load orders:', error);
+      } finally {
+        isLoadingOrders.value = false;
+      }
+    };
+
+    const loadMoreOrders = () => {
+      loadOrders(currentPage.value + 1);
+    };
+
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat('uk-UA', {
+        style: 'currency',
+        currency: 'UAH'
+      }).format(price);
+    };
+
+    const calculateSubtotal = (order) => {
+      return order.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    };
+
+    const calculateTotal = (order) => {
+      return calculateSubtotal(order) + order.shipping;
+    };
+
+    const getStatusClass = (status) => {
+      const statusMap = {
+        'PENDING': 'status-pending',
+        'PROCESSING': 'status-processing',
+        'SHIPPED': 'status-shipped',
+        'DELIVERED': 'status-delivered',
+        'CANCELLED': 'status-cancelled'
+      };
+      
+      return statusMap[status] || 'status-unknown';
+    };
+
+    const viewOrderDetails = (orderId) => {
+      router.push(`/order/${orderId}`);
+    };
+
+    const reorderItems = async (order) => {
+      // Add all items to cart
+      for (const item of order.items) {
+        await cartStore.addToCart({
+          id: item.productId,
+          quantity: item.quantity
+        });
+      }
+      
+      // Navigate to cart
+      router.push('/cart');
+    };
+
     // Check authentication on component mount
     onMounted(() => {
       if (!user.value) {
@@ -204,6 +370,9 @@ export default {
       if (darkModeEnabled.value) {
         document.documentElement.classList.add('dark-mode');
       }
+      
+      // Load orders
+      loadOrders();
     });
 
     return {
@@ -217,7 +386,18 @@ export default {
       handleAvatarUpload,
       saveProfile,
       logout,
-      formatDate
+      formatDate,
+      // Order history
+      orders,
+      isLoadingOrders,
+      hasMoreOrders,
+      loadMoreOrders,
+      formatPrice,
+      calculateSubtotal,
+      calculateTotal,
+      getStatusClass,
+      viewOrderDetails,
+      reorderItems
     };
   }
 };
@@ -438,7 +618,219 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-/* Dark mode styles */
+/* Order History Styles */
+.order-history-section {
+  margin-top: 20px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 102, 204, 0.1);
+  border-radius: 50%;
+  border-top-color: #0066cc;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-orders {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.empty-orders p {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+}
+
+.order-meta h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.order-date {
+  font-size: 14px;
+  color: #666;
+}
+
+.order-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-pending {
+  background-color: #FFF3CD;
+  color: #856404;
+}
+
+.status-processing {
+  background-color: #D1ECF1;
+  color: #0C5460;
+}
+
+.status-shipped {
+  background-color: #D4EDDA;
+  color: #155724;
+}
+
+.status-delivered {
+  background-color: #CCE5FF;
+  color: #004085;
+}
+
+.status-cancelled {
+  background-color: #F8D7DA;
+  color: #721C24;
+}
+
+.order-items {
+  padding: 15px;
+}
+
+.order-item {
+  display: flex;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.item-image {
+  width: 60px;
+  height: 60px;
+  margin-right: 15px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  margin: 0 0 5px 0;
+  font-weight: 500;
+}
+
+.item-quantity {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.item-price {
+  font-weight: 600;
+  color: #333;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+}
+
+.order-totals {
+  flex: 1;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.total-final {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.order-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #0066cc;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 14px;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+.btn-small {
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
+.load-more {
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Dark mode overrides */
 :root.dark-mode .user-profile-container {
   background-color: #1a1a1a;
   color: #f0f0f0;
@@ -461,6 +853,29 @@ input:checked + .slider:before {
   background-color: #333;
   color: #f0f0f0;
   border-color: #444;
+}
+
+:root.dark-mode .order-card {
+  background-color: #2a2a2a;
+}
+
+:root.dark-mode .order-header,
+:root.dark-mode .order-footer {
+  background-color: #222;
+  border-color: #333;
+}
+
+:root.dark-mode .order-item {
+  border-color: #333;
+}
+
+:root.dark-mode .order-date,
+:root.dark-mode .item-quantity {
+  color: #aaa;
+}
+
+:root.dark-mode .item-price {
+  color: #f0f0f0;
 }
 
 @media (max-width: 768px) {
@@ -490,6 +905,15 @@ input:checked + .slider:before {
 
   .btn-primary, .btn-secondary {
     width: 100%;
+  }
+  
+  .order-footer {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .order-actions {
+    justify-content: flex-start;
   }
 }
 </style>

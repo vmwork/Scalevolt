@@ -1,0 +1,84 @@
+{
+    "common": {
+      "home": "Strona główna",
+      "products": "Produkty",
+      "categories": "Kategorie",
+      "cart": "Koszyk",
+      "profile": "Profil",
+      "login": "Zaloguj się",
+      "logout": "Wyloguj się",
+      "register": "Zarejestruj się",
+      "search": "Szukaj"
+    },
+    "product": {
+      "price": "Cena",
+      "quantity": "Ilość",
+      "available": "Dostępny",
+      "outOfStock": "Niedostępny",
+      "addToCart": "Dodaj do koszyka",
+      "specifications": "Specyfikacje",
+      "description": "Opis",
+      "relatedProducts": "Podobne produkty"
+    },
+    "cart": {
+      "yourCart": "Twój koszyk",
+      "empty": "Twój koszyk jest pusty",
+      "continueShopping": "Kontynuuj zakupy",
+      "subtotal": "Suma częściowa",
+      "shipping": "Dostawa",
+      "total": "Razem",
+      "checkout": "Do kasy"
+    },
+    "checkout": {
+      "shippingAddress": "Adres dostawy",
+      "billingAddress": "Adres rozliczeniowy",
+      "paymentMethod": "Metoda płatności",
+      "orderSummary": "Podsumowanie zamówienia",
+      "placeOrder": "Złóż zamówienie"
+    },
+    "profile": {
+      "account_details": "Szczegóły konta",
+      "account_settings": "Ustawienia konta",
+      "email": "Email",
+      "joined_date": "Data dołączenia",
+      "email_notifications": "Powiadomienia email",
+      "dark_mode": "Tryb ciemny",
+      "update_profile": "Aktualizuj profil",
+      "logout": "Wyloguj się",
+      "order_history": "Historia zamówień",
+      "no_orders_yet": "Nie masz jeszcze żadnych zamówień",
+      "start_shopping": "Rozpocznij zakupy",
+      "order_number": "Numer zamówienia",
+      "order_status_pending": "Oczekujące",
+      "order_status_processing": "W trakcie realizacji",
+      "order_status_shipped": "Wysłane",
+      "order_status_delivered": "Dostarczone",
+      "order_status_cancelled": "Anulowane",
+      "quantity": "Ilość",
+      "subtotal": "Suma częściowa",
+      "shipping": "Dostawa",
+      "total": "Suma",
+      "view_details": "Szczegóły",
+      "reorder": "Zamów ponownie",
+      "load_more_orders": "Załaduj więcej zamówień"
+    },
+    "solar_components": {
+      "solar_panels": "Panele słoneczne",
+      "batteries": "Akumulatory",
+      "inverters": "Falowniki",
+      "mounting_systems": "Systemy montażowe",
+      "charging_stations": "Stacje ładowania",
+      "cables_wires": "Kable i przewody",
+      "power_plants": "Zestawy elektrowni słonecznych",
+      "portable_stations": "Przenośne elektrownie",
+      "portable_panels": "Przenośne panele słoneczne"
+    },
+    "footer": {
+      "company": "Firma",
+      "about": "O nas",
+      "contact": "Kontakt",
+      "terms": "Warunki korzystania",
+      "privacy": "Polityka prywatności",
+      "copyright": "© 2025 ScaleVolt. Wszelkie prawa zastrzeżone."
+    }
+  }
