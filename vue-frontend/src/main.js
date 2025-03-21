@@ -1,10 +1,10 @@
-import { createApp } from 'vue';
+import { createApp, watch, ref } from 'vue'; // Import watch from Vue
 import App from './App.vue';
 import router from '@/router';
 import { createPinia } from 'pinia';
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
-import { createI18n } from 'vue-i18n'; // Import createI18n instead of i18n
+import { createI18n } from 'vue-i18n';
 import { auth } from '@/firebase';
 import uk from '@/i18n/locales/uk.json';
 import pl from '@/i18n/locales/pl.json';
@@ -27,7 +27,7 @@ const setupFirebaseAuth = (app) => {
     } else {
       console.log('🚨 User is signed out');
     }
-
+    
     // ✅ Mount the app AFTER firebase confirms auth status
     app.mount('#app');
   });
@@ -37,6 +37,7 @@ const setupFirebaseAuth = (app) => {
 const savedLocale = localStorage.getItem('userLocale') || 'uk';
 console.log('Initializing with locale:', savedLocale);
 
+// Create i18n instance
 const i18n = createI18n({
   legacy: false,
   locale: savedLocale,
@@ -98,21 +99,31 @@ const initializeApp = () => {
   try {
     const app = createApp(App);
     const pinia = createPinia();
-
+    
     // Load saved locale from localStorage
     const savedLocale = localStorage.getItem('userLocale');
     if (savedLocale) {
       i18n.global.locale.value = savedLocale;
     }
-
+    
+    // Correctly watch for locale changes
+    app.config.globalProperties.$locale = ref(i18n.global.locale.value);
+    
+    // Set up a watcher for locale changes
+    watch(() => i18n.global.locale.value, (newLocale) => {
+      document.documentElement.setAttribute('lang', newLocale);
+      localStorage.setItem('userLocale', newLocale);
+      app.config.globalProperties.$locale.value = newLocale;
+    });
+    
     app.use(pinia);
     app.use(router);
     app.use(i18n);
     app.use(Toast, toastOptions);
-
+    
     // ✅ Add a global error handler
     app.config.errorHandler = globalErrorHandler;
-
+    
     // ✅ Handle Firebase Auth & Then Mount
     setupFirebaseAuth(app);
   } catch (error) {

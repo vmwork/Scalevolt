@@ -192,7 +192,7 @@ export default {
 
 /* Add to Cart Button */
 .add-to-cart {
-  background-color: #ff4f5a;
+  background-color: #4CAF50;
   color: #fff;
   border: none;
   padding: 12px;
@@ -234,8 +234,8 @@ export default {
 .increment-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid #ff4f5a;
-  color: #ff4f5a;
+  border: 1px solid #4CAF50; /* Replace with your logo color */
+  color: #4CAF50; /* Replace with your logo color */
   background: transparent;
   cursor: pointer;
   display: flex;
@@ -248,7 +248,7 @@ export default {
 
 .decrement-btn:hover,
 .increment-btn:hover {
-  background-color: #ff4f5a;
+  background-color:  #4CAF50;
   color: #fff;
 }
 

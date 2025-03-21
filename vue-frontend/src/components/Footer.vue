@@ -22,8 +22,9 @@
 <div class="footer-section">
   <h3>Про Нас</h3>
   <ul>
-    <li><a href="#">Компанія</a></li>
-    <li><a href="#">Наша Команда</a></li>
+    <li>
+      <router-link to="/company">Компанія</router-link>
+    </li>    <li><a href="#">Наша Команда</a></li>
     <li>
       <router-link to="/customer-cases">Кейси клієнтів</router-link>
     </li>
@@ -38,7 +39,11 @@
         <h3>Підтримка</h3>
         <ul>
           <li><a href="#">Запитання й відповіді</a></li>
-          <li><a href="#">Доставка/Гарантія/Повернення</a></li>
+          <li>
+  <router-link to="/delivery-warranty-returns">
+    {{ $t('delivery.pageTitle') }}
+  </router-link>
+</li>
           <li><a href="#">Підтримка клієнтів</a></li>
         </ul>
       </div>

@@ -113,6 +113,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import debounce from 'lodash.debounce';
 import { useRouter } from 'vue-router';
+import productService from '@/services/productService';
 
 export default {
   name: 'SearchBar',
@@ -166,6 +167,19 @@ export default {
     const searchContainer = ref(null);
     const noResults = ref(false);
     const highlightedIndex = ref(-1);
+    const productList = ref([]);
+    const allSearchableProducts = ref([]);
+    const isInitialLoading = ref(true);
+    
+    // Choose which products list to use
+    const effectiveProducts = computed(() => {
+      // If we have products from the service, use those
+      if (productList.value.length > 0) {
+        return productList.value;
+      }
+      // Otherwise use the props.allProducts as fallback
+      return props.allProducts;
+    });
     
     // Log for debugging
     watch(() => props.allProducts, (newProducts) => {
@@ -184,12 +198,12 @@ export default {
       const normalizedQuery = query.trim().toLowerCase();
       
       // Check if products array is valid
-      if (!props.allProducts || !Array.isArray(props.allProducts)) {
+      if (!effectiveProducts.value || !Array.isArray(effectiveProducts.value)) {
         return;
       }
 
       // Build suggestions from product data
-      props.allProducts.forEach(product => {
+      effectiveProducts.value.forEach(product => {
         if (!product || typeof product !== 'object') return;
         
         // Skip out-of-stock items if configured
@@ -197,38 +211,43 @@ export default {
           return;
         }
         
+        // If we have a searchableText field, use it for suggestions too
+        if (product.searchableText) {
+          const words = product.searchableText.split(/\s+/);
+          words.forEach(word => {
+            if (word.length > 3 && word.includes(normalizedQuery)) {
+              suggestionsSet.add(word);
+            }
+          });
+        }
+        
         // Generate suggestions from each searchable field
         props.searchKeys.forEach(key => {
-          if (!(key in product)) return;
-          
-          const value = product[key];
-          if (value === null || value === undefined) return;
-          
-          const stringValue = String(value).toLowerCase();
-          
-          // Add exact matches
-          if (stringValue.includes(normalizedQuery)) {
-            suggestionsSet.add(stringValue);
-          }
-          
-          // Add word-based matches
-          if (key === 'name' || key === 'description') {
-            const words = stringValue.split(/\s+/);
-            words.forEach(word => {
-              if (word.length > 3 && word.includes(normalizedQuery)) {
-                suggestionsSet.add(word);
-              }
-            });
+          // Also check language-specific fields
+          const normalKey = key;
+          const ukKey = `${key}Uk`;
+          const plKey = `${key}Pl`;
+          [normalKey, ukKey, plKey].forEach(fieldKey => {
+            if (!(fieldKey in product)) return;
             
-            // Add category/type based suggestions
-            if (key === 'category' && product.name) {
-              const category = stringValue;
-              const name = String(product.name).toLowerCase();
-              if (category.includes(normalizedQuery) || name.includes(normalizedQuery)) {
-                suggestionsSet.add(category + ' ' + name);
-              }
+            const value = product[fieldKey];
+            if (value === null || value === undefined) return;
+            const stringValue = String(value).toLowerCase();
+            
+            // Add exact matches
+            if (stringValue.includes(normalizedQuery)) {
+              suggestionsSet.add(stringValue);
             }
-          }
+            // Add word-based matches for longer fields
+            if (fieldKey.includes('name') || fieldKey.includes('description')) {
+              const words = stringValue.split(/\s+/);
+              words.forEach(word => {
+                if (word.length > 3 && word.includes(normalizedQuery)) {
+                  suggestionsSet.add(word);
+                }
+              });
+            }
+          });
         });
       });
       
@@ -260,8 +279,9 @@ export default {
     // Enhanced search function with multiple key support
     const performSearch = debounce(() => {
       const query = searchTerm.value.trim().toLowerCase();
+      const lang = localStorage.getItem('userLocale') || 'en'; // Get language from localStorage
       
-      // Generate suggestions first (works even with shorter queries)
+      // Generate suggestions first
       generateSuggestions(query);
       
       // Reset state
@@ -273,24 +293,23 @@ export default {
         isLoading.value = false;
         return;
       }
-
+      
       isLoading.value = true;
       error.value = null;
 
       try {
-        console.log(`Searching for: "${query}" in ${props.allProducts?.length || 0} products`);
+        console.log(`Searching for: "${query}" in ${effectiveProducts.value?.length || 0} products with language: ${lang}`);
         
         // Check if products array is valid
-        if (!props.allProducts || !Array.isArray(props.allProducts)) {
-          console.error('allProducts is not a valid array:', props.allProducts);
+        if (!effectiveProducts.value || !Array.isArray(effectiveProducts.value)) {
+          console.error('Products not available:', effectiveProducts.value);
           throw new Error('Product data is not available');
         }
-
-        // Filter products based on search query
-        const results = props.allProducts.filter(product => {
-          // Validate product is an object
+        
+        // Filter products using the searchableText field if available
+        const results = effectiveProducts.value.filter(product => {
+          // Skip if product is invalid
           if (!product || typeof product !== 'object') {
-            console.warn('Invalid product in array:', product);
             return false;
           }
           
@@ -298,16 +317,17 @@ export default {
           if (props.onlyShowInStock && product.stock !== undefined && product.stock <= 0) {
             return false;
           }
+
+          // Use searchableText if available (it contains all languages)
+          if (product.searchableText) {
+            return product.searchableText.includes(query);
+          }
           
+          // Fallback to the original search method
           return props.searchKeys.some(key => {
-            // Skip if key doesn't exist in product
             if (!(key in product)) return false;
-            
             const value = product[key];
-            // Handle different value types
             if (value === null || value === undefined) return false;
-            
-            // Convert to string for comparison
             return String(value).toLowerCase().includes(query);
           });
         });
@@ -323,10 +343,10 @@ export default {
         // Emit search event
         emit('search-performed', {
           term: query,
+          lang: lang,
           resultsCount: results.length,
           limitedResults: filteredResults.value
         });
-        
       } catch (err) {
         console.error('Search error:', err);
         error.value = t('search_error') || 'Error searching products.';
@@ -468,12 +488,48 @@ export default {
     onMounted(() => {
       document.addEventListener('click', handleClickOutside);
       console.log('SearchBar mounted with products:', props.allProducts?.length || 0);
+      
+      try {
+        isLoading.value = true;
+        // Load products from service
+        productService.getAllProducts().then(products => {
+          productList.value = products;
+          console.log('Loaded', productList.value.length, 'products from service');
+          isLoading.value = false;
+        }).catch(error => {
+          console.error('Error loading products:', error);
+          isLoading.value = false;
+        });
+        
+        // Load searchable products data
+        isInitialLoading.value = true;
+        productService.getAllProductsForSearch().then(products => {
+          allSearchableProducts.value = products;
+          console.log(`Loaded ${products.length} multilingual products for search`);
+          isInitialLoading.value = false;
+        }).catch(error => {
+          console.error('Error loading products for search:', error);
+          isInitialLoading.value = false;
+        });
+      } catch (error) {
+        console.error('Error in onMounted:', error);
+        isLoading.value = false;
+        isInitialLoading.value = false;
+      }
     });
 
     onBeforeUnmount(() => {
       document.removeEventListener('click', handleClickOutside);
     });
 
+    // Add this computed property
+    const effectiveProductsList = computed(() => {
+      if (allSearchableProducts.value && allSearchableProducts.value.length > 0) {
+        return allSearchableProducts.value;
+      }
+      return props.allProducts || [];
+    });
+    
     return {
       searchTerm,
       filteredResults,

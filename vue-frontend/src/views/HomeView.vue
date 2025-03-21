@@ -190,25 +190,25 @@ export default {
         },
       ],
       evChargerItems: [
-        {
-          id: 1,
-          name: 'Зарядні пристрої для електромобілів',
-          slug: 'ev-chargers',
-          image: '/images/HomeView/otcta-стійка-02.png',
-        },
-        {
-          id: 2,
-          name: 'Кабелі та адаптери',
-          slug: 'cables-adapters',
-          image: '/images/HomeView/electric-charging-adapters.png',
-        },
-        {
-          id: 3,
-          name: 'Зарядні станції',
-          slug: 'charging-stations',
-          image: '/images/HomeView/ev-charger-city.png',
-        },
-      ],
+      {
+    id: 1,
+    name: 'Швидкі Зарядні Станції (DC)',
+    slug: 'dc-charging-stations',
+    image: '/images/HomeView/ev-charger-city.png',
+  },
+  {
+    id: 2,
+    name: 'Зарядні Станції Рівня 2 (AC)',
+    slug: 'ac-charging-stations',
+    image:'/images/HomeView/otcta-стійка-02.png',
+  },
+  {
+    id: 3,
+    name: 'Портативні/Мобільні Зарядні Пристрої',
+    slug: 'portable-charging-devices',
+    image: '/images/HomeView/ev-charger-city.png',
+  },
+],
       ads: [],
       promotionCategories: [],
       carouselSlides: [

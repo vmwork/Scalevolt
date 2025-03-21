@@ -21,8 +21,11 @@ import PortableSolarPanelsView from '@/views/PortableSolarPanelsView.vue';
 import SolarMountSystemView from '@/views/SolarMountSystemView.vue';
 import PortablePowerStationView from '@/views/PortablePowerStationView.vue';
 import UserProfileView from '@/views/UserProfileView.vue';
-// Import the layout component - you need to create this or use your existing layout
+// Import the layout component
 import Layout from '@/components/Layout.vue';
+import DeliveryWarrantyReturnsView from '@/views/DeliveryWarrantyReturnsView.vue'
+import CompanyView from '@/views/CompanyView.vue';
+
 
 // Define your routes for use within the region layout
 const productRoutes = [
@@ -35,10 +38,20 @@ const productRoutes = [
     name: 'SolarMountSystem',
     component: SolarMountSystemView
   },
-  { 
-    path: 'charging-stations', 
-    name: 'ChargingStations',
-    component: ChargingStationsView 
+  {
+    path: '/dc-charging-stations',
+    name: 'DCChargingStations',
+    component: () => import('../views/CategoryView.vue')
+  },
+  {
+    path: '/ac-charging-stations',
+    name: 'ACChargingStations',
+    component: () => import('../views/CategoryView.vue')
+  },
+  {
+    path: '/portable-charging-devices',
+    name: 'PortableChargingDevices',
+    component: () => import('../views/CategoryView.vue')
   },
   { path: 'cables-wires', name: 'CablesWires', component: CablesWiresView },
   {
@@ -65,6 +78,11 @@ const productRoutes = [
     name: 'CustomerCases',
     component: () => import('@/views/CustomerCases.vue')
   },
+  {
+    path: 'delivery-warranty-returns',
+    name: 'DeliveryWarrantyReturns',
+    component: DeliveryWarrantyReturnsView
+  },
   { 
     path: 'portable-solar-panels', 
     name: 'PortableSolarPanels', 
@@ -75,6 +93,25 @@ const productRoutes = [
     name: 'UserProfile', 
     component: UserProfileView
   },
+  {
+    path: 'test-translations',  // Make this relative to your region path
+    name: 'TestTranslations',
+    component: () => import('@/views/TestTranslations.vue')
+  },
+  {
+    path: '/admin/translations',
+    name: 'TranslationManager',
+    component: () => import('../views/admin/TranslationManager.vue'),
+    meta: { requiresAuth: true } // Optional - if you have authentication
+  },
+  {
+    path: 'company',
+    name: 'Company',
+    component: CompanyView,
+    meta: {
+      title: 'Компанія | SCALEVOLT'
+    }
+  }
 ];
 
 // Main routes array
@@ -90,6 +127,8 @@ const routes = [
       if (to.params.region && validRegions.includes(to.params.region)) {
         // Set the locale based on URL region
         i18n.global.locale.value = to.params.region;
+        localStorage.setItem('userLocale', to.params.region);
+        document.documentElement.setAttribute('lang', to.params.region);
         next();
       } 
       // If no region specified (root path)
@@ -115,7 +154,10 @@ const routes = [
   // Fallback route
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/'
+    redirect: () => {
+      const locale = localStorage.getItem('userLocale') || i18n.global.locale.value || 'uk';
+      return `/${locale}`;
+    }
   }
 ];
 
@@ -129,6 +171,19 @@ const router = createRouter({
       return { top: 0 };
     }
   }
+});
+
+// Navigation guard to set page title
+router.beforeEach((to, from, next) => {
+  // Set page title if available
+  const title = to.meta.title;
+  if (title) {
+    document.title = title;
+  } else {
+    document.title = 'SCALEVOLT';
+  }
+  
+  next();
 });
 
 export default router;

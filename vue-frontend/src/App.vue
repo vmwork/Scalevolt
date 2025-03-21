@@ -7,23 +7,31 @@
     </div>
     <!-- Use Footer only once here -->
     <Footer />
+    <ConsentBanner />
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
+import ConsentBanner from './components/ConsentBanner.vue';
 import { useUserStore } from './stores/user';
+import { detectUserCountry, mapCountryToLocale } from './services/geoService';
+import productService from './services/productService';
+
 
 export default {
   name: 'App',
   components: {
     Header,
     Footer,
+    ConsentBanner
   },
   setup() {
     const baseURL = import.meta.env.BASE_URL;
+    const { locale } = useI18n();
     
     const products = ref([
       {
@@ -65,7 +73,38 @@ export default {
     
     const { autoLogin } = useUserStore();
     
+    // Auto login from the store
     autoLogin();
+    
+    // Locale detection and product preloading on mount
+    onMounted(async () => {
+      // Check if user has already set a preference
+      const savedLocale = localStorage.getItem('userLocale');
+      
+      if (!savedLocale) {
+        // Show a consent dialog first
+        const consentGranted = confirm("Can we detect your location to provide content in your local language?");
+        
+        if (consentGranted) {
+          const country = await detectUserCountry();
+          if (country) {
+            const detectedLocale = mapCountryToLocale(country);
+            locale.value = detectedLocale;
+            localStorage.setItem('userLocale', detectedLocale);
+            // Reload to apply language changes
+            window.location.reload();
+          }
+        }
+      }
+      
+      // Preload all products for search functionality
+      try {
+        const searchProducts = await productService.getAllProductsForSearch();
+        console.log(`Products preloaded for search: ${searchProducts.length} products`);
+      } catch (error) {
+        console.error('Failed to preload products:', error);
+      }
+    });
     
     return {
       baseURL,

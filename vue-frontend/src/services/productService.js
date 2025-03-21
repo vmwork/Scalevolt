@@ -222,7 +222,7 @@ export default {
     }
   },
   
-  // NEW: Search products function
+  // ENHANCED: Search products function with multilingual support
   async searchProducts(searchTerm, params = {}) {
     try {
       const defaultParams = {
@@ -230,12 +230,20 @@ export default {
           general_information: {
             populate: ['images'],
           },
+          localizations: {
+            populate: ['general_information']
+          },
           pricing_and_inventory: true,
         },
         filters: {
           $or: [
+            // English fields
             { 'general_information.name': { $containsi: searchTerm } },
             { 'general_information.description': { $containsi: searchTerm } },
+            // Include localizations (Ukrainian and Polish)
+            { 'localizations.general_information.name': { $containsi: searchTerm } },
+            { 'localizations.general_information.description': { $containsi: searchTerm } },
+            // Other searchable fields
             { 'categories.name': { $containsi: searchTerm } },
             { 'tags.name': { $containsi: searchTerm } },
             { 'specifications.value': { $containsi: searchTerm } }
@@ -261,7 +269,7 @@ export default {
     }
   },
   
-  // NEW: Get all products for search (optimized version with minimal data)
+  // ENHANCED: Get all products for search with multilingual support
   async getAllProductsForSearch() {
     try {
       const params = {
@@ -281,6 +289,15 @@ export default {
           },
           categories: {
             fields: ['name']
+          },
+          // Include localizations for multilingual search
+          localizations: {
+            fields: [],
+            populate: {
+              general_information: {
+                fields: ['name', 'description']
+              }
+            }
           }
         },
         pagination: {
@@ -298,20 +315,52 @@ export default {
       const response = await axios.get(`${API_URL}/products?${queryString}`);
       
       // Transform the data to match the expected format for the search component
+      // and create the searchableText field combining all languages
       const transformedProducts = response.data.data.map(product => {
         const attrs = product.attributes;
+        
+        // Get English content
+        const name = attrs.general_information?.name || 'Unnamed Product';
+        const description = attrs.general_information?.description || '';
+        
+        // Get localized content (Ukrainian and Polish)
+        const localizations = attrs.localizations?.data || [];
+        
+        // Collect all names and descriptions in all languages
+        const allNames = [name];
+        const allDescriptions = [description];
+        
+        localizations.forEach(localization => {
+          const localAttrs = localization.attributes;
+          if (localAttrs.general_information?.name) {
+            allNames.push(localAttrs.general_information.name);
+          }
+          if (localAttrs.general_information?.description) {
+            allDescriptions.push(localAttrs.general_information.description);
+          }
+        });
+        
+        // Combine all text data into a single searchable field
+        const searchableText = [
+          ...allNames, 
+          ...allDescriptions,
+          attrs.categories?.data?.[0]?.attributes?.name || ''
+        ].join(' ').toLowerCase();
+        
         return {
           id: product.id,
-          name: attrs.general_information?.name || 'Unnamed Product',
-          description: attrs.general_information?.description || '',
+          name: name,
+          description: description,
           price: attrs.pricing_and_inventory?.price,
           stock: attrs.pricing_and_inventory?.stock_quantity,
           image: attrs.general_information?.images?.data?.[0]?.attributes?.url || null,
-          category: attrs.categories?.data?.[0]?.attributes?.name || ''
+          category: attrs.categories?.data?.[0]?.attributes?.name || '',
+          // Add the combined searchable text
+          searchableText: searchableText
         };
       });
       
-      console.log(`Prepared ${transformedProducts.length} products for search`);
+      console.log(`Prepared ${transformedProducts.length} products for search with multilingual support`);
       return transformedProducts;
     } catch (error) {
       console.error('ProductService getAllProductsForSearch error:', error);
@@ -319,3 +368,42 @@ export default {
     }
   }
 };
+
+// src/services/productService.js
+import axios from 'axios';
+
+const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:3000/api';
+
+const productService = {
+  // Get all products with optional filters
+  getProducts: async (options = {}) => {
+    try {
+      // Transform options into query parameters
+      const params = new URLSearchParams();
+      
+      if (options.type) params.append('type', options.type);
+      if (options.categoryId) params.append('categoryId', options.categoryId);
+      if (options.brand) params.append('brand', options.brand);
+      
+      // Make the API request
+      const response = await axios.get(`${API_URL}/products`, { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
+  },
+  
+  // Get product by ID
+  getProductById: async (id) => {
+    try {
+      const response = await axios.get(`${API_URL}/products/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      throw error;
+    }
+  }
+};
+
+export default productService;

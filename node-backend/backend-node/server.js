@@ -10,14 +10,11 @@ import { Pool } from 'pg';
 import Stripe from 'stripe';
 import axios from 'axios';
 
-// Fixed import - pick only one import style based on your project setup
-// For ES modules (if "type": "module" in package.json):
+// Import routes
 import productRoutes from './routes/productRoutes.js';
-// OR for CommonJS (if no "type": "module" in package.json):
-// const productRoutes = require('./routes/productRoutes');
+import quoteRequestRoutes from './routes/quoteRequestRoutes.js';
 
-// If your package.json has "type": "module",
-// __dirname is not defined by default. We can create it manually:
+// __dirname setup for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -30,19 +27,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 // Use CORS to allow requests from your frontend domains
-// Allowing requests from both port 3000 and 1337 since your frontend might be configured for either
 app.use(cors({ 
   origin: ['http://localhost:3000', 'http://localhost:1337', 'http://localhost:8080'] 
 }));
 
 // Use JSON parsing middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Serve static images from 'public/images'
 app.use('/images', express.static('public/images'));
 
 // Mount product routes at /api/products
 app.use('/api/products', productRoutes);
+app.use('/api/quote-requests', quoteRequestRoutes);
 
 // Serve static files from the frontend's dist directory
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -55,6 +53,9 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 });
+
+// Export pool for use in other modules
+export const dbPool = pool;
 
 // Test the connection
 pool.query('SELECT NOW()', (err, dbRes) => {

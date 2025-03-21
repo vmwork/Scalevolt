@@ -22,10 +22,11 @@ export default defineConfig({
     }
   },
   
-  build: {
-    outDir: path.resolve(__dirname, '../dist'),
-    assetsDir: 'assets',
-    emptyOutDir: true,
+// To this:
+build: {
+  outDir: 'dist',  // Changed to use local 'dist' folder
+  assetsDir: 'assets',
+  emptyOutDir: true,
     
     rollupOptions: {
       output: {

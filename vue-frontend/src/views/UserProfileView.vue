@@ -4,7 +4,7 @@
       <div class="profile-avatar-container">
         <img 
           :src="user?.photoURL || defaultAvatar" 
-          alt="User Avatar" 
+          alt="Аватар користувача" 
           class="profile-avatar"
         />
         <button @click="triggerAvatarUpload" class="edit-avatar-btn">
@@ -20,7 +20,7 @@
       </div>
       
       <div class="profile-info">
-        <h1 class="user-name">{{ user?.displayName || 'User' }}</h1>
+        <h1 class="user-name">{{ user?.displayName || 'Користувач' }}</h1>
         <p class="user-email">{{ user?.email }}</p>
       </div>
     </div>
@@ -174,12 +174,48 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'fire
 export default {
   name: 'UserProfilePage',
   setup() {
-    const { t } = useI18n();
+    const { t: i18nT } = useI18n();
     const router = useRouter();
     const userStore = useUserStore();
     const cartStore = useCartStore();
     const auth = getAuth();
     const storage = getStorage();
+
+    // Direct Ukrainian translations
+    const translations = {
+      account_details: 'Інформація про акаунт',
+      email: 'Електронна пошта',
+      joined_date: 'Дата реєстрації',
+      account_settings: 'Налаштування акаунту',
+      email_notifications: 'Сповіщення на пошту',
+      dark_mode: 'Темна тема',
+      order_history: 'Історія замовлень',
+      no_orders_yet: 'У вас ще немає замовлень',
+      start_shopping: 'Почати покупки',
+      order_number: 'Номер замовлення',
+      order_status_pending: 'Очікує обробки',
+      order_status_processing: 'Обробляється',
+      order_status_shipped: 'Відправлено',
+      order_status_delivered: 'Доставлено',
+      order_status_cancelled: 'Скасовано',
+      quantity: 'Кількість',
+      subtotal: 'Проміжний підсумок',
+      shipping: 'Доставка',
+      total: 'Разом',
+      view_details: 'Деталі',
+      reorder: 'Замовити знову',
+      load_more_orders: 'Завантажити більше замовлень',
+      update_profile: 'Оновити профіль',
+      logout: 'Вийти'
+    };
+
+    // Custom translation function that uses direct translations first
+    const t = (key) => {
+      if (translations[key]) {
+        return translations[key];
+      }
+      return i18nT(key);
+    };
 
     // Get current user from store or auth
     const user = computed(() => userStore.user || auth.currentUser);
@@ -229,7 +265,7 @@ export default {
         const downloadURL = await getDownloadURL(fileRef);
         return downloadURL;
       } catch (error) {
-        console.error('Error uploading file:', error);
+        console.error('Помилка завантаження файлу:', error);
         throw error;
       }
     };
@@ -248,8 +284,8 @@ export default {
           userStore.updateUserPhoto(photoURL);
         }
       } catch (error) {
-        console.error('Avatar upload failed:', error);
-        alert('Failed to upload avatar. Please try again.');
+        console.error('Завантаження аватару не вдалося:', error);
+        alert('Не вдалося завантажити аватар. Будь ласка, спробуйте ще раз.');
       }
     };
 
@@ -259,10 +295,10 @@ export default {
         saveSettings();
         
         // Show success message
-        alert('Profile updated successfully!');
+        alert('Профіль успішно оновлено!');
       } catch (error) {
-        console.error('Profile update failed:', error);
-        alert('Failed to update profile. Please try again.');
+        console.error('Помилка оновлення профілю:', error);
+        alert('Не вдалося оновити профіль. Будь ласка, спробуйте ще раз.');
       }
     };
 
@@ -272,13 +308,13 @@ export default {
         userStore.clearUser();
         router.push('/login');
       } catch (error) {
-        console.error('Logout failed:', error);
-        alert('Failed to logout. Please try again.');
+        console.error('Помилка виходу з системи:', error);
+        alert('Не вдалося вийти. Будь ласка, спробуйте ще раз.');
       }
     };
 
     const formatDate = (timestamp) => {
-      if (!timestamp) return 'N/A';
+      if (!timestamp) return 'Н/Д';
       return new Date(timestamp).toLocaleDateString();
     };
 
@@ -302,7 +338,7 @@ export default {
         hasMoreOrders.value = response.pagination.page < response.pagination.pageCount;
         currentPage.value = page;
       } catch (error) {
-        console.error('Failed to load orders:', error);
+        console.error('Не вдалося завантажити замовлення:', error);
       } finally {
         isLoadingOrders.value = false;
       }
@@ -359,12 +395,12 @@ export default {
     // Check authentication on component mount
     onMounted(() => {
       if (!user.value) {
-        console.log('No user found, redirecting to login');
+        console.log('Користувача не знайдено, перенаправлення на сторінку входу');
         router.push('/login');
         return;
       }
       
-      console.log('User profile loaded:', user.value);
+      console.log('Профіль користувача завантажено:', user.value);
       
       // Apply saved settings
       if (darkModeEnabled.value) {
