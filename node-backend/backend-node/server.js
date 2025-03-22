@@ -245,3 +245,61 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Access the API at http://localhost:${PORT}/api`);
 });
+
+
+
+
+
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 4242;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// MongoDB Connection
+mongoose.connect(`mongodb://admin:password@mongodb:27017/ecommerce?authSource=admin`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err));
+
+// Simple product schema and model
+const productSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  price: Number,
+  imageUrl: String,
+  category: String
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+// Routes
+app.get('/', (req, res) => {
+  res.send('E-commerce API is running!');
+});
+
+// Get all products
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await Product.find({});
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching products', error });
+  }
+});
+
+// Add more routes as needed
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
