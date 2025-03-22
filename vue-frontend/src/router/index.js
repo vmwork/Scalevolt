@@ -93,11 +93,7 @@ const productRoutes = [
     name: 'UserProfile', 
     component: UserProfileView
   },
-  {
-    path: 'test-translations',  // Make this relative to your region path
-    name: 'TestTranslations',
-    component: () => import('@/views/TestTranslations.vue')
-  },
+
   {
     path: '/admin/translations',
     name: 'TranslationManager',
