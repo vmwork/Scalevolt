@@ -325,7 +325,33 @@ const mockProducts = [
       ],
       offers: [],
       installationAvailable: false
-    }
+    },
+    {
+      id: 66,
+      name: 'Генератор 10 кВт',
+      type: 'Генератори',
+      price: 1000,
+      image: '/images/generators/generator-10kw.png',
+      brand: 'PowerMax',
+      rentalPrices: {
+        day: 150,
+        week: 300,
+        month: 600
+      }
+    },
+    {
+      id: 67,
+      name: 'Промисловий Генератор 50 кВт',
+      type: 'Промислові генератори для важких навантажень (100 кВт+)',
+      price: 2000,
+      image: '/images/generators/industrial-50kw.png',
+      brand: 'IndustrialPower',
+      rentalPrices: {
+        day: 300,
+        week: 600,
+        month: 1200
+      }
+    },
 ];
 
 export default mockProducts;

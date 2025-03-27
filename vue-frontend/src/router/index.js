@@ -25,6 +25,10 @@ import UserProfileView from '@/views/UserProfileView.vue';
 import Layout from '@/components/Layout.vue';
 import DeliveryWarrantyReturnsView from '@/views/DeliveryWarrantyReturnsView.vue'
 import CompanyView from '@/views/CompanyView.vue';
+import LiftsAndCranesCategory from '@/views/LiftsAndCranesCategory.vue'
+import PrivacyView from '@/views/PrivacyView.vue'
+import ErrorView from '@/views/ErrorView.vue'
+import LegalTermsView from '@/views/LegalTermsView.vue'
 
 
 // Define your routes for use within the region layout
@@ -93,6 +97,37 @@ const productRoutes = [
     name: 'UserProfile', 
     component: UserProfileView
   },
+  {
+    path: 'generators',
+    name: 'Generators',
+    component: CategoryView  // Use a generic CategoryView or create specific views
+  },
+  {
+    path: 'industrial-generators',
+    name: 'IndustrialGenerators',
+    component: CategoryView
+  },
+  {
+    path: 'solar-lighting-towers',
+    name: 'SolarLightingTowers',
+    component: CategoryView
+  },
+  {
+    path: '/lifts-and-cranes',
+    name: 'LiftsAndCranes',
+    component: LiftsAndCranesCategory
+  },
+  // Potential sub-routes for specific lift types
+  {
+    path: '/lifts-and-cranes/scissor-lifts',
+    name: 'ScissorLifts',
+    component: LiftsAndCranesCategory
+  },
+  {
+    path: '/lifts-and-cranes/boom-lifts',
+    name: 'BoomLifts',
+    component: LiftsAndCranesCategory
+  },
 
   {
     path: '/admin/translations',
@@ -107,6 +142,29 @@ const productRoutes = [
     meta: {
       title: 'Компанія | SCALEVOLT'
     }
+  },
+  {
+    path: 'privacy-policy',
+    name: 'Privacy',
+    component: PrivacyView
+  },
+  {
+    path: 'error/:errorCode?',
+    name: 'Error',
+    component: ErrorView,
+    props: true
+  },
+  {
+    // Catch-all 404 route
+    path: ':pathMatch(.*)*',
+    name: 'NotFound',
+    component: ErrorView,
+    props: { errorCode: '404' }
+  },
+  {
+    path: 'legal-terms',
+    name: 'LegalTerms',
+    component: LegalTermsView
   }
 ];
 

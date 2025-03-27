@@ -110,19 +110,19 @@
           >
         </div>
         <div class="categories-grid">
-          <router-link
-            v-for="category in categories"
-            :key="category.id"
-            :to="getCategoryRoute(category.slug)"
-            class="category-card promo-box"
-          >
-            <img :src="category.image" :alt="category.name" />
-            <h3>{{ category.name }}</h3>
-          </router-link>
-        </div>
+  <div v-if="categories.length === 0">No categories found</div>
+  <router-link
+    v-for="category in categories"
+    :key="category.id"
+    :to="getCategoryRoute(category.slug)"
+    class="category-card promo-box"
+  >
+    <img :src="category.image" :alt="category.name" />
+    <h3>{{ category.name }}</h3>
+  </router-link>
+</div>
       </section>
     </div><!-- Close .page-container #5 -->
-
   </div>
 </template>
 
@@ -260,24 +260,30 @@ export default {
         },
       ],
       categories: [
-        {
+      {
           id: 1,
           name: 'Генератори',
-          slug: 'automatics',
+          slug: 'generators',
           image: '/images/HomeView/генератори.png',
         },
         {
           id: 2,
           name: 'Промислові генератори для важких навантажень (100 кВт+)',
-          slug: 'cable',
+          slug: 'industrial-generators',
           image: '/images/HomeView/Промислові-генератори-для-важких-навантажень.png',     
         },
         {
           id: 3,
-          name: 'Освітлювальні-вежі-на-сонячних-батареях',
-          slug: 'cable',
+          name: 'Освітлювальні вежі на сонячних батареях',
+          slug: 'solar-lighting-towers',
           image: '/images/HomeView/Освітлювальні-вежі-на-сонячних-батареях.png',     
         },
+        {
+          id: 4,
+          name: 'Підйомники та Крани',
+          slug: 'lifts-and-cranes',
+          image: '/images/Categories/rent/lifts.png',// You'll need to add this image
+        }
       ],
       products: [],
       loading: true,
@@ -351,12 +357,13 @@ async fetchAds() {
       }
     },
   },
-  mounted() {
-    this.fetchAds()
-    this.fetchPromotionCategories()
-    this.fetchProducts()
-    this.fetchCarouselSlides()
-  },
+  mmounted() {
+  console.log('Categories:', this.categories);
+  this.fetchAds()
+  this.fetchPromotionCategories()
+  this.fetchProducts()
+  this.fetchCarouselSlides()
+},
 }
 
 import Intercom from '@intercom/messenger-js-sdk'

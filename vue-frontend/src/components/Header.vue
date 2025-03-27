@@ -215,17 +215,17 @@
       <div class="right-section" style="width: auto; min-width: 100px;">
         <ul class="icon-links">
           <!-- Replace the profile icon router-link in your Header component with this code -->
-<li class="header-item">
-  <div class="icon-text">
-    <router-link v-if="!user" to="/login" class="icon-text">
-      <img src="/images/header/profile-logo.svg" alt="Account" />
-    </router-link>
-    <router-link v-else to="/profile" class="icon-text">
-      <img src="/images/header/profile-logo.svg" alt="Account" />
-      <span v-if="user.displayName" class="profile-name">{{ user.displayName }}</span>
-    </router-link>
-  </div>
-</li>
+          <li class="header-item">
+            <div class="icon-text">
+              <router-link v-if="!user" to="/login" class="icon-text">
+                <img src="/images/header/profile-logo.svg" alt="Account" />
+              </router-link>
+              <router-link v-else to="/profile" class="icon-text">
+                <img src="/images/header/profile-logo.svg" alt="Account" />
+                <span v-if="user.displayName" class="profile-name">{{ user.displayName }}</span>
+              </router-link>
+            </div>
+          </li>
           <li class="header-item">
             <div class="icon-text">
               <router-link to="/cart" class="icon-text">
@@ -235,23 +235,23 @@
             </div>
           </li>
 
-<!-- Region Selector -->
-<div class="region-selector" @click.stop="toggleRegionMenu">
-  <span class="lang-code">{{ currentLocale.toUpperCase() }}</span>
-  <div class="region-icon-container">
-    <img src="/images/header/globe-icon.svg" alt="Region Icon" class="region-icon" />
-  </div>
-</div>
+          <!-- Region Selector -->
+          <div class="region-selector" @click.stop="toggleRegionMenu">
+            <span class="lang-code">{{ currentLocale && currentLocale.toUpperCase() || 'UK' }}</span>
+            <div class="region-icon-container">
+              <img src="/images/header/globe-icon.svg" alt="Region Icon" class="region-icon" />
+            </div>
+          </div>
 
-<!-- Region Dropdown Menu -->
-<div v-if="regionMenuVisible" class="region-dropdown" @click.stop>
-  <div class="region-option" @click="selectRegion('uk')">
-    <span class="language">Українська</span>
-  </div>
-  <div class="region-option" @click="selectRegion('pl')">
-    <span class="language">Polski</span>
-  </div>
-</div>
+          <!-- Region Dropdown Menu -->
+          <div v-if="regionMenuVisible" class="region-dropdown" @click.stop>
+            <div class="region-option" @click="selectRegion('uk')">
+              <span class="language">Українська</span>
+            </div>
+            <div class="region-option" @click="selectRegion('pl')">
+              <span class="language">Polski</span>
+            </div>
+          </div>
         </ul>
       </div>
     </div>
@@ -295,7 +295,10 @@ export default {
     const user = computed(() => userStore.user)
     const cartCount = computed(() => cartStore.totalQuantity)
     const isHomePage = computed(() => route.path === '/')
-    const currentLocale = computed(() => locale.value)
+    const currentLocale = computed(() => {
+      // Add a default value if locale.value is undefined
+      return locale.value || 'uk'
+    })
 
     // Solar System Categories
     const solarSystemItems = [
@@ -466,10 +469,22 @@ export default {
       // Update document language
       document.documentElement.setAttribute('lang', region);
       
-      // Force a full page reload to make sure everything updates
+      // Update currency based on region if not explicitly set by user
+      if (!localStorage.getItem('userCurrency')) {
+        const newCurrency = region === 'pl' ? 'PLN' : 'UAH';
+        localStorage.setItem('userCurrency', newCurrency);
+      }
+      
+      // Choose ONE navigation approach - either reload or Vue Router
+      // Option 1: Force a full page reload
       window.location.reload();
       
-      // Close the dropdown (this won't execute because of the reload, but keep it for safety)
+      // Option 2: Use Vue Router (commented out since we're using reload)
+      // const currentPath = router.currentRoute.value.path;
+      // const newPath = `/${region}${currentPath.substring(currentPath.indexOf('/', 1) || currentPath.length)}`;
+      // router.push(newPath);
+      
+      // Close the dropdown (won't execute with reload)
       regionMenuVisible.value = false;
     };
 
@@ -898,7 +913,7 @@ export default {
 }
 
 .generator-color {
-  background-color: #27ae60; /* Green for generators */
+  background-color: #27ae60
 }
 
 .electrical-color {

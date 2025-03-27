@@ -1,5 +1,5 @@
 <template>
-  <div class="product-card">
+  <div class="product-card" :class="{ 'rental-mode': isRentalItem }">
     <!-- Only Image & Title Navigate to Product Page -->
     <router-link :to="productLink" class="product-image">
       <img :src="imageSrc" :alt="title || 'Product Image'" />
@@ -14,7 +14,23 @@
       Brand: {{ brand }}
     </div>
 
-    <h3 class="product-price">{{ price }} грн</h3>
+    <!-- Pricing Display -->
+    <div v-if="isRentalItem" class="rental-pricing">
+      <div class="rental-duration-options">
+        <button 
+          v-for="(price, duration) in rentalPrices" 
+          :key="duration"
+          @click="selectRentalDuration(duration)"
+          :class="{ 'selected': selectedDuration === duration }"
+        >
+          {{ formatDurationDisplay(duration) }}
+        </button>
+      </div>
+      <h3 class="product-price">
+        {{ formatRentalPrice(selectedDuration) }} грн / {{ selectedDuration }}
+      </h3>
+    </div>
+    <h3 v-else class="product-price">{{ price }} грн</h3>
 
     <!-- Transition between Add-to-Cart and +/- controls -->
     <transition name="fade">
@@ -23,18 +39,20 @@
         <span class="quantity-number">{{ cartCount }}</span>
         <button @click.stop.prevent="increaseCount" class="increment-btn">+</button>
       </div>
-      <button v-else class="add-to-cart" @click.stop.prevent="handleAddToCart">
-        Додати в кошик
+      <button 
+        v-else 
+        class="add-to-cart" 
+        @click.stop.prevent="handleAddToCart"
+      >
+        {{ isRentalItem ? 'Орендувати' : 'Додати в кошик' }}
       </button>
     </transition>
   </div> 
 </template>
 
-
 <script>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useCartStore } from '@/stores/cart';
-
 
 export default {
   name: 'ProductCard',
@@ -60,9 +78,22 @@ export default {
       required: false,
       default: '',
     },
+    // New prop for rental items
+    rentalPrices: {
+      type: Object,
+      default: () => ({}),
+    },
+    // Flag to indicate if this is a rental item
+    isRentalItem: {
+      type: Boolean,
+      default: false,
+    }
   },
   setup(props) {
     const cartStore = useCartStore();
+
+    // State for rental duration
+    const selectedDuration = ref('day');
 
     // Computed property to get the current quantity from the store
     const cartCount = computed(() => cartStore.getItemQuantity(props.productId));
@@ -70,16 +101,53 @@ export default {
     // Computed property for the product link
     const productLink = computed(() => `/product/${props.productId}`);
 
+    // Method to format rental price
+    const formatRentalPrice = (duration) => {
+      return props.rentalPrices[duration] 
+        ? props.rentalPrices[duration].toLocaleString() 
+        : 'N/A';
+    };
+
+    // Method to format duration display
+    const formatDurationDisplay = (duration) => {
+      const durationMap = {
+        'day': 'День',
+        'week': 'Тиждень',
+        'month': 'Місяць'
+      };
+      return durationMap[duration] || duration.charAt(0).toUpperCase() + duration.slice(1);
+    };
+
+    // Method to select rental duration
+    const selectRentalDuration = (duration) => {
+      selectedDuration.value = duration;
+    };
+
     // Method to add product to cart
     const handleAddToCart = () => {
-      cartStore.addToCart({
-        id: props.productId,
-        name: props.title,
-        price: props.price,
-        image: props.imageSrc,
-        brand: props.brand,
-        quantity: 1,
-      });
+      if (props.isRentalItem) {
+        // Special handling for rental items
+        cartStore.addToCart({
+          id: props.productId,
+          name: props.title,
+          price: props.rentalPrices[selectedDuration.value],
+          image: props.imageSrc,
+          brand: props.brand,
+          quantity: 1,
+          rentalDuration: selectedDuration.value,
+          isRental: true
+        });
+      } else {
+        // Regular product add to cart
+        cartStore.addToCart({
+          id: props.productId,
+          name: props.title,
+          price: props.price,
+          image: props.imageSrc,
+          brand: props.brand,
+          quantity: 1,
+        });
+      }
 
       // Force UI to update instantly by modifying a reactive property
       cartStore.$patch((state) => {
@@ -103,12 +171,14 @@ export default {
       handleAddToCart,
       increaseCount,
       decreaseCount,
+      selectedDuration,
+      selectRentalDuration,
+      formatRentalPrice,
+      formatDurationDisplay
     };
   },
 };
 </script>
-
-
 
 <style scoped>
 /* Product Card Container */
@@ -130,6 +200,43 @@ export default {
 .product-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Rental Mode Specific Styling */
+.product-card.rental-mode {
+  border: 2px solid #4CAF50;
+}
+
+
+.rental-pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.rental-duration-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.rental-duration-options button {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.rental-duration-options button.selected {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+.rental-duration-options button:hover {
+  background-color: #e0e0e0;
 }
 
 /* Product Image */
@@ -279,4 +386,3 @@ export default {
   }
 }
 </style>
- 

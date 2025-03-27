@@ -13,8 +13,10 @@
         :productId="product.id"
         :title="product.name || product.title"
         :price="product.price"
-        :image-src="getProductImage(product)"
+        :imageSrc="getProductImage(product)"
         :brand="product.brand"
+        :isRentalItem="product.isRentalItem"
+        :rentalPrices="product.rentalPrices"
       />
     </div>
     
@@ -26,8 +28,7 @@
 </template>
 
 <script>
-// In CategoryView.vue
-import { ref, computed, watchEffect } from 'vue';
+import { ref, computed, watchEffect, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import ProductCard from '@/components/ProductCard.vue';
 import productService from '@/services/productService';
@@ -50,8 +51,12 @@ export default {
     const loading = ref(true);
     const categoryName = ref('');
     
-    // Map route paths to category types
+    // Expanded route to type mapping
     const routeToType = {
+      '/generators': 'Генератори',
+      '/industrial-generators': 'Промислові генератори для важких навантажень (100 кВт+)',
+      '/solar-lighting-towers': 'Освітлювальні вежі на сонячних батареях',
+      '/lifts-and-cranes': 'Підйомники та Крани',
       '/dc-charging-stations': 'Швидкі Зарядні Станції (DC)',
       '/ac-charging-stations': 'Зарядні Станції Рівня 2 (AC)',
       '/portable-charging-devices': 'Портативні/Мобільні Зарядні Пристрої',
@@ -61,6 +66,14 @@ export default {
       '/solar-sets': 'SolarSets',
       '/mounting-systems': 'Система монтажу сонячних панелей'
     };
+
+    // Rental categories that should use rental item display
+    const rentalCategories = [
+      'Генератори', 
+      'Промислові генератори для важких навантажень (100 кВт+)', 
+      'Освітлювальні вежі на сонячних батареях',
+      'Підйомники та Крани'
+    ];
 
     // Determine if we should use API or mock data based on route
     const isCustomRoute = computed(() => {
@@ -80,10 +93,73 @@ export default {
       return categoryName.value;
     });
 
-    // Fetch products by category ID (for traditional categories)
-    const fetchProductsByCategory = async (categoryId) => {
+    // Fetch products by type
+    const fetchProductsByType = async (type) => {
+      loading.value = true;
       try {
-        loading.value = true;
+        // First, try API
+        try {
+          const response = await productService.getProducts({ 
+            filters: { 
+              type: { $eq: type } 
+            },
+            populate: ['general_information.images', 'pricing_and_inventory']
+          });
+          
+          if (response.data && response.data.length > 0) {
+            products.value = response.data.map(product => {
+              const isRental = rentalCategories.includes(type);
+              return {
+                id: product.id,
+                name: product.attributes?.name || product.name,
+                price: product.attributes?.pricing_and_inventory?.price || product.price,
+                image: product.attributes?.general_information?.images?.data?.[0]?.attributes?.url || product.image,
+                brand: product.attributes?.general_information?.brand || product.brand,
+                // Add rental-specific properties
+                isRentalItem: isRental,
+                rentalPrices: isRental ? {
+                  day: product.attributes?.pricing_and_inventory?.day_price || 150,
+                  week: product.attributes?.pricing_and_inventory?.week_price || 300,
+                  month: product.attributes?.pricing_and_inventory?.month_price || 600
+                } : {}
+              };
+            });
+            return;
+          }
+        } catch (apiError) {
+          console.warn('API fetch failed, falling back to mock products', apiError);
+        }
+
+        // Fallback to mock data with rental information
+        products.value = mockProducts
+          .filter(product => 
+            product.type === type || 
+            product.type?.toLowerCase() === type.toLowerCase()
+          )
+          .map(product => {
+            const isRental = rentalCategories.includes(type);
+            return {
+              ...product,
+              isRentalItem: isRental,
+              rentalPrices: isRental ? (product.rentalPrices || {
+                day: 150,
+                week: 300,
+                month: 600
+              }) : {}
+            };
+          });
+      } catch (error) {
+        console.error('Error fetching products by type:', error);
+        products.value = [];
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    // Fetch products by category ID
+    const fetchProductsByCategory = async (categoryId) => {
+      loading.value = true;
+      try {
         const response = await productService.getProducts({
           populate: ['general_information.images', 'pricing_and_inventory'],
           filters: {
@@ -108,23 +184,6 @@ export default {
         loading.value = false;
       }
     };
-
-    // Fetch mock products by type (for custom routes)
-   // In CategoryView.vue
-const fetchProductsByType = async (type) => {
-  loading.value = true;
-  try {
-    // Use the API instead of mock data
-    const response = await productService.getProducts({ type });
-    products.value = response.data;
-  } catch (error) {
-    console.error('Error fetching products by type:', error);
-    // Fallback to mock data if API fails
-    products.value = mockProducts.filter(product => product.type === type);
-  } finally {
-    loading.value = false;
-  }
-};
 
     // Watch for route changes and fetch appropriate products
     watchEffect(() => {

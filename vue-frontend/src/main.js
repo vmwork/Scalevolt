@@ -1,4 +1,4 @@
-import { createApp, watch, ref } from 'vue'; // Import watch from Vue
+import { createApp, watch, ref } from 'vue';
 import App from './App.vue';
 import router from '@/router';
 import { createPinia } from 'pinia';
@@ -9,6 +9,7 @@ import { auth } from '@/firebase';
 import uk from '@/i18n/locales/uk.json';
 import pl from '@/i18n/locales/pl.json';
 import './style.css';
+import { getUserCurrencyPreference } from '@/services/currency';
 
 // ✅ Add favicon programmatically to prevent 404 errors
 const addFavicon = () => {
@@ -114,7 +115,28 @@ const initializeApp = () => {
       document.documentElement.setAttribute('lang', newLocale);
       localStorage.setItem('userLocale', newLocale);
       app.config.globalProperties.$locale.value = newLocale;
+      
+      // Update currency based on locale if user hasn't explicitly set it
+      if (!localStorage.getItem('userCurrency')) {
+        const newCurrency = newLocale === 'pl' ? 'PLN' : 'UAH';
+        app.config.globalProperties.$currencyStore.value.currentCurrency = newCurrency;
+        localStorage.setItem('userCurrency', newCurrency);
+      }
     });
+    
+    // Add currency store
+    const currencyStore = ref({
+      currentCurrency: getUserCurrencyPreference() || 
+                      (i18n.global.locale.value === 'pl' ? 'PLN' : 'UAH'),
+      setCurrency(currency) {
+        this.currentCurrency = currency;
+        localStorage.setItem('userCurrency', currency);
+      }
+    });
+    
+    // Add currency store to both global properties and as provide/inject
+    app.config.globalProperties.$currencyStore = currencyStore;
+    app.provide('currencyStore', currencyStore);
     
     app.use(pinia);
     app.use(router);

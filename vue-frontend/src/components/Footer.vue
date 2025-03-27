@@ -44,9 +44,34 @@
     {{ $t('delivery.pageTitle') }}
   </router-link>
 </li>
-          <li><a href="#">Підтримка клієнтів</a></li>
-        </ul>
-      </div>
+ <!-- Add this line for the Privacy Policy -->
+ <li>
+      <router-link to="/privacy-policy">
+        {{ $t('privacy.pageTitle') }}
+      </router-link>
+    </li>
+    <li><a href="#">Підтримка клієнтів</a></li>
+  </ul>
+</div>
+       
+      <!-- In your Footer.vue file -->
+<div class="footer-section">
+  <h3>{{ $t('footer.company') }}</h3>
+  <ul>
+    <li>
+      <router-link to="company">{{ $t('footer.about') }}</router-link>
+    </li>
+    <li>
+      <router-link to="customer-cases">{{ $t('footer.cases') }}</router-link>
+    </li>
+    <li>
+      <router-link to="legal-terms">{{ $t('footer.terms') }}</router-link>
+    </li>
+    <li>
+      <router-link to="privacy-policy">{{ $t('footer.privacy') }}</router-link>
+    </li>
+  </ul>
+</div>
 
       <!-- Brand Promises / Advantages -->
       <div class="footer-section">
