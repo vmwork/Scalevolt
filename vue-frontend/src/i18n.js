@@ -1,9 +1,338 @@
 // src/i18n/index.js
 import { createI18n } from 'vue-i18n';
 
-// Import all locale files
-import ukLocale from './locales/uk.json';
-import plLocale from './locales/pl.json';
+// Instead of importing JSON files, define the objects directly
+// Define UK locale content
+const ukLocale = {
+  common: {
+    home: "Головна",
+    products: "Товари",
+    categories: "Категорії",
+    cart: "Кошик",
+    profile: "Профіль",
+    login: "Увійти",
+    logout: "Вийти",
+    register: "Зареєструватися",
+    search: "Пошук",
+    translation_test: "Тест перекладів",
+    current_locale: "Поточна мова",
+    navigation: "Навігація",
+    force_refresh: "Оновити сторінку",
+    ukrainian: "Українська",
+    polish: "Польська",
+    loading: "Завантаження продуктів...",
+    noProductsFound: "У цій категорії не знайдено товарів.",
+    category: "Категорія",
+    remove: "Видалити",
+    or: "або",
+    emailLabel: "Електронна пошта",
+    passwordLabel: "Пароль"
+  },
+  homeView: {
+    residentialCommercialSolar: "Житлова та комерційна сонячна система",
+    evChargersComponents: "Зарядні пристрої та компоненти для електромобілів",
+    exploreNewCategories: "Досліджуйте нові категорії",
+    solarPanels: "Сонячні Панелі",
+    batteries: "Батареї",
+    inverters: "Інвертори",
+    solarSets: "Комплекти сонячних електростанцій",
+    mountingSystems: "Система монтажу сонячних панелей",
+    dcChargingStations: "Швидкі Зарядні Станції (DC)",
+    acChargingStations: "Зарядні Станції Рівня 2 (AC)",
+    portableChargingDevices: "Портативні/Мобільні Зарядні Пристрої",
+    portablePowerStation: "Портативна електростанції",
+    solarGenerators: "Cонячні генератори",
+    portableSolarPanels: "Портативні сонячні панелі",
+    cablesAndWires: "Кабелі електричні та дроти",
+    generators: "Генератори",
+    industrialGenerators: "Промислові генератори для важких навантажень (100 кВт+)",
+    solarLightingTowers: "Освітлювальні вежі на сонячних батареях",
+    liftsAndCranes: "Підйомники та Крани",
+    rental: "Оренда",
+    seeAll: "Переглянути всі"
+  },
+  login: {
+    title: "Ласкаво просимо назад",
+    subtitle: "Будь ласка, увійдіть, щоб продовжити.",
+    tabLabel: "Вхід",
+    googleBtn: "Продовжити з Google",
+    appleBtn: "Продовжити з Apple",
+    emailBtn: "Увійти за допомогою Email",
+    emailPlaceholder: "Електронна пошта",
+    passwordPlaceholder: "Пароль",
+    forgotPassword: "Забули пароль?",
+    enterEmailForReset: "Введіть вашу електронну пошту для скидання паролю",
+    resetEmailSent: "Лист з інструкціями надіслано на вашу пошту",
+    noAccount: "Не маєте облікового запису?",
+    signUp: "Зареєструватися",
+    terms: "Продовжуючи, ви погоджуєтеся з нашими",
+    termsLink: "Умовами використання",
+    privacyLink: "Політикою конфіденційності",
+    and: "та"
+  },
+  register: {
+    title: "Створити обліковий запис",
+    subtitle: "Зареєструйтеся, щоб почати користуватися.",
+    tabLabel: "Реєстрація",
+    googleBtn: "Продовжити з Google",
+    appleBtn: "Продовжити з Apple",
+    nameLabel: "Ім'я",
+    namePlaceholder: "Введіть ваше ім'я",
+    confirmPasswordLabel: "Підтвердіть пароль",
+    confirmPasswordPlaceholder: "Введіть пароль ще раз",
+    submitBtn: "Зареєструватися",
+    hasAccount: "Вже маєте обліковий запис?",
+    signIn: "Увійти",
+    passwordMismatch: "Паролі не співпадають"
+  },
+  product: {
+    section_title: "Інформація про товар",
+    price: "Ціна",
+    quantity: "Кількість",
+    available: "В наявності",
+    outOfStock: "Немає в наявності",
+    addToCart: "Додати в кошик",
+    specifications: "Характеристики",
+    description: "Опис",
+    relatedProducts: "Схожі товари",
+    reviews: "Відгуки",
+    off: "знижки",
+    taxInfo: "включаючи всі податки",
+    fastDelivery: "Швидка доставка",
+    daysExchange: "{days} днів на обмін",
+    brand: "Бренд",
+    model: "Модель",
+    rent: "Орендувати",
+    duration: {
+      day: "День",
+      week: "Тиждень",
+      month: "Місяць"
+    }
+  },
+  // Add header and footer sections for Ukrainian
+  header: {
+    menu: {
+      solarSystem: "Сонячна система",
+      evChargers: "Зарядні пристрої для електромобілів",
+      portablePower: "Портативна енергія",
+      generators: "Генератори",
+      electricalComponents: "Електричні компоненти"
+    },
+    featured: {
+      solar: "Популярні сонячні рішення",
+      ev: "Топові зарядні станції",
+      portable: "Портативні рішення для енергії",
+      generators: "Генератори для будь-яких потреб",
+      electrical: "Електричні компоненти та кабелі"
+    },
+    categories: {
+      solarPanels: "Сонячні Панелі",
+      batteries: "Батареї",
+      inverters: "Інвертори",
+      solarSets: "Комплекти сонячних електростанцій",
+      mountingSystems: "Система монтажу сонячних панелей",
+      evChargers: "Зарядні пристрої для електромобілів",
+      cablesAdapters: "Кабелі та адаптери",
+      chargingStations: "Зарядні станції",
+      portablePowerStations: "Портативна електростанції",
+      solarGenerators: "Cонячні генератори",
+      portableSolarPanels: "Портативні сонячні панелі",
+      industrialGenerators: "Промислові генератори для важких навантажень (100 кВт+)",
+      solarLightingTowers: "Освітлювальні вежі на сонячних батареях",
+      automaticSwitches: "Автоматичні вимикачі",
+      cablesWires: "Кабелі електричні та дроти"
+    }
+  },
+  footer: {
+    company: "Компанія",
+    about: "Про нас",
+    contact: "Контакти",
+    terms: "Умови використання",
+    privacy: "Політика конфіденційності",
+    copyright: "© {year} ScaleVolt. Всі права захищені.",
+    cases: "Кейси клієнтів",
+    products: "Продукти",
+    sale: "Розпродаж",
+    solarSets: "Сонячні набори",
+    batteries: "Акумулятори",
+    inverters: "Інвертори",
+    customerSupport: "Підтримка клієнтів",
+    aboutUs: "Про Нас",
+    ourTeam: "Наша Команда",
+    contactUs: "Зв'яжіться з нами",
+    support: "Підтримка",
+    faq: "Запитання й відповіді",
+    career: "Кар'єра",
+    jobs: "Вакансії",
+    followUs: "Слідкуйте за нами"
+  }
+};
+
+// Define PL locale content
+const plLocale = {
+  common: {
+    home: "Strona główna",
+    products: "Produkty",
+    categories: "Kategorie",
+    cart: "Koszyk",
+    profile: "Profil",
+    login: "Zaloguj się",
+    logout: "Wyloguj się",
+    register: "Zarejestruj się",
+    search: "Szukaj",
+    translation_test: "Test tłumaczeń",
+    current_locale: "Aktualny język",
+    navigation: "Nawigacja",
+    force_refresh: "Odśwież stronę",
+    ukrainian: "Ukraiński",
+    polish: "Polski",
+    loading: "Ładowanie produktów...",
+    noProductsFound: "Nie znaleziono produktów w tej kategorii.",
+    category: "Kategoria",
+    remove: "Usuń",
+    or: "lub",
+    emailLabel: "Email",
+    passwordLabel: "Hasło"
+  },
+  homeView: {
+    residentialCommercialSolar: "Domowe i komercyjne systemy słoneczne",
+    evChargersComponents: "Ładowarki i komponenty do pojazdów elektrycznych",
+    exploreNewCategories: "Odkryj nowe kategorie",
+    solarPanels: "Panele słoneczne",
+    batteries: "Akumulatory",
+    inverters: "Falowniki",
+    solarSets: "Zestawy elektrowni słonecznych",
+    mountingSystems: "Systemy montażowe paneli słonecznych",
+    dcChargingStations: "Szybkie stacje ładowania (DC)",
+    acChargingStations: "Stacje ładowania poziomu 2 (AC)",
+    portableChargingDevices: "Przenośne/mobilne urządzenia ładujące",
+    portablePowerStation: "Przenośne elektrownie",
+    solarGenerators: "Generatory słoneczne",
+    portableSolarPanels: "Przenośne panele słoneczne",
+    cablesAndWires: "Kable elektryczne i przewody",
+    generators: "Generatory",
+    industrialGenerators: "Przemysłowe generatory do dużych obciążeń (100 kW+)",
+    solarLightingTowers: "Wieże oświetleniowe zasilane energią słoneczną",
+    liftsAndCranes: "Podnośniki i dźwigi",
+    rental: "Wynajem",
+    seeAll: "Zobacz wszystko"
+  },
+  login: {
+    title: "Witamy ponownie",
+    subtitle: "Zaloguj się, aby kontynuować.",
+    tabLabel: "Logowanie",
+    googleBtn: "Kontynuuj z Google",
+    appleBtn: "Kontynuuj z Apple",
+    emailBtn: "Zaloguj się za pomocą Email",
+    emailPlaceholder: "Email",
+    passwordPlaceholder: "Hasło",
+    forgotPassword: "Zapomniałeś hasła?",
+    enterEmailForReset: "Wprowadź swój adres email, aby zresetować hasło",
+    resetEmailSent: "Email z instrukcjami został wysłany",
+    noAccount: "Nie masz konta?",
+    signUp: "Zarejestruj się",
+    terms: "Kontynuując, zgadzasz się na nasze",
+    termsLink: "Warunki korzystania z usługi",
+    privacyLink: "Politykę prywatności",
+    and: "i"
+  },
+  register: {
+    title: "Utwórz konto",
+    subtitle: "Zarejestruj się, aby rozpocząć korzystanie.",
+    tabLabel: "Rejestracja",
+    googleBtn: "Kontynuuj z Google",
+    appleBtn: "Kontynuuj z Apple",
+    nameLabel: "Imię",
+    namePlaceholder: "Wprowadź swoje imię",
+    confirmPasswordLabel: "Potwierdź hasło",
+    confirmPasswordPlaceholder: "Wprowadź hasło ponownie",
+    submitBtn: "Zarejestruj się",
+    hasAccount: "Masz już konto?",
+    signIn: "Zaloguj się",
+    passwordMismatch: "Hasła nie są zgodne"
+  },
+  product: {
+    section_title: "Informacje o produkcie",
+    price: "Cena",
+    quantity: "Ilość",
+    available: "Dostępny",
+    outOfStock: "Niedostępny",
+    addToCart: "Dodaj do koszyka",
+    specifications: "Specyfikacje",
+    description: "Opis",
+    relatedProducts: "Podobne produkty",
+    reviews: "Opinie",
+    off: "zniżki",
+    taxInfo: "w tym wszystkie podatki",
+    fastDelivery: "Szybka dostawa",
+    daysExchange: "{days} dni na wymianę",
+    brand: "Marka",
+    model: "Model",
+    rent: "Wynajmij",
+    duration: {
+      day: "Dzień",
+      week: "Tydzień",
+      month: "Miesiąc"
+    }
+  },
+  // Add header and footer sections for Polish
+  header: {
+    menu: {
+      solarSystem: "System solarny",
+      evChargers: "Ładowarki do pojazdów elektrycznych",
+      portablePower: "Przenośna energia",
+      generators: "Generatory",
+      electricalComponents: "Komponenty elektryczne"
+    },
+    featured: {
+      solar: "Popularne rozwiązania solarne",
+      ev: "Najlepsze stacje ładowania",
+      portable: "Przenośne rozwiązania energetyczne",
+      generators: "Generatory do każdych potrzeb",
+      electrical: "Komponenty elektryczne i kable"
+    },
+    categories: {
+      solarPanels: "Panele słoneczne",
+      batteries: "Akumulatory",
+      inverters: "Falowniki",
+      solarSets: "Zestawy elektrowni słonecznych",
+      mountingSystems: "Systemy montażowe paneli słonecznych",
+      evChargers: "Ładowarki do pojazdów elektrycznych",
+      cablesAdapters: "Kable i adaptery",
+      chargingStations: "Stacje ładowania",
+      portablePowerStations: "Przenośne elektrownie",
+      solarGenerators: "Generatory słoneczne",
+      portableSolarPanels: "Przenośne panele słoneczne",
+      industrialGenerators: "Przemysłowe generatory do dużych obciążeń (100 kW+)",
+      solarLightingTowers: "Wieże oświetleniowe zasilane energią słoneczną",
+      automaticSwitches: "Wyłączniki automatyczne",
+      cablesWires: "Kable elektryczne i przewody"
+    }
+  },
+  footer: {
+    company: "Firma",
+    about: "O nas",
+    contact: "Kontakt",
+    terms: "Warunki korzystania",
+    privacy: "Polityka prywatności",
+    copyright: "© {year} ScaleVolt. Wszelkie prawa zastrzeżone.",
+    cases: "Przypadki klientów",
+    products: "Produkty",
+    sale: "Wyprzedaż",
+    solarSets: "Zestawy słoneczne",
+    batteries: "Akumulatory",
+    inverters: "Falowniki",
+    customerSupport: "Obsługa klienta",
+    aboutUs: "O Nas",
+    ourTeam: "Nasz Zespół",
+    contactUs: "Skontaktuj się z nami",
+    support: "Wsparcie",
+    faq: "Pytania i odpowiedzi",
+    career: "Kariera",
+    jobs: "Oferty pracy",
+    followUs: "Obserwuj nas"
+  }
+};
 
 // Merge delivery, warranty and returns content for each locale
 const ukDeliveryContent = {
@@ -134,6 +463,7 @@ const plDeliveryContent = {
     "returnPolicyDesc": "Zgodnie z polskim prawem konsumenckim, masz prawo do zwrotu towaru pełnowartościowego w ciągu 14 dni od otrzymania, jeśli nie był używany i zachował wszystkie właściwości konsumenckie, oryginalne opakowanie i kompletność.",
     "returnProcess": "Proces zwrotu",
     "step1": "Wypełnij wniosek o zwrot w panelu klienta lub skontaktuj się z naszym działem obsługi klienta.",
+    "step2": "Otrzymaj potwierdzenie wniosku i instrukcje dot",
     "step2": "Otrzymaj potwierdzenie wniosku i instrukcje dotyczące zwrotu produktu.",
     "step3": "Zabezpiecz produkt w oryginalnym opakowaniu ze wszystkimi akcesoriami i dokumentacją.",
     "step4": "Wyślij produkt na wskazany adres lub zamów odbiór kurierski (w zależności od wartości zamówienia).",
@@ -238,7 +568,40 @@ export const i18n = createI18n({
   }
 });
 
+// Helper function to debug i18n issues
+export const debugI18n = () => {
+  console.log('i18n Configuration:');
+  console.log('Current locale:', i18n.global.locale.value);
+  console.log('Available locales:', Object.keys(i18n.global.messages.value));
+  console.log('Sample translation (UK):', i18n.global.t('login.title', [], { locale: 'uk' }));
+  console.log('Sample translation (PL):', i18n.global.t('login.title', [], { locale: 'pl' }));
+  console.log('Footer translation (UK):', i18n.global.t('footer.products', [], { locale: 'uk' }));
+  console.log('Footer translation (PL):', i18n.global.t('footer.products', [], { locale: 'pl' }));
+  console.log('Header translation (UK):', i18n.global.t('header.menu.solarSystem', [], { locale: 'uk' }));
+  console.log('Header translation (PL):', i18n.global.t('header.menu.solarSystem', [], { locale: 'pl' }));
+};
+
 // Set document language attribute
 document.documentElement.setAttribute('lang', defaultLocale);
+
+// Provide a function to switch locales
+export const setLocale = (locale) => {
+  if (locale !== 'uk' && locale !== 'pl') {
+    console.error('Invalid locale:', locale);
+    return;
+  }
+  
+  i18n.global.locale.value = locale;
+  localStorage.setItem('userLocale', locale);
+  document.documentElement.setAttribute('lang', locale);
+  
+  // Dispatch an event that components can listen for
+  window.dispatchEvent(new CustomEvent('locale-changed', {
+    detail: { locale: locale }
+  }));
+  
+  console.log('Locale switched to:', locale);
+  return locale;
+};
 
 export default i18n;

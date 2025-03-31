@@ -23,7 +23,7 @@
                   @mouseenter="activeCategory = 'solar'">
                 <div class="category-header">
                   <div class="category-icon-placeholder solar-color"></div>
-                  <h3>Сонячна система</h3>
+                  <h3>{{ $t('header.menu.solarSystem') }}</h3>
                 </div>
               </div>
 
@@ -33,7 +33,7 @@
                   @mouseenter="activeCategory = 'ev'">
                 <div class="category-header">
                   <div class="category-icon-placeholder ev-color"></div>
-                  <h3>Зарядні пристрої для електромобілів</h3>
+                  <h3>{{ $t('header.menu.evChargers') }}</h3>
                 </div>
               </div>
 
@@ -43,7 +43,7 @@
                   @mouseenter="activeCategory = 'portable'">
                 <div class="category-header">
                   <div class="category-icon-placeholder portable-color"></div>
-                  <h3>Портативна енергія</h3>
+                  <h3>{{ $t('header.menu.portablePower') }}</h3>
                 </div>
               </div>
 
@@ -53,7 +53,7 @@
                   @mouseenter="activeCategory = 'generators'">
                 <div class="category-header">
                   <div class="category-icon-placeholder generator-color"></div>
-                  <h3>Генератори</h3>
+                  <h3>{{ $t('header.menu.generators') }}</h3>
                 </div>
               </div>
 
@@ -63,130 +63,131 @@
                   @mouseenter="activeCategory = 'electrical'">
                 <div class="category-header">
                   <div class="category-icon-placeholder electrical-color"></div>
-                  <h3>Електричні компоненти</h3>
+                  <h3>{{ $t('header.menu.electricalComponents') }}</h3>
                 </div>
               </div>
-            </div>
+            </div> <!-- Closing tag for menu-categories -->
+            
 
-            <!-- Subcategories Panel -->
-            <div class="menu-subcategories">
-              <!-- Solar System Subcategories -->
-              <div class="subcategory-panel" v-if="activeCategory === 'solar'">
-                <div class="subcategory-list">
-                  <router-link 
-                    v-for="item in solarSystemItems" 
-                    :key="item.id" 
-                    :to="getCategoryRoute(item.slug)" 
-                    class="subcategory-item" 
-                    @click.stop="handleMenuItemClick">
-                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
-                    <span>{{ item.name }}</span>
-                  </router-link>
-                </div>
-                <div class="featured-category">
-                  <div class="featured-header">
-                    <h4>Популярні сонячні рішення</h4>
-                  </div>
-                  <div class="featured-image">
-                    <img src="/images/HomeView/solar-farm.png" alt="Solar Solutions" />
-                  </div>
-                </div>
-              </div>
+           <!-- Subcategories Panel -->
+<div class="menu-subcategories">
+  <!-- Solar System Subcategories -->
+  <div class="subcategory-panel" v-if="activeCategory === 'solar'">
+    <div class="subcategory-list">
+      <router-link 
+        v-for="item in solarSystemItems" 
+        :key="item.id" 
+        :to="getCategoryRoute(item.slug)" 
+        class="subcategory-item" 
+        @click.stop="handleMenuItemClick">
+        <img :src="item.image" :alt="item.name" class="subcategory-image" />
+        <span>{{ item.name }}</span>
+      </router-link>
+    </div>
+    <div class="featured-category">
+      <div class="featured-header">
+        <h4>{{ $t('header.featured.solar', 'Популярні сонячні рішення') }}</h4>
+      </div>
+      <div class="featured-image">
+        <img src="/images/HomeView/solar-farm.png" alt="Solar Solutions" />
+      </div>
+    </div>
+  </div>
 
-              <!-- EV Chargers Subcategories -->
-              <div class="subcategory-panel" v-if="activeCategory === 'ev'">
-                <div class="subcategory-list">
-                  <router-link 
-                    v-for="item in evChargerItems" 
-                    :key="item.id" 
-                    :to="getCategoryRoute(item.slug)" 
-                    class="subcategory-item" 
-                    @click.stop="handleMenuItemClick">
-                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
-                    <span>{{ item.name }}</span>
-                  </router-link>
-                </div>
-                <div class="featured-category">
-                  <div class="featured-header">
-                    <h4>Топові зарядні станції</h4>
-                  </div>
-                  <div class="featured-image">
-                    <img src="/images/HomeView/ev-charger-city.png" alt="EV Charging Stations" />
-                  </div>
-                </div>
-              </div>
+  <!-- EV Chargers Subcategories -->
+  <div class="subcategory-panel" v-if="activeCategory === 'ev'">
+    <div class="subcategory-list">
+      <router-link 
+        v-for="item in evChargerItems" 
+        :key="item.id" 
+        :to="getCategoryRoute(item.slug)" 
+        class="subcategory-item" 
+        @click.stop="handleMenuItemClick">
+        <img :src="item.image" :alt="item.name" class="subcategory-image" />
+        <span>{{ item.name }}</span>
+      </router-link>
+    </div>
+    <div class="featured-category">
+      <div class="featured-header">
+        <h4>{{ $t('header.featured.ev', 'Топові зарядні станції') }}</h4>
+      </div>
+      <div class="featured-image">
+        <img src="/images/HomeView/ev-charger-city.png" alt="EV Charging Stations" />
+      </div>
+    </div>
+  </div>
 
-              <!-- Portable Power Subcategories -->
-              <div class="subcategory-panel" v-if="activeCategory === 'portable'">
-                <div class="subcategory-list">
-                  <router-link 
-                    v-for="item in portablePowerItems" 
-                    :key="item.id" 
-                    :to="getCategoryRoute(item.slug)" 
-                    class="subcategory-item" 
-                    @click.stop="handleMenuItemClick">
-                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
-                    <span>{{ item.name }}</span>
-                  </router-link>
-                </div>
-                <div class="featured-category">
-                  <div class="featured-header">
-                    <h4>Портативні рішення для енергії</h4>
-                  </div>
-                  <div class="featured-image">
-                    <img src="/images/HomeView/solar-panel.png" alt="Portable Power Solutions" />
-                  </div>
-                </div>
-              </div>
+  <!-- Portable Power Subcategories -->
+  <div class="subcategory-panel" v-if="activeCategory === 'portable'">
+    <div class="subcategory-list">
+      <router-link 
+        v-for="item in portablePowerItems" 
+        :key="item.id" 
+        :to="getCategoryRoute(item.slug)" 
+        class="subcategory-item" 
+        @click.stop="handleMenuItemClick">
+        <img :src="item.image" :alt="item.name" class="subcategory-image" />
+        <span>{{ item.name }}</span>
+      </router-link>
+    </div>
+    <div class="featured-category">
+      <div class="featured-header">
+        <h4>{{ $t('header.featured.portable', 'Портативні рішення для енергії') }}</h4>
+      </div>
+      <div class="featured-image">
+        <img src="/images/HomeView/solar-panel.png" alt="Portable Power Solutions" />
+      </div>
+    </div>
+  </div>
 
-              <!-- Generators Subcategories -->
-              <div class="subcategory-panel" v-if="activeCategory === 'generators'">
-                <div class="subcategory-list">
-                  <router-link 
-                    v-for="item in generatorItems" 
-                    :key="item.id" 
-                    :to="getCategoryRoute(item.slug)" 
-                    class="subcategory-item" 
-                    @click.stop="handleMenuItemClick">
-                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
-                    <span>{{ item.name }}</span>
-                  </router-link>
-                </div>
-                <div class="featured-category">
-                  <div class="featured-header">
-                    <h4>Генератори для будь-яких потреб</h4>
-                  </div>
-                  <div class="featured-image">
-                    <img src="/images/HomeView/генератори.png" alt="Generators" />
-                  </div>
-                </div>
-              </div>
+  <!-- Generators Subcategories -->
+  <div class="subcategory-panel" v-if="activeCategory === 'generators'">
+    <div class="subcategory-list">
+      <router-link 
+        v-for="item in generatorItems" 
+        :key="item.id" 
+        :to="getCategoryRoute(item.slug)" 
+        class="subcategory-item" 
+        @click.stop="handleMenuItemClick">
+        <img :src="item.image" :alt="item.name" class="subcategory-image" />
+        <span>{{ item.name }}</span>
+      </router-link>
+    </div>
+    <div class="featured-category">
+      <div class="featured-header">
+        <h4>{{ $t('header.featured.generators', 'Генератори для будь-яких потреб') }}</h4>
+      </div>
+      <div class="featured-image">
+        <img src="/images/HomeView/генератори.png" alt="Generators" />
+      </div>
+    </div>
+  </div>
 
-              <!-- Electrical Components Subcategories -->
-              <div class="subcategory-panel" v-if="activeCategory === 'electrical'">
-                <div class="subcategory-list">
-                  <router-link 
-                    v-for="item in electricalItems" 
-                    :key="item.id" 
-                    :to="getCategoryRoute(item.slug)" 
-                    class="subcategory-item" 
-                    @click.stop="handleMenuItemClick">
-                    <img :src="item.image" :alt="item.name" class="subcategory-image" />
-                    <span>{{ item.name }}</span>
-                  </router-link>
-                </div>
-                <div class="featured-category">
-                  <div class="featured-header">
-                    <h4>Електричні компоненти та кабелі</h4>
-                  </div>
-                  <div class="featured-image">
-                    <img src="/images/HomeView/Electrical-cables-and-wires.jpg" alt="Electrical Components" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+  <!-- Electrical Components Subcategories -->
+  <div class="subcategory-panel" v-if="activeCategory === 'electrical'">
+    <div class="subcategory-list">
+      <router-link 
+        v-for="item in electricalItems" 
+        :key="item.id" 
+        :to="getCategoryRoute(item.slug)" 
+        class="subcategory-item" 
+        @click.stop="handleMenuItemClick">
+        <img :src="item.image" :alt="item.name" class="subcategory-image" />
+        <span>{{ item.name }}</span>
+      </router-link>
+    </div>
+    <div class="featured-category">
+      <div class="featured-header">
+        <h4>{{ $t('header.featured.electrical', 'Електричні компоненти та кабелі') }}</h4>
+      </div>
+      <div class="featured-image">
+        <img src="/images/HomeView/Electrical-cables-and-wires.jpg" alt="Electrical Components" />
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
 
         <!-- Logo in the center -->
         <div class="logo-container">
@@ -289,7 +290,7 @@ export default {
     // Initialize stores and i18n
     const cartStore = useCartStore()
     const userStore = useUserStore()
-    const { locale } = useI18n()
+    const { t, locale } = useI18n()  // Make sure to get the t function
     
     // Computed properties
     const user = computed(() => userStore.user)
@@ -301,120 +302,121 @@ export default {
     })
 
     // Solar System Categories
-    const solarSystemItems = [
-      {
-        id: 1,
-        name: 'Сонячні Панелі',
-        slug: 'solar-panels',
-        image: '/images/HomeView/solar-farm.png',
-      },
-      {
-        id: 2,
-        name: 'Батареї',
-        slug: 'batteries',
-        image: '/images/HomeView/solar-battery.png',
-      },
-      {
-        id: 3,
-        name: 'Інвертори',
-        slug: 'inverters',
-        image: '/images/HomeView/інвертер.png',
-      },
-      {
-        id: 4,
-        name: 'Комплекти сонячних електростанцій',
-        slug: 'Sets-of-solar-power-plants',
-        image: '/images/HomeView/комплект-сонячних.png',
-      },
-      {
-        id: 6,
-        name: 'Система монтажу сонячних панелей',
-        slug: 'mounting-systems',
-        image: '/images/HomeView/solar-mount-system.png',
-      },
-    ]
+    const solarSystemItems = computed(() => [
+  {
+    id: 1,
+    name: t('header.categories.solarPanels'),  // Dynamic translation
+    slug: 'solar-panels',
+    image: '/images/HomeView/solar-farm.png',
+  },
+  {
+    id: 2,
+    name: t('header.categories.batteries'),
+    slug: 'batteries',
+    image: '/images/HomeView/solar-battery.png',
+  },
+  {
+    id: 3,
+    name: t('header.categories.inverters'),
+    slug: 'inverters',
+    image: '/images/HomeView/інвертер.png',
+  },
+  {
+    id: 4,
+    name: t('header.categories.solarSets'),
+    slug: 'Sets-of-solar-power-plants',
+    image: '/images/HomeView/комплект-сонячних.png',
+  },
+  {
+    id: 6,
+    name: t('header.categories.mountingSystems'),
+    slug: 'mounting-systems',
+    image: '/images/HomeView/solar-mount-system.png',
+  },
+])
 
     // EV Charger Categories
-    const evChargerItems = [
-      {
-        id: 1,
-        name: 'Зарядні пристрої для електромобілів',
-        slug: 'ev-chargers',
-        image: '/images/HomeView/otcta-стійка-02.png',
-      },
-      {
-        id: 2,
-        name: 'Кабелі та адаптери',
-        slug: 'cables-adapters',
-        image: '/images/HomeView/electric-charging-adapters.png',
-      },
-      {
-        id: 3,
-        name: 'Зарядні станції',
-        slug: 'charging-stations',
-        image: '/images/HomeView/ev-charger-city.png',
-      },
-    ]
+    const evChargerItems = computed(() => [
+  {
+    id: 1,
+    name: t('header.categories.evChargers'),
+    slug: 'ev-chargers',
+    image: '/images/HomeView/otcta-стійка-02.png',
+  },
+  {
+    id: 2,
+    name: t('header.categories.cablesAdapters'),
+    slug: 'cables-adapters',
+    image: '/images/HomeView/electric-charging-adapters.png',
+  },
+  {
+    id: 3,
+    name: t('header.categories.chargingStations'),
+    slug: 'charging-stations',
+    image: '/images/HomeView/ev-charger-city.png',
+  },
+])
 
     // Portable Power Categories
-    const portablePowerItems = [
-      {
-        id: 1,
-        name: 'Портативна електростанції',
-        slug: 'portable-power-stations',
-        image: '/images/HomeView/solar-panel.png',
-      },
-      {
-        id: 2,
-        name: 'Cонячні генератори',
-        slug: 'solar-generators',
-        image: '/images/HomeView/Charging-station-ND-EVC-UR40.jpg',
-      },
-      {
-        id: 3,
-        name: 'Портативні сонячні панелі',
-        slug: 'portable-solar-panels',
-        image: '/images/Categories/portable.solar.panels/Портативні-Сонячні-панелі-Jackery-SolarSaga-100W.png',
-      },
-    ]
+    const portablePowerItems = computed(() => [
+  {
+    id: 1,
+    name: t('header.categories.portablePowerStations'),
+    slug: 'portable-power-stations',
+    image: '/images/HomeView/solar-panel.png',
+  },
+  {
+    id: 2,
+    name: t('header.categories.solarGenerators'),
+    slug: 'solar-generators',
+    image: '/images/HomeView/Charging-station-ND-EVC-UR40.jpg',
+  },
+  {
+    id: 3,
+    name: t('header.categories.portableSolarPanels'),
+    slug: 'portable-solar-panels',
+    image: '/images/Categories/portable.solar.panels/Портативні-Сонячні-панелі-Jackery-SolarSaga-100W.png',
+  },
+])
+
 
     // Generator Categories
-    const generatorItems = [
-      {
-        id: 1,
-        name: 'Генератори',
-        slug: 'generators',
-        image: '/images/HomeView/генератори.png',
-      },
-      {
-        id: 2,
-        name: 'Промислові генератори для важких навантажень (100 кВт+)',
-        slug: 'industrial-generators',
-        image: '/images/HomeView/Промислові-генератори-для-важких-навантажень.png',     
-      },
-      {
-        id: 3,
-        name: 'Освітлювальні вежі на сонячних батареях',
-        slug: 'solar-lighting-towers',
-        image: '/images/HomeView/Освітлювальні-вежі-на-сонячних-батареях.png',     
-      },
-    ]
+    const generatorItems = computed(() => [
+  {
+    id: 1,
+    name: t('header.categories.generators'),
+    slug: 'generators',
+    image: '/images/HomeView/генератори.png',
+  },
+  {
+    id: 2,
+    name: t('header.categories.industrialGenerators'),
+    slug: 'industrial-generators',
+    image: '/images/HomeView/Промислові-генератори-для-важких-навантажень.png',     
+  },
+  {
+    id: 3,
+    name: t('header.categories.solarLightingTowers'),
+    slug: 'solar-lighting-towers',
+    image: '/images/HomeView/Освітлювальні-вежі-на-сонячних-батареях.png',     
+  },
+])
 
     // Electrical Component Categories
-    const electricalItems = [
-      {
-        id: 1,
-        name: 'Автоматичні вимикачі',
-        slug: 'automatic-switches',
-        image: '/images/HomeView/інвертер.png',
-      },
-      {
-        id: 2,
-        name: 'Кабелі електричні та дроти',
-        slug: 'cables-wires',
-        image: '/images/HomeView/Electrical-cables-and-wires.jpg',
-      },
-    ]
+    const electricalItems = computed(() => [
+  {
+    id: 1,
+    name: t('header.categories.automaticSwitches'),
+    slug: 'automatic-switches',
+    image: '/images/HomeView/інвертер.png',
+  },
+  {
+    id: 2,
+    name: t('header.categories.cablesWires'),
+    slug: 'cables-wires',
+    image: '/images/HomeView/Electrical-cables-and-wires.jpg',
+  },
+])
 
     // Example products for search
     const allProducts = ref([
@@ -904,7 +906,7 @@ export default {
   background-color: #ffd700; /* Gold for solar */
 }
 
-.ev-color {
+.ev-color {''
   background-color: #3498db; /* Blue for EV */
 }
 

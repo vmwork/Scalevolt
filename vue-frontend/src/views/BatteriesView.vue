@@ -1,131 +1,136 @@
 <template>
-    <div class="catalogue-view">
-      <!-- Breadcrumb Component with same design classes -->
-      <Breadcrumb :breadcrumbs="breadcrumbs" class="breadcrumb-spacing" />
-  
-      <h1>{{ pageTitle }}</h1>
-  
-      <!-- Product Listing -->
-      <div class="products-container">
-        <div
-          v-for="product in displayedProducts"
-          :key="product.uniqueKey"
-          class="product-card-wrapper"
+  <div class="catalogue-view">
+    <Breadcrumb :breadcrumbs="localizedBreadcrumbs" class="breadcrumb-spacing" />
+    <h1>{{ $t('categories.batteries') }}</h1>
+    
+    <div class="products-container">
+      <div
+        v-for="product in displayedProducts"
+        :key="product.uniqueKey"
+        class="product-card-wrapper"
+      >
+        <router-link
+          :to="`/product/${product.id}`"
+          style="text-decoration: none; color: inherit;"
         >
-  
-          <!-- Wrap ProductCard in <router-link> to /product/:id -->
-            <router-link
-            :to="`/product/${product.id}`"
-            style="text-decoration: none; color: inherit;"
-          >
-  
-          <!-- Corrected ProductCard component tag -->
           <ProductCard
             :productId="product.id"
-            :title="product.name"
+            :title="getTranslatedProductName(product)"
             :price="product.price"
             :image-src="product.image"
             :brand="product.brand"
-               />
-          </router-link>
-        </div>
+          />
+        </router-link>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import { ref, computed } from 'vue';
-  import { useRoute } from 'vue-router';
-  import ProductCard from '@/components/ProductCard.vue';
-  import Breadcrumb from '@/components/Breadcrumb.vue';
-  import { useCartStore } from '@/stores/cart';
-  
-  export default {
-    name: 'SolarPanels',
-    components: {
-      ProductCard,
-      Breadcrumb,
-    },
-    setup() {
-      const cartStore = useCartStore();
-      const route = useRoute();
-      const categoryId = route.params.id || null;
-  
-      const products = ref([
-        {
-          id: 11,
-          name: 'АКБ Deye RW-M6.1-B-1',
-          price: 1000,
-          image: '/images/Categories/batteries/АКБ.Deye.RW-M6.1-B-1.jpg',
-          brand: 'Deye',
-          categoryId: 2,
-        },
-        {
-          id: 12,
-          name: 'RW-M5.3-Pro_1',
-          price: 1200,
-          image: '/images/Categories/batteries/RW-M5.3-Pro_1-2.jpg',
-          brand: 'Deye',
-          categoryId: 2,
-        },
-        {
-          id: 13,
-          name: 'Deye-RW-F10.6-51.2V-208AH-10.64KWH-1',
-          price: 1000,
-          image: '/images/Categories/batteries/Deye-RW-F10.6-51.2V-208AH-10.64KWH-1.png',
-          brand: 'Deye',
-          categoryId: 2,
-        },
-        {
-          id: 14,
-          name: 'АКБ-Pylontech-US5000',
-          price: 1200,
-          image: '/images/Categories/batteries/АКБ-Pylontech-US5000-1.jpg',
-          brand: 'Pylontech',
-          categoryId: 2,
-        },
-        {
-          id: 15,
-          name: 'АКБ-Dyness-48V-50Ah-1  ',
-          price: 1000,
-          image: '/images/Categories/batteries/АКБ-Dyness-48V-50Ah-1.jpg',
-          brand: 'Dyness',
-          categoryId: 2,
-        },
-      ]);
-  
-      // Add uniqueKey to each product
-      products.value.forEach((product) => {
-        product.uniqueKey = product.id;
-      });
-  
-      // Filter products by categoryId if present
-      const displayedProducts = computed(() => {
-        if (categoryId) {
-          return products.value.filter(
-            (product) => product.categoryId === categoryId
-          );
-        }
-        return products.value;
-      });
-  
-      // Define breadcrumbs
-      const breadcrumbs = ref([
-        { name: 'Home', link: '/' },
-        { name: 'Каталог', link: '/catalogue' },
-        { name: 'Батареї' },
-      ]);
-  
-      const pageTitle = 'Батареї';
-  
-      return {
-        displayedProducts,
-        pageTitle,
-        breadcrumbs,
-      };
-    },
-  };
-  </script>
+  </div>
+</template>
+
+<script>
+import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import ProductCard from '@/components/ProductCard.vue';
+import Breadcrumb from '@/components/Breadcrumb.vue';
+import { useCartStore } from '@/stores/cart';
+
+export default {
+  name: 'Batteries',
+  components: {
+    ProductCard,
+    Breadcrumb,
+  },
+  setup() {
+    const { t, locale } = useI18n();
+    const cartStore = useCartStore();
+    const route = useRoute();
+    const categoryId = route.params.id || null;
+
+    // Product data with translation keys
+    const products = ref([
+      {
+        id: 11,
+        nameKey: 'products.batteries.deyeRWM61B1',
+        defaultName: 'АКБ Deye RW-M6.1-B-1',
+        price: 1000,
+        image: '/images/Categories/batteries/АКБ.Deye.RW-M6.1-B-1.jpg',
+        brand: 'Deye',
+        categoryId: 2,
+      },
+      {
+        id: 12,
+        nameKey: 'products.batteries.rwM53Pro1',
+        defaultName: 'RW-M5.3-Pro_1',
+        price: 1200,
+        image: '/images/Categories/batteries/RW-M5.3-Pro_1-2.jpg',
+        brand: 'Deye',
+        categoryId: 2,
+      },
+      {
+        id: 13,
+        nameKey: 'products.batteries.deyeRWF106',
+        defaultName: 'Deye-RW-F10.6-51.2V-208AH-10.64KWH-1',
+        price: 1000,
+        image: '/images/Categories/batteries/Deye-RW-F10.6-51.2V-208AH-10.64KWH-1.png',
+        brand: 'Deye',
+        categoryId: 2,
+      },
+      {
+        id: 14,
+        nameKey: 'products.batteries.pylontechUS5000',
+        defaultName: 'АКБ-Pylontech-US5000',
+        price: 1200,
+        image: '/images/Categories/batteries/АКБ-Pylontech-US5000-1.jpg',
+        brand: 'Pylontech',
+        categoryId: 2,
+      },
+      {
+        id: 15,
+        nameKey: 'products.batteries.dyness48V50Ah',
+        defaultName: 'АКБ-Dyness-48V-50Ah-1',
+        price: 1000,
+        image: '/images/Categories/batteries/АКБ-Dyness-48V-50Ah-1.jpg',
+        brand: 'Dyness',
+        categoryId: 2,
+      },
+    ]);
+
+    // Add uniqueKey to each product
+    products.value.forEach((product) => {
+      product.uniqueKey = product.id;
+    });
+
+    // Filter products by categoryId if present
+    const displayedProducts = computed(() => {
+      if (categoryId) {
+        return products.value.filter(
+          (product) => product.categoryId === categoryId
+        );
+      }
+      return products.value;
+    });
+
+    // Get translated product name based on current locale
+    const getTranslatedProductName = (product) => {
+      return t(product.nameKey, product.defaultName);
+    };
+
+    // Define localized breadcrumbs
+    const localizedBreadcrumbs = computed(() => [
+      { name: t('common.home'), link: '/' },
+      { name: t('common.categories'), link: '/catalogue' },
+      { name: t('categories.batteries') },
+    ]);
+
+    return {
+      displayedProducts,
+      getTranslatedProductName,
+      localizedBreadcrumbs,
+    };
+  },
+};
+</script>
+
   
   <style scoped>
   

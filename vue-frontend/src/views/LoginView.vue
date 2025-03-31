@@ -4,19 +4,19 @@
       <h1>App Name</h1>
     </header>
     <main class="login-view">
-      <h1>Welcome Back</h1>
-      <p>Please sign in to continue.</p>
+      <h1>{{ $t('login.title') }}</h1>
+      <p>{{ $t('login.subtitle') }}</p>
       <div class="login-buttons">
         <!-- Google Sign-In Button -->
         <button @click="signInWithGoogle" class="login-button google" aria-label="Sign in with Google">
           <img src="/images/Login/google-login-icon.svg" alt="Google Icon" />
-          Continue with Google
+          {{ $t('login.googleBtn') }}
         </button>
 
         <!-- Apple Sign-In Button -->
         <button @click="signInWithApple" class="login-button apple" aria-label="Sign in with Apple">
           <img src="/images/Login/apple-login-icon.svg" alt="Apple Icon" />
-          Continue with Apple
+          {{ $t('login.appleBtn') }}
         </button>
 
         <!-- Divider -->
@@ -24,19 +24,19 @@
 
         <!-- Email Sign-In Form -->
         <form @submit.prevent="signInWithEmail">
-          <input type="email" v-model="email" placeholder="Email" required />
-          <input type="password" v-model="password" placeholder="Password" required />
-          <button type="submit" class="login-button email">Sign In with Email</button>
+          <input type="email" v-model="email" :placeholder="$t('login.emailPlaceholder')" required />
+          <input type="password" v-model="password" :placeholder="$t('login.passwordPlaceholder')" required />
+          <button type="submit" class="login-button email">{{ $t('login.emailBtn') }}</button>
         </form>
 
         <!-- Sign-Up Link -->
         <p class="signup-link">
-          Don't have an account? <router-link to="/signup">Sign Up</router-link>
+          {{ $t('login.noAccount') }} <router-link to="/signup">{{ $t('login.signUp') }}</router-link>
         </p>
       </div>
       <p class="terms">
-        By continuing, you agree to our
-        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        {{ $t('login.terms') }}
+        <a href="#">{{ $t('login.termsLink') }}</a> {{ $t('login.and') }} <a href="#">{{ $t('login.privacyLink') }}</a>.
       </p>
     </main>
   </div>
@@ -46,9 +46,15 @@
 import { auth } from '../firebase';
 import { signInWithPopup, GoogleAuthProvider, OAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
 import { useUserStore } from '@/stores/user';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'LoginView',
+  setup() {
+    const { t } = useI18n(); // Access the i18n composition API
+    
+    return { t };
+  },
   data() {
     return {
       email: '',
@@ -117,6 +123,7 @@ export default {
 </script>
 
 <style scoped>
+/* Your existing styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -140,7 +147,7 @@ header {
   position: fixed;
   top: 0;
   width: 100%;
-  height: 60px; /* Height of the header */
+  height: 60px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -160,7 +167,7 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 170px 20px 20px; /* Match padding-top to the header height */
+  padding: 170px 20px 20px;
 }
 
 .login-view {

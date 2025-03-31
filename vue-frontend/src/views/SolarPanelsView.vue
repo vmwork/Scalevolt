@@ -1,32 +1,25 @@
 <template>
   <div class="catalogue-view">
-    <!-- Breadcrumb Component with same design classes -->
-    <Breadcrumb :breadcrumbs="breadcrumbs" class="breadcrumb-spacing" />
-
-    <h1>{{ pageTitle }}</h1>
-
-    <!-- Product Listing -->
+    <Breadcrumb :breadcrumbs="localizedBreadcrumbs" class="breadcrumb-spacing" />
+    <h1>{{ $t('categories.solarPanels') }}</h1>
+    
     <div class="products-container">
       <div
         v-for="product in displayedProducts"
         :key="product.uniqueKey"
         class="product-card-wrapper"
       >
-
-        <!-- Wrap ProductCard in <router-link> to /product/:id -->
-          <router-link
+        <router-link
           :to="`/product/${product.id}`"
           style="text-decoration: none; color: inherit;"
         >
-
-        <!-- Corrected ProductCard component tag -->
-        <ProductCard
-          :productId="product.id"
-          :title="product.name"
-          :price="product.price"
-          :image-src="product.image"
-          :brand="product.brand"
-             />
+          <ProductCard
+            :productId="product.id"
+            :title="getTranslatedProductName(product)"
+            :price="product.price"
+            :image-src="product.image"
+            :brand="product.brand"
+          />
         </router-link>
       </div>
     </div>
@@ -36,6 +29,7 @@
 <script>
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import ProductCard from '@/components/ProductCard.vue';
 import Breadcrumb from '@/components/Breadcrumb.vue';
 import { useCartStore } from '@/stores/cart';
@@ -47,14 +41,17 @@ export default {
     Breadcrumb,
   },
   setup() {
+    const { t, locale } = useI18n();
     const cartStore = useCartStore();
     const route = useRoute();
     const categoryId = route.params.id || null;
 
+    // Product data with translation keys for each product
     const products = ref([
       {
         id: 1,
-        name: 'Сонячна Панель Longi-410-Black',
+        nameKey: 'products.solarPanels.longi410Black',
+        defaultName: 'Сонячна Панель Longi-410-Black',
         price: 1000,
         image: '/images/Categories/solar.panels/Longi-410-Black.png',
         brand: 'Longi',
@@ -62,7 +59,8 @@ export default {
       },
       {
         id: 2,
-        name: 'Сонячна Панель Longi-420-Black',
+        nameKey: 'products.solarPanels.longi420Black',
+        defaultName: 'Сонячна Панель Longi-420-Black',
         price: 1200,
         image: '/images/Categories/solar.panels/Longi-420-Black.png',
         brand: 'Longi',
@@ -70,7 +68,8 @@ export default {
       },
       {
         id: 3,
-        name: 'Сонячна Панель Longi-425-Black',
+        nameKey: 'products.solarPanels.longi425Black',
+        defaultName: 'Сонячна Панель Longi-425-Black',
         price: 1000,
         image: '/images/Categories/solar.panels/Longi-425-Black.png',
         brand: 'Longi',
@@ -78,7 +77,8 @@ export default {
       },
       {
         id: 4,
-        name: 'Сонячна Панель Longi-530-Black',
+        nameKey: 'products.solarPanels.longi530Black',
+        defaultName: 'Сонячна Панель Longi-530-Black',
         price: 1200,
         image: '/images/Categories/solar.panels/Longi-530-Black.png',
         brand: 'Longi',
@@ -86,7 +86,8 @@ export default {
       },
       {
         id: 5,
-        name: 'Сонячна Панель Longi-630-Bifacial',
+        nameKey: 'products.solarPanels.longi630Bifacial',
+        defaultName: 'Сонячна Панель Longi-630-Bifacial',
         price: 1000,
         image: '/images/Categories/solar.panels/Longi-630-Bifacial.png',
         brand: 'Longi',
@@ -94,7 +95,8 @@ export default {
       },
       {
         id: 6,
-        name: 'Сонячна Панель Longi-430',
+        nameKey: 'products.solarPanels.longi430',
+        defaultName: 'Сонячна Панель Longi-430',
         price: 1200,
         image: '/images/Categories/solar.panels/Longi-430.png',
         brand: 'Longi',
@@ -102,7 +104,8 @@ export default {
       },
       {
         id: 7,
-        name: 'Сонячна Панель Longi-580',
+        nameKey: 'products.solarPanels.longi580',
+        defaultName: 'Сонячна Панель Longi-580',
         price: 1000,
         image: '/images/Categories/solar.panels/Longi-580.png',
         brand: 'Longi',
@@ -110,7 +113,8 @@ export default {
       },
       {
         id: 8,
-        name: 'Сонячна Панель Longi-585',
+        nameKey: 'products.solarPanels.longi585',
+        defaultName: 'Сонячна Панель Longi-585',
         price: 1200,
         image: '/images/Categories/solar.panels/Longi-585.png',
         brand: 'Longi',
@@ -118,7 +122,8 @@ export default {
       },
       {
         id: 9,
-        name: 'Сонячна Панель Longi-440',
+        nameKey: 'products.solarPanels.longi440',
+        defaultName: 'Сонячна Панель Longi-440',
         price: 1000,
         image: '/images/Categories/solar.panels/Longi-440.png',
         brand: 'Longi-440',
@@ -126,7 +131,8 @@ export default {
       },
       {
         id: 10,
-        name: 'Сонячна Панель Longi-455',
+        nameKey: 'products.solarPanels.longi455',
+        defaultName: 'Сонячна Панель Longi-455',
         price: 1200,
         image: '/images/Categories/solar.panels/Longi-455.png',
         brand: 'Longi',
@@ -149,19 +155,22 @@ export default {
       return products.value;
     });
 
-    // Define breadcrumbs
-    const breadcrumbs = ref([
-      { name: 'Home', link: '/' },
-      { name: 'Каталог', link: '/catalogue' },
-      { name: 'Сонячні Панелі' },
-    ]);
+    // Get translated product name based on current locale
+    const getTranslatedProductName = (product) => {
+      return t(product.nameKey, product.defaultName);
+    };
 
-    const pageTitle = 'Сонячні Панелі';
+    // Define localized breadcrumbs
+    const localizedBreadcrumbs = computed(() => [
+      { name: t('common.home'), link: '/' },
+      { name: t('common.categories'), link: '/catalogue' },
+      { name: t('categories.solarPanels') },
+    ]);
 
     return {
       displayedProducts,
-      pageTitle,
-      breadcrumbs,
+      getTranslatedProductName,
+      localizedBreadcrumbs,
     };
   },
 };

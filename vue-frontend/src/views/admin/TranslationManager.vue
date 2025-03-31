@@ -78,6 +78,9 @@
               Save Translations
             </button>
           </div>
+          <button @click="autoTranslate(product)" class="translate-button">
+  Auto Translate
+</button>
         </div>
       </div>
     </div>
@@ -148,7 +151,33 @@
         } finally {
           this.savingProducts[product.id] = false;
         }
-      }
+      },
+      async autoTranslate(product) {
+  this.savingProducts[product.id] = true;
+  
+  try {
+    const response = await axios.post(`/api/products/${product.id}/auto-translate`, {
+      targetLanguages: ['uk', 'pl'],
+      sourceLanguage: 'en'
+    });
+    
+    // Update the product in the UI with translated fields
+    const translatedProduct = response.data;
+    Object.assign(product, {
+      name_uk: translatedProduct.name_uk,
+      name_pl: translatedProduct.name_pl,
+      description_uk: translatedProduct.description_uk,
+      description_pl: translatedProduct.description_pl
+    });
+    
+    alert(`Auto-translated "${product.name}" successfully!`);
+  } catch (error) {
+    console.error('Error auto-translating:', error);
+    alert('Failed to auto-translate');
+  } finally {
+    this.savingProducts[product.id] = false;
+  }
+},
     }
   };
   </script>
@@ -259,5 +288,19 @@
     .translations {
       grid-template-columns: 1fr;
     }
-  }
+  },
+  .translate-button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.translate-button:hover {
+  background-color: #0b7dda;
+}
   </style>

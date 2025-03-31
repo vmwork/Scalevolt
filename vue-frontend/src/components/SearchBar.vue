@@ -3,7 +3,7 @@
     <div class="search-input-wrapper" style="width: 100%;">
       <input
         type="text"
-        :placeholder="t('search')"
+        :placeholder="t('common.search')"
         v-model="searchTerm"
         @input="onInput"
         @keydown.enter.prevent="onEnter"

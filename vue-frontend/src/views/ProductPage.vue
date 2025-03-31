@@ -1,14 +1,15 @@
+
 <template>
   <div class="product-page-container">
     <!-- Breadcrumb Navigation -->
     <nav class="breadcrumb">
-      <router-link to="/">Home</router-link>
+      <router-link to="/">{{ $t('common.home') }}</router-link>
       <span class="breadcrumb-separator">&gt;</span>
       <router-link :to="getTypeRoute(product?.type)">
-        {{ product?.type || 'Category' }}
+        {{ product?.type || $t('common.categories') }}
       </router-link>
       <span class="breadcrumb-separator">&gt;</span>
-      <span class="current-page">{{ product?.title || 'Product' }}</span>
+      <span class="current-page">{{ product?.title || $t('product.section_title') }}</span>
     </nav>
 
     <div v-if="product" class="product-content">
@@ -70,7 +71,7 @@
     </div>
 
     <div>
-      <a href="#" class="view-all-offers">View all coupons</a>
+      <a href="#" class="view-all-offers">{{ $t('delivery.seeAll') }}</a>
     
 
       <!-- Quantity and Cart Control -->
@@ -91,7 +92,7 @@
           class="add-to-cart-btn" 
           @click="addToCart"
         >
-          Add To Cart
+          {{ $t('product.addToCart') }}
         </button>
       </div>
 
@@ -110,10 +111,10 @@
 
     <!-- Product Highlights -->
     <div v-if="product" class="product-highlights">
-      <h2>Product Details</h2>
+      <h2>{{ $t('product.section_title') }}</h2>
       <table class="highlights-table">
         <tr>
-          <th>Net Qty</th>
+          <th>{{ $t('product.quantity') }}</th>
           <td>{{ product.quantity }}</td>
         </tr>
         <tr>
@@ -137,105 +138,81 @@
   </div>
 </template>
 
-  <script>
-  import { ref, onMounted, computed } from 'vue';
-  import { useRoute } from 'vue-router';
-  import { useCartStore } from '@/stores/cart';
-  import ProductQuoteForm from '@/components/ProductQuoteForm.vue';
+<script>
+import { ref, onMounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useCartStore } from '@/stores/cart';
+import ProductQuoteForm from '@/components/ProductQuoteForm.vue';
 
-  export default {
-  name: 'ProductPage',
-  components: {
-    ProductQuoteForm
+// Define mockProducts array outside of setup
+const mockProducts = [
+  {
+    id: 1,
+    title: 'Portronics 1.5M Cord Length HDMI Cable(Black)',
+    price: 199,
+    originalPrice: 499,
+    quantity: '1 piece',
+    brand: 'Portronics',
+    model: 'HDMI-1.5M',
+    type: 'Cables, Chargers & Powerbanks',
+    images: [
+      '/images/1.jpg',
+      '/images/2.jpg',
+      '/images/3.jpg',
+      '/images/4.jpg',
+      '/images/5.jpg'
+    ],
+    offers: [
+      { 
+        id: 1, 
+        bank: 'CRED', 
+        detail: 'Get assured rewards',
+        icon: '/images/cred-icon.png'
+      },
+      { 
+        id: 2, 
+        bank: 'BHIM UPI', 
+        detail: 'Get flat ₹25 discount'
+      },
+      { 
+        id: 3, 
+        bank: 'Amazon Pay', 
+        detail: 'Get up to ₹25 cashback'
+      }
+    ], 
+    installationAvailable: true  // Add this flag
   },
-  setup() {
-    const route = useRoute();
-    const cartStore = useCartStore();
-
-    // Product State
-    const product = ref(null);
-    const selectedImage = ref(null);
-    const quantity = ref(1);
-    
-    // Add these new reactive properties
-    const addInstallation = ref(false);
-const installationDetails = ref({
-  companyName: '',
-  address: '',
-  notes: ''
-});
-
-    const mockProducts = [
-      {
-        id: 1,
-      title: 'Portronics 1.5M Cord Length HDMI Cable(Black)',
-      price: 199,
-      originalPrice: 499,
-      quantity: '1 piece',
-      brand: 'Portronics',
-      model: 'HDMI-1.5M',
-      type: 'Cables, Chargers & Powerbanks',
-      images: [
-        '/images/1.jpg',
-        '/images/2.jpg',
-        '/images/3.jpg',
-        '/images/4.jpg',
-        '/images/5.jpg'
-      ],
-      offers: [
-        { 
-          id: 1, 
-          bank: 'CRED', 
-          detail: 'Get assured rewards',
-          icon: '/images/cred-icon.png'
-        },
-        { 
-          id: 2, 
-          bank: 'BHIM UPI', 
-          detail: 'Get flat ₹25 discount'
-        },
-        { 
-          id: 3, 
-          bank: 'Amazon Pay', 
-          detail: 'Get up to ₹25 cashback'
-        }
-      ], 
-      installationAvailable: true  // Add this flag
-
-    },
-    {
-      id: 2,
-      title: 'Сонячна Панель Longi-420-Black',
-      price: 1200,
-      originalPrice: 1500,
-      quantity: '1 piece',
-      brand: 'Longi',
-      model: 'Longi-420-Black',
-      type: 'Сонячні Панелі',
-      images: [
-        '/images/Categories/solar.panels/Longi-420-Black.png'
-      ],
-      offers: [],
-      installationAvailable: true  // Add this flag
-
-    },
-    {
-      id: 3,
-      title: 'Сонячна Панель Longi-425-Black',
-      price: 1000,
-      originalPrice: 1300,
-      quantity: '1 piece',
-      brand: 'Longi',
-      model: 'Longi-425-Black',
-      type: 'Сонячні Панелі',
-      images: [
-        '/images/Categories/solar.panels/Longi-425-Black.png'
-      ],
-      offers: [],
-      installationAvailable: true  // Add this flag
-
-    },
-    {
+  {
+    id: 2,
+    title: 'Сонячна Панель Longi-420-Black',
+    price: 1200,
+    originalPrice: 1500,
+    quantity: '1 piece',
+    brand: 'Longi',
+    model: 'Longi-420-Black',
+    type: 'Сонячні Панелі',
+    images: [
+      '/images/Categories/solar.panels/Longi-420-Black.png'
+    ],
+    offers: [],
+    installationAvailable: true  // Add this flag
+  },
+  {
+    id: 3,
+    title: 'Сонячна Панель Longi-425-Black',
+    price: 1000,
+    originalPrice: 1300,
+    quantity: '1 piece',
+    brand: 'Longi',
+    model: 'Longi-425-Black',
+    type: 'Сонячні Панелі',
+    images: [
+      '/images/Categories/solar.panels/Longi-425-Black.png'
+    ],
+    offers: [],
+    installationAvailable: true  // Add this flag
+  },
+  {
     id: 4,
     title: 'Сонячна Панель Longi-530-Black',
     price: 1200,
@@ -249,186 +226,178 @@ const installationDetails = ref({
     ],
     offers: [], 
     installationAvailable: true  // Add this flag
-
   },
-    {
-      id: 5,
-      title: 'Сонячна Панель Longi-630-Bifacial',
-      price: 1000,
-      originalPrice: 1300,
-      quantity: '1 piece',
-      brand: 'Longi',
-      model: 'Longi-630-Bifacial',
-      type: 'Сонячні Панелі',
-      images: [
-        '/images/Categories/solar.panels/Longi-630-Bifacial.png'
-      ],
-      offers: [],
-      installationAvailable: true  // Add this flag
-
-    },
-    {
-      id: 6,
-      title: 'Сонячна Панель Longi-430',
-      price: 1200,
-      originalPrice: 1500,
-      quantity: '1 piece',
-      brand: 'Longi',
-      model: 'Longi-430',
-      type: 'Сонячні Панелі',
-      images: [
-        '/images/Categories/solar.panels/Longi-430.png'
-      ],
-      offers: [],
-      installationAvailable: true  // Add this flag
-
-    },
-    {
-      id: 7,
-      title: 'Сонячна Панель Longi-580',
-      price: 1000,
-      originalPrice: 1300,
-      quantity: '1 piece',
-      brand: 'Longi',
-      model: 'Longi-580',
-      type: 'Сонячні Панелі',
-      images: [
-        '/images/Categories/solar.panels/Longi-580.png'
-      ],
-      offers: [],
-      installationAvailable: true  // Add this flag
-
-    },
-    {
-      id: 8,
-      title: 'Сонячна Панель Longi-585',
-      price: 1200,
-      originalPrice: 1500,
-      quantity: '1 piece',
-      brand: 'Longi',
-      model: 'Longi-585',
-      type: 'Сонячні Панелі',
-      images: [
-        '/images/Categories/solar.panels/Longi-585.png'
-      ],
-      offers: [],
-      installationAvailable: true  // Add this flag
-
-    },
-    {
-      id: 9,
-      title: 'Сонячна Панель Longi-440',
-      price: 1000,
-      originalPrice: 1300,
-      quantity: '1 piece',
-      brand: 'Longi',
-      model: 'Longi-440',
-      type: 'Сонячні Панелі',
-      images: [
-        '/images/Categories/solar.panels/Longi-440.png'
-      ],
-      offers: [],
-      installationAvailable: true  // Add this flag
-
-    },
-    {
-      id: 10,
-      title: 'Сонячна Панель Longi-455',
-      price: 1200,
-      originalPrice: 1500,
-      quantity: '1 piece',
-      brand: 'Longi',
-      model: 'Longi-455',
-      type: 'Сонячні Панелі',
-      images: [
-        '/images/Categories/solar.panels/Longi-455.png'
-      ],
-      offers: [],
-      installationAvailable: true  // Add this flag
-
-    }, 
-    {
-            id: 11,
-            name: 'АКБ Deye RW-M6.1-B-1',
-            price: 1000,
-            image: '/images/Categories/batteries/АКБ.Deye.RW-M6.1-B-1.jpg',
-            brand: 'Deye',
-            categoryId: 2,
-          },
-          {
-            id: 12,
-            name: 'RW-M5.3-Pro_1',
-            price: 1200,
-            image: '/images/Categories/batteries/RW-M5.3-Pro_1-2.jpg',
-            brand: 'Deye',
-            categoryId: 2,
-          },
-          {
-            id: 13,
-            name: 'Deye-RW-F10.6-51.2V-208AH-10.64KWH-1',
-            price: 1000,
-            image: '/images/Categories/batteries/Deye-RW-F10.6-51.2V-208AH-10.64KWH-1.jpg',
-            brand: 'Deyes',
-            categoryId: 2,
-          },
-          {
-            id: 14,
-            name: 'АКБ-Pylontech-US5000',
-            price: 1200,
-            image: '/images/Categories/batteries/АКБ-Pylontech-US5000-1.jpg',
-            brand: 'Pylontech',
-            categoryId: 2,
-          },
-          {
-            id: 15,
-            name: 'Сонячна Панель JA Solar 560kW',
-            price: 1000,
-            image: '/images/5.jpg',
-            brand: 'JA Solar',
-            categoryId: 2,
-          },
-          {
-            id: 16,
-            name: 'Сонячна Панель Jinko Tiger 560kW',
-            price: 1200,
-            image: '/images/6.jpg',
-            brand: 'Jinko Tiger',
-            categoryId: 2,
-          },
-          {
-            id: 17,
-            name: 'Сонячна Панель JA Solar 560kW',
-            price: 1000,
-            image: '/images/7.jpg',
-            brand: 'JA Solar',
-            categoryId: 2,
-          },
-          {
-            id: 18,
-            name: 'Сонячна Панель Jinko Tiger 560kW',
-            price: 1200,
-            image: '/images/8.jpg',
-            brand: 'Jinko Tiger',
-            categoryId: 2,
-          },
-          {
-            id: 19,
-            name: 'Сонячна Панель JA Solar 560kW',
-            price: 1000,
-            image: '/images/9.jpg',
-            brand: 'JA Solar',
-            categoryId: 2,
-          },
-          {
-            id: 20,
-            name: 'Сонячна Панель Jinko Tiger 560kW',
-            price: 1200,
-            image: '/images/Categories/batteries/АКБ.Deye.RW-M6.1-B-1.jpg',
-            brand: 'Jinko Tiger',
-            categoryId: 2,
-          },
-          {
-
+  {
+    id: 5,
+    title: 'Сонячна Панель Longi-630-Bifacial',
+    price: 1000,
+    originalPrice: 1300,
+    quantity: '1 piece',
+    brand: 'Longi',
+    model: 'Longi-630-Bifacial',
+    type: 'Сонячні Панелі',
+    images: [
+      '/images/Categories/solar.panels/Longi-630-Bifacial.png'
+    ],
+    offers: [],
+    installationAvailable: true  // Add this flag
+  },
+  {
+    id: 6,
+    title: 'Сонячна Панель Longi-430',
+    price: 1200,
+    originalPrice: 1500,
+    quantity: '1 piece',
+    brand: 'Longi',
+    model: 'Longi-430',
+    type: 'Сонячні Панелі',
+    images: [
+      '/images/Categories/solar.panels/Longi-430.png'
+    ],
+    offers: [],
+    installationAvailable: true  // Add this flag
+  },
+  {
+    id: 7,
+    title: 'Сонячна Панель Longi-580',
+    price: 1000,
+    originalPrice: 1300,
+    quantity: '1 piece',
+    brand: 'Longi',
+    model: 'Longi-580',
+    type: 'Сонячні Панелі',
+    images: [
+      '/images/Categories/solar.panels/Longi-580.png'
+    ],
+    offers: [],
+    installationAvailable: true  // Add this flag
+  },
+  {
+    id: 8,
+    title: 'Сонячна Панель Longi-585',
+    price: 1200,
+    originalPrice: 1500,
+    quantity: '1 piece',
+    brand: 'Longi',
+    model: 'Longi-585',
+    type: 'Сонячні Панелі',
+    images: [
+      '/images/Categories/solar.panels/Longi-585.png'
+    ],
+    offers: [],
+    installationAvailable: true  // Add this flag
+  },
+  {
+    id: 9,
+    title: 'Сонячна Панель Longi-440',
+    price: 1000,
+    originalPrice: 1300,
+    quantity: '1 piece',
+    brand: 'Longi',
+    model: 'Longi-440',
+    type: 'Сонячні Панелі',
+    images: [
+      '/images/Categories/solar.panels/Longi-440.png'
+    ],
+    offers: [],
+    installationAvailable: true  // Add this flag
+  },
+  {
+    id: 10,
+    title: 'Сонячна Панель Longi-455',
+    price: 1200,
+    originalPrice: 1500,
+    quantity: '1 piece',
+    brand: 'Longi',
+    model: 'Longi-455',
+    type: 'Сонячні Панелі',
+    images: [
+      '/images/Categories/solar.panels/Longi-455.png'
+    ],
+    offers: [],
+    installationAvailable: true  // Add this flag
+  }, 
+  {
+    id: 11,
+    name: 'АКБ Deye RW-M6.1-B-1',
+    price: 1000,
+    image: '/images/Categories/batteries/АКБ.Deye.RW-M6.1-B-1.jpg',
+    brand: 'Deye',
+    categoryId: 2,
+  },
+  {
+    id: 12,
+    name: 'RW-M5.3-Pro_1',
+    price: 1200,
+    image: '/images/Categories/batteries/RW-M5.3-Pro_1-2.jpg',
+    brand: 'Deye',
+    categoryId: 2,
+  },
+  {
+    id: 13,
+    name: 'Deye-RW-F10.6-51.2V-208AH-10.64KWH-1',
+    price: 1000,
+    image: '/images/Categories/batteries/Deye-RW-F10.6-51.2V-208AH-10.64KWH-1.jpg',
+    brand: 'Deyes',
+    categoryId: 2,
+  },
+  {
+    id: 14,
+    name: 'АКБ-Pylontech-US5000',
+    price: 1200,
+    image: '/images/Categories/batteries/АКБ-Pylontech-US5000-1.jpg',
+    brand: 'Pylontech',
+    categoryId: 2,
+  },
+  {
+    id: 15,
+    name: 'Сонячна Панель JA Solar 560kW',
+    price: 1000,
+    image: '/images/5.jpg',
+    brand: 'JA Solar',
+    categoryId: 2,
+  },
+  {
+    id: 16,
+    name: 'Сонячна Панель Jinko Tiger 560kW',
+    price: 1200,
+    image: '/images/6.jpg',
+    brand: 'Jinko Tiger',
+    categoryId: 2,
+  },
+  {
+    id: 17,
+    name: 'Сонячна Панель JA Solar 560kW',
+    price: 1000,
+    image: '/images/7.jpg',
+    brand: 'JA Solar',
+    categoryId: 2,
+  },
+  {
+    id: 18,
+    name: 'Сонячна Панель Jinko Tiger 560kW',
+    price: 1200,
+    image: '/images/8.jpg',
+    brand: 'Jinko Tiger',
+    categoryId: 2,
+  },
+  {
+    id: 19,
+    name: 'Сонячна Панель JA Solar 560kW',
+    price: 1000,
+    image: '/images/9.jpg',
+    brand: 'JA Solar',
+    categoryId: 2,
+  },
+  {
+    id: 20,
+    name: 'Сонячна Панель Jinko Tiger 560kW',
+    price: 1200,
+    image: '/images/Categories/batteries/АКБ.Deye.RW-M6.1-B-1.jpg',
+    brand: 'Jinko Tiger',
+    categoryId: 2,
+  },
+  {
     id: 21,
     title: 'PowerBank 10000mAh Ultra Slim',
     price: 599,
@@ -438,7 +407,7 @@ const installationDetails = ref({
     model: 'PB-10000',
     type: 'Батареї',
     image:[
-    '/images/Categories/batteries/АКБ.Deye.RW-M6.1-B-1.jpg',
+      '/images/Categories/batteries/АКБ.Deye.RW-M6.1-B-1.jpg',
     ],
     offers: []
   },
@@ -880,7 +849,6 @@ const installationDetails = ref({
     ],
     offers: [],
     installationAvailable: true  // Add this flag
-
   },
   {
     id: 61,
@@ -896,7 +864,6 @@ const installationDetails = ref({
     ],
     offers: [],
     installationAvailable: true  // Add this flag
-
   },
   {
     id: 63,
@@ -912,127 +879,142 @@ const installationDetails = ref({
     ],
     offers: [],
     installationAvailable: true  // Add this flag
-
   },
-  
-  ];
+];
 
+export default {
+  name: 'ProductPage',
+  components: {
+    ProductQuoteForm
+  },
+  setup() {
+    const route = useRoute();
+    const cartStore = useCartStore();
 
+    // Product State
+    const product = ref(null);
+    const selectedImage = ref(null);
+    const quantity = ref(1);
+    
+    // Add these new reactive properties
+    const addInstallation = ref(false);
+    const installationDetails = ref({
+      companyName: '',
+      address: '',
+      notes: ''
+    });
 
-
-  // To this:
-  onMounted(async () => {
-    try {
-      const productId = route.params.id;
-      // Simulate API call or use mock data
-      const foundProduct = mockProducts.find(p => p.id.toString() === productId);
-      
-      if (foundProduct) {
-        product.value = foundProduct;
-        
-        // Set selected image safely
-        if (foundProduct.images && foundProduct.images.length > 0) {
-          selectedImage.value = foundProduct.images[0];
-        } else if (foundProduct.image) {
-          selectedImage.value = Array.isArray(foundProduct.image) 
-            ? foundProduct.image[0] 
-            : foundProduct.image;
-        } else {
-          selectedImage.value = '/images/placeholder.png';
-        }
+    // Compute product images safely
+    const productImages = computed(() => {
+      if (!product.value) return [];
+      if (product.value.images) return product.value.images;
+      if (product.value.image) {
+        return Array.isArray(product.value.image) ? product.value.image : [product.value.image];
       }
-    } catch (error) {
-      console.error('Error fetching product:', error);
-    }
-  });
+      return ['/images/placeholder.png'];
+    });
 
-      // Methods
-      const formatPrice = (price) => {
-        return price ? price.toLocaleString('en-IN') : 'N/A';
-      };
-
-      const getOfferIcon = (bank) => {
-        // Map bank names to icons (you'd replace with actual icon paths)
-        const iconMap = {
-          'CRED': '/images/cred-icon.png',
-          'BHIM UPI': '/images/bhim-icon.png',
-          'Amazon Pay': '/images/amazon-pay-icon.png'
-        };
-        return iconMap[bank] || '/images/default-bank-icon.png';
-      };
-
-      const incrementQuantity = () => {
-        quantity.value++;
-      };
-
-      const decrementQuantity = () => {
-        if (quantity.value > 1) {
-          quantity.value--;
+    // Fetch product on component mount
+    onMounted(async () => {
+      try {
+        const productId = route.params.id;
+        // Simulate API call or use mock data
+        const foundProduct = mockProducts.find(p => p.id.toString() === productId);
+        
+        if (foundProduct) {
+          product.value = foundProduct;
+          
+          // Set selected image safely
+          if (foundProduct.images && foundProduct.images.length > 0) {
+            selectedImage.value = foundProduct.images[0];
+          } else if (foundProduct.image) {
+            selectedImage.value = Array.isArray(foundProduct.image) 
+              ? foundProduct.image[0] 
+              : foundProduct.image;
+          } else {
+            selectedImage.value = '/images/placeholder.png';
+          }
         }
-      };
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      }
+    });
 
-      const addToCart = () => {
-  if (product.value) {
-    const cartItem = {
-      id: product.value.id,
-      title: product.value.title || product.value.name,
-      price: product.value.price,
-      image: productImages.value[0] || '/images/placeholder.png',
-      quantity: quantity.value,
-      installation: addInstallation.value ? installationDetails.value : null
-    };  // <-- This closing brace was missing
-    
-    cartStore.addItem(cartItem);
-    
-    alert(`Added ${quantity.value} ${product.value.title || product.value.name} to cart${addInstallation.value ? ' with installation' : ''}`);
+    // Methods
+    const formatPrice = (price) => {
+      return price ? price.toLocaleString('en-IN') : 'N/A';
+    };
+
+    const getOfferIcon = (bank) => {
+      // Map bank names to icons (you'd replace with actual icon paths)
+      const iconMap = {
+        'CRED': '/images/cred-icon.png',
+        'BHIM UPI': '/images/bhim-icon.png',
+        'Amazon Pay': '/images/amazon-pay-icon.png'
+      };
+      return iconMap[bank] || '/images/default-bank-icon.png';
+    };
+
+    const incrementQuantity = () => {
+      quantity.value++;
+    };
+
+    const decrementQuantity = () => {
+      if (quantity.value > 1) {
+        quantity.value--;
+      }
+    };
+
+    const addToCart = () => {
+      if (product.value) {
+        const cartItem = {
+          id: product.value.id,
+          title: product.value.title || product.value.name,
+          price: product.value.price,
+          image: productImages.value[0] || '/images/placeholder.png',
+          quantity: quantity.value,
+          installation: addInstallation.value ? installationDetails.value : null
+        };  
+        
+        cartStore.addItem(cartItem);
+        
+        alert(`Added ${quantity.value} ${product.value.title || product.value.name} to cart${addInstallation.value ? ' with installation' : ''}`);
+      }
+    };
+
+    // Add the getTypeRoute function here
+    const getTypeRoute = (type) => {
+      const typeToRoute = {
+        'Сонячні Панелі': '/solar-panels',
+        'Батареї': '/batteries',
+        'Cables, Chargers & Powerbanks': '/cables',
+        'Інвертори': '/inverters',
+        'SolarSets': '/solar-sets',
+        'Система монтажу сонячних панелей': '/mounting-systems', // Changed to match your URL
+        'Швидкі Зарядні Станції (DC)': '/dc-charging-stations',
+        'Зарядні Станції Рівня 2 (AC)': '/ac-charging-stations',
+        'Портативні/Мобільні Зарядні Пристрої': '/portable-charging-devices'
+      };
+      return typeToRoute[type] || '/catalogue';
+    };
+
+    return {
+      product,
+      selectedImage,
+      quantity,
+      formatPrice,
+      getOfferIcon,
+      incrementQuantity,
+      decrementQuantity,
+      addToCart,
+      getTypeRoute,
+      addInstallation,
+      installationDetails,
+      productImages
+    };
   }
 };
-
-      // Add the getTypeRoute function here
-      const getTypeRoute = (type) => {
-        const typeToRoute = {
-          'Сонячні Панелі': '/solar-panels',
-          'Батареї': '/batteries',
-          'Cables, Chargers & Powerbanks': '/cables',
-          'Інвертори': '/inverters',
-          'SolarSets': '/solar-sets',
-          'Система монтажу сонячних панелей': '/mounting-systems', // Changed to match your URL
-          'Швидкі Зарядні Станції (DC)': '/dc-charging-stations',
-    'Зарядні Станції Рівня 2 (AC)': '/ac-charging-stations',
-    'Портативні/Мобільні Зарядні Пристрої': '/portable-charging-devices'
-  };
-
-        return typeToRoute[type] || '/catalogue';
-      };
-      // Add this computed property
-  const productImages = computed(() => {
-    if (!product.value) return [];
-    if (product.value.images) return product.value.images;
-    if (product.value.image) {
-      return Array.isArray(product.value.image) ? product.value.image : [product.value.image];
-    }
-    return ['/images/placeholder.png'];
-  });
-
-
-
-
-      return {
-        product,
-        selectedImage,
-        quantity,
-        formatPrice,
-        getOfferIcon,
-        incrementQuantity,
-        decrementQuantity,
-        addToCart,
-        getTypeRoute,  // Add this line
-        addInstallation,
-  installationDetails
-      };
-    }
-  };
-  </script>
+</script>
 
   <style scoped>
   .product-page-container {

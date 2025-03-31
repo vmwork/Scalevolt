@@ -4,77 +4,23 @@ import router from '@/router';
 import { createPinia } from 'pinia';
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
-import { createI18n } from 'vue-i18n';
+import { i18n, debugI18n } from '@/i18n'; // Import from separate i18n file
 import { auth } from '@/firebase';
-import uk from '@/i18n/locales/uk.json';
-import pl from '@/i18n/locales/pl.json';
 import './style.css';
 import { getUserCurrencyPreference } from '@/services/currency';
+import { useAuthStore } from './stores/auth';
 
 // ✅ Add favicon programmatically to prevent 404 errors
-const addFavicon = () => {
-  const link = document.createElement('link');
+function addFavicon() {
+  var link = document.createElement('link');
   link.rel = 'icon';
   link.type = 'image/x-icon';
   link.href = '/favicon.ico';
   document.head.appendChild(link);
-};
-
-// ✅ Automatically re-authenticate users on refresh
-const setupFirebaseAuth = (app) => {
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      console.log('✅ User is logged in:', user);
-    } else {
-      console.log('🚨 User is signed out');
-    }
-    
-    // ✅ Mount the app AFTER firebase confirms auth status
-    app.mount('#app');
-  });
-};
-
-// ✅ Configure the i18n (Multi-language)
-const savedLocale = localStorage.getItem('userLocale') || 'uk';
-console.log('Initializing with locale:', savedLocale);
-
-// Create i18n instance
-const i18n = createI18n({
-  legacy: false,
-  locale: savedLocale,
-  fallbackLocale: 'uk',
-  messages: { uk, pl }, // Include all your languages
-  warnHtmlMessage: false,
-  numberFormats: {
-    'uk': {
-      currency: {
-        style: 'currency',
-        currency: 'UAH',
-        notation: 'standard'
-      }
-    },
-    'pl': {
-      currency: {
-        style: 'currency', 
-        currency: 'PLN',
-        notation: 'standard'
-      }
-    },
-    'ua': {
-      currency: {
-        style: 'currency',
-        currency: 'UAH',
-        notation: 'standard'
-      }
-    },
-  }
-});
-
-// Set document language attribute based on saved locale
-document.documentElement.setAttribute('lang', savedLocale);
+}
 
 // ✅ Configure the Toast Notifications
-const toastOptions = {
+var toastOptions = {
   timeout: 3000,
   closeOnClick: true,
   pauseOnFocusLoss: true,
@@ -84,7 +30,7 @@ const toastOptions = {
 };
 
 // ✅ Enhanced Error Handler (Professional Error Page)
-const globalErrorHandler = (err, instance, info) => {
+function globalErrorHandler(err, instance, info) {
   console.error('🚨 Vue Error:', err, '\nComponent:', instance?.$options?.name, '\nInfo:', info);
   document.getElementById('app').innerHTML = `
     <div style="color: red; padding: 20px;">
@@ -93,42 +39,57 @@ const globalErrorHandler = (err, instance, info) => {
       <p><strong>Component:</strong> ${instance?.$options?.name || 'Unknown'}</p>
     </div>
   `;
-};
+}
 
 // ✅ Initialize the Vue App with Plugins
-const initializeApp = () => {
+function initializeApp() {
   try {
-    const app = createApp(App);
-    const pinia = createPinia();
+    var app = createApp(App);
+    var pinia = createPinia();
     
-    // Load saved locale from localStorage
-    const savedLocale = localStorage.getItem('userLocale');
+    app.use(pinia);
+    
+    // Initialize the auth store to connect with Firebase
+    // This needs to happen AFTER pinia is installed but BEFORE app is mounted
+    var authStore = useAuthStore();
+    authStore.init();
+    
+    // Load saved locale from localStorage and ensure it's applied
+    var savedLocale = localStorage.getItem('userLocale');
     if (savedLocale) {
       i18n.global.locale.value = savedLocale;
+      console.log('Loaded saved locale:', savedLocale);
     }
     
     // Correctly watch for locale changes
     app.config.globalProperties.$locale = ref(i18n.global.locale.value);
     
-    // Set up a watcher for locale changes
-    watch(() => i18n.global.locale.value, (newLocale) => {
+    // Enhanced locale change handling
+    watch(function() { return i18n.global.locale.value; }, function(newLocale) {
+      console.log('🌍 Locale changed to:', newLocale);
       document.documentElement.setAttribute('lang', newLocale);
       localStorage.setItem('userLocale', newLocale);
       app.config.globalProperties.$locale.value = newLocale;
       
+      // Debug - print a sample translation to verify it's working
+      console.log('Sample translation:', i18n.global.t('login.title'));
+      
       // Update currency based on locale if user hasn't explicitly set it
       if (!localStorage.getItem('userCurrency')) {
-        const newCurrency = newLocale === 'pl' ? 'PLN' : 'UAH';
+        var newCurrency = newLocale === 'pl' ? 'PLN' : 'UAH';
         app.config.globalProperties.$currencyStore.value.currentCurrency = newCurrency;
         localStorage.setItem('userCurrency', newCurrency);
       }
+      
+      // Trigger a custom event for components to detect
+      window.dispatchEvent(new CustomEvent('locale-changed', { detail: newLocale }));
     });
     
     // Add currency store
-    const currencyStore = ref({
+    var currencyStore = ref({
       currentCurrency: getUserCurrencyPreference() || 
                       (i18n.global.locale.value === 'pl' ? 'PLN' : 'UAH'),
-      setCurrency(currency) {
+      setCurrency: function(currency) {
         this.currentCurrency = currency;
         localStorage.setItem('userCurrency', currency);
       }
@@ -138,7 +99,26 @@ const initializeApp = () => {
     app.config.globalProperties.$currencyStore = currencyStore;
     app.provide('currencyStore', currencyStore);
     
-    app.use(pinia);
+    // Enhanced language switching method
+    app.config.globalProperties.$switchLocale = function(locale) {
+      console.log('Switching locale to:', locale);
+      
+      // Change i18n locale
+      i18n.global.locale.value = locale;
+      
+      // Save to localStorage
+      localStorage.setItem('userLocale', locale);
+      
+      // Update document lang attribute
+      document.documentElement.setAttribute('lang', locale);
+      
+      // Dispatch custom event for components
+      window.dispatchEvent(new CustomEvent('locale-changed', { detail: locale }));
+      
+      // Force global update (optional, may be needed for some components)
+      // app.config.globalProperties.$forceUpdate();
+    };
+    
     app.use(router);
     app.use(i18n);
     app.use(Toast, toastOptions);
@@ -146,8 +126,23 @@ const initializeApp = () => {
     // ✅ Add a global error handler
     app.config.errorHandler = globalErrorHandler;
     
+    // Debug i18n setup
+    debugI18n();
+    
+    // Make i18n available globally for debugging
+    window.i18n = i18n;
+    
     // ✅ Handle Firebase Auth & Then Mount
-    setupFirebaseAuth(app);
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        console.log('✅ User is logged in:', user);
+      } else {
+        console.log('🚨 User is signed out');
+      }
+      
+      // ✅ Mount the app AFTER firebase confirms auth status
+      app.mount('#app');
+    });
   } catch (error) {
     console.error('🔥 Critical App Error:', error);
     document.getElementById('app').innerHTML = `
@@ -157,6 +152,34 @@ const initializeApp = () => {
       </div>
     `;
   }
+}
+
+// Enhanced global methods for debugging i18n in the browser console
+window.switchLanguage = function(locale) {
+  console.log('Manually switching to', locale);
+  i18n.global.locale.value = locale;
+  localStorage.setItem('userLocale', locale);
+  document.documentElement.setAttribute('lang', locale);
+  
+  // Dispatch custom event
+  window.dispatchEvent(new CustomEvent('locale-changed', { detail: locale }));
+  
+  console.log('After switch - Current locale:', i18n.global.locale.value);
+  return 'Language switched to ' + locale;
+};
+
+window.checkTranslations = function() {
+  const locale = i18n.global.locale.value;
+  console.log('Current locale:', locale);
+  console.log('Sample translation:', i18n.global.t('login.title'));
+  console.log('Footer translations available?', 
+    !!i18n.global.messages.value[locale]?.footer);
+  return 'Checked translations for ' + locale;
+};
+
+window.reloadApp = function() {
+  window.location.reload();
+  return 'Reloading application...';
 };
 
 // ✅ 👇 Start everything in the correct order

@@ -39,6 +39,10 @@
           <span class="status-badge" :class="userTierClass">{{ t(userTier) }}</span>
           <span class="member-since">{{ t('member_since') }}: {{ formatDate(user?.metadata?.creationTime) }}</span>
         </div>
+        <button @click="logout" class="logout-button">
+          <i class="icon-logout"></i>
+          {{ t('logout') }}
+        </button>
       </div>
       
       <div class="quick-stats">
@@ -115,27 +119,6 @@
           </div>
         </div>
         
-        <!-- Recommendations -->
-        <div class="dashboard-card recommendations">
-          <h3>{{ t('recommended_for_you') }}</h3>
-          <div class="recommendation-slider">
-            <div v-for="product in recommendations" :key="product.id" class="recommendation-item">
-              <img :src="product.image" :alt="product.name" class="recommendation-image">
-              <div class="recommendation-content">
-                <h4>{{ product.name }}</h4>
-                <p class="recommendation-price">{{ formatPrice(product.price) }}</p>
-                <div class="recommendation-buttons">
-                  <button @click="addToCart(product)" class="btn-small btn-primary">
-                    {{ t('purchase') }}
-                  </button>
-                  <button @click="addToLeases(product)" class="btn-small btn-secondary">
-                    {{ t('lease') }}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         
         <!-- Payments Due -->
         <div class="dashboard-card">
@@ -637,7 +620,6 @@
               <div v-for="transaction in monthGroup" :key="transaction.id" class="timeline-item">
                 <div class="timeline-marker" :class="transaction.type"></div>
                 <div class="timeline-content">
-                  <div class="timeline-date">{{ formatTimelineDate(transaction.date) }}</div>
                   <div class="timeline-card" :class="transaction.type">
                     <div class="timeline-type-badge">{{ t(transaction.type) }}</div>
                     <h4>{{ t('order_number') }}: #{{ transaction.orderNumber }}</h4>
@@ -669,12 +651,14 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useUserStore } from '@/stores/user';
 import { useCartStore } from '@/stores/cart';
+import { useToast } from 'vue-toastification';
 import { 
   getAuth, 
   updateProfile as firebaseUpdateProfile, 
   updatePassword, 
   EmailAuthProvider, 
-  reauthenticateWithCredential 
+  reauthenticateWithCredential,
+  signOut 
 } from 'firebase/auth';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -687,6 +671,7 @@ export default {
     const cartStore = useCartStore();
     const auth = getAuth();
     const storage = getStorage();
+    const toast = useToast();
     
     // Firebase User
     const user = computed(() => auth.currentUser);
@@ -739,6 +724,21 @@ export default {
         icon: 'icon-refresh-cw' 
       }
     ];
+    
+    // Logout function
+    const logout = async () => {
+      try {
+        await signOut(auth);
+        // Clear user data from store
+        userStore.clearUserData();
+        // Redirect to login page
+        router.push('/login');
+        // Show a success message
+        toast("You've been successfully logged out");
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    };
     
     // User tier
     const userTier = computed(() => userStore.tier || 'standard');
@@ -795,29 +795,7 @@ export default {
         leaseId: 'lease2'
       }
     ]);
-    
-    // Recommendations
-    const recommendations = ref([
-      {
-        id: 'rec1',
-        name: 'Wireless Headphones',
-        price: 1499,
-        image: '/images/products/headphones.jpg'
-      },
-      {
-        id: 'rec2',
-        name: 'Smart Watch',
-        price: 2999,
-        image: '/images/products/smartwatch.jpg'
-      },
-      {
-        id: 'rec3',
-        name: 'Bluetooth Speaker',
-        price: 899,
-        image: '/images/products/speaker.jpg'
-      }
-    ]);
-    
+   
     // Upcoming payments
     const upcomingPayments = ref([
       {
@@ -1601,7 +1579,7 @@ export default {
         id: product.id,
         quantity: 1
       });
-      alert(`${product.name} added to cart`);
+      toast(`${product.name} added to cart`);
     };
     
     const addToLeases = (product) => {
@@ -1738,7 +1716,7 @@ export default {
         // Update last password change date
         securityInfo.lastPasswordChange = new Date();
         
-        alert('Password updated successfully');
+        toast('Password updated successfully');
         showPasswordModal.value = false;
         
         // Clear form
@@ -1749,9 +1727,9 @@ export default {
         console.error('Error updating password:', error);
         
         if (error.code === 'auth/wrong-password') {
-          alert('Current password is incorrect');
+          toast.error('Current password is incorrect');
         } else {
-          alert('Error updating password. Please try again later.');
+          toast.error('Error updating password. Please try again later.');
         }
       }
     };
@@ -1809,10 +1787,10 @@ export default {
         });
         
         // Show success message
-        alert('Profile updated successfully');
+        toast('Profile updated successfully');
       } catch (error) {
         console.error('Error updating profile:', error);
-        alert('Error updating profile. Please try again later.');
+        toast.error('Error updating profile. Please try again later.');
       }
     };
     
@@ -1830,7 +1808,7 @@ export default {
     
     const downloadInvoice = (transactionId) => {
       console.log(`Downloading invoice for transaction: ${transactionId}`);
-      alert('Invoice download started');
+      toast('Invoice download started');
     };
     
     const reorderItems = (transaction) => {
@@ -1887,250 +1865,6 @@ export default {
       }, 500);
     };
     
-    // Payment Methods actions
-    const addPaymentMethod = () => {
-      // Reset current payment form
-      Object.keys(currentPayment).forEach(key => {
-        if (!['type', 'walletName'].includes(key)) {
-          currentPayment[key] = '';
-        }
-      });
-      currentPayment.isDefault = false;
-      currentPayment.forRecurring = false;
-      
-      editingPaymentIndex.value = -1;
-      showPaymentModal.value = true;
-    };
-    
-    const editPaymentMethod = (index) => {
-      const method = paymentMethods.value[index];
-      
-      // Copy payment data to form
-      Object.keys(currentPayment).forEach(key => {
-        if (key in method) {
-          currentPayment[key] = method[key];
-        }
-      });
-      
-      // Clear sensitive data
-      if (method.type === 'card') {
-        currentPayment.cardNumber = '';
-        currentPayment.cvv = '';
-      } else if (method.type === 'bank') {
-        currentPayment.accountNumber = '';
-        currentPayment.routingNumber = '';
-      }
-      
-      editingPaymentIndex.value = index;
-      showPaymentModal.value = true;
-    };
-    
-    const savePaymentMethod = () => {
-      // Validate form based on payment type
-      let isValid = true;
-      
-      if (currentPayment.type === 'card') {
-        if (!currentPayment.cardName) {
-          alert('Please enter cardholder name');
-          isValid = false;
-        }
-        
-        // Only validate card number if adding new or if it was changed
-        if (editingPaymentIndex.value === -1 && !currentPayment.cardNumber) {
-          alert('Please enter card number');
-          isValid = false;
-        }
-      } else if (currentPayment.type === 'bank') {
-        if (!currentPayment.accountName || !currentPayment.bankName) {
-          alert('Please fill in all required fields');
-          isValid = false;
-        }
-        
-        // Only validate account number if adding new or if it was changed
-        if (editingPaymentIndex.value === -1 && (!currentPayment.accountNumber || !currentPayment.routingNumber)) {
-          alert('Please enter account and routing numbers');
-          isValid = false;
-        }
-      } else if (currentPayment.type === 'wallet') {
-        if (!currentPayment.email) {
-          alert('Please enter wallet email');
-          isValid = false;
-        }
-      }
-      
-      if (!isValid) return;
-      
-      // Generate last4 for card or bank account
-      let last4 = '';
-      if (currentPayment.type === 'card' && currentPayment.cardNumber) {
-        last4 = currentPayment.cardNumber.slice(-4);
-      } else if (currentPayment.type === 'bank' && currentPayment.accountNumber) {
-        last4 = currentPayment.accountNumber.slice(-4);
-      }
-      
-      if (editingPaymentIndex.value === -1) {
-        // Add new payment method
-        const newMethod = {
-          id: `pay${paymentMethods.value.length + 1}`,
-          ...currentPayment
-        };
-        
-        if (last4) {
-          newMethod.last4 = last4;
-        }
-        
-        paymentMethods.value.push(newMethod);
-        
-        // If set as default, update other methods
-        if (currentPayment.isDefault) {
-          paymentMethods.value.forEach((method, idx) => {
-            if (idx !== paymentMethods.value.length - 1) {
-              method.isDefault = false;
-            }
-          });
-        }
-      } else {
-        // Update existing payment method
-        const updatedMethod = {
-          ...paymentMethods.value[editingPaymentIndex.value],
-          ...currentPayment
-        };
-        
-        if (last4) {
-          updatedMethod.last4 = last4;
-        }
-        
-        paymentMethods.value[editingPaymentIndex.value] = updatedMethod;
-        
-        // If set as default, update other methods
-        if (updatedMethod.isDefault) {
-          paymentMethods.value.forEach((method, idx) => {
-            if (idx !== editingPaymentIndex.value) {
-              method.isDefault = false;
-            }
-          });
-        }
-      }
-      
-      showPaymentModal.value = false;
-    };
-    
-    const deletePaymentMethod = (index) => {
-      if (confirm('Are you sure you want to delete this payment method?')) {
-        // Check if it's the default method
-        const isDefault = paymentMethods.value[index].isDefault;
-        
-        // Remove the payment method
-        paymentMethods.value.splice(index, 1);
-        
-        // If it was the default and we have other methods, set the first one as default
-        if (isDefault && paymentMethods.value.length > 0) {
-          paymentMethods.value[0].isDefault = true;
-        }
-      }
-    };
-    
-    const setDefaultPayment = (index) => {
-      // Set the selected payment method as default
-      paymentMethods.value.forEach((method, idx) => {
-        method.isDefault = idx === index;
-      });
-    };
-    
-    const downloadTaxStatement = () => {
-      console.log('Downloading tax statement');
-      alert('Tax statement download started');
-    };
-    
-    const loadMoreBillingHistory = () => {
-      // In a real app, this would fetch more billing history from the server
-      console.log('Loading more billing history');
-      // Simulate loading more
-      setTimeout(() => {
-        billingHistory.value.push(
-          {
-            id: 'bill4',
-            date: new Date(2022, 9, 1),
-            description: 'Monthly lease payment - High-End Laptop',
-            orderNumber: 'LEASE-2022-567',
-            paymentMethodId: 'pay1',
-            amount: 1299,
-            type: 'lease'
-          },
-          {
-            id: 'bill5',
-            date: new Date(2022, 8, 5),
-            description: 'Order #ORD-2022-950',
-            orderNumber: 'ORD-2022-950',
-            paymentMethodId: 'pay1',
-            amount: 1599,
-            type: 'purchase'
-          }
-        );
-        hasMoreBillingHistory.value = false;
-      }, 500);
-    };
-    
-    // Support & Documentation actions
-    const createNewTicket = () => {
-      router.push('/support/new-ticket');
-    };
-    
-    const viewTicketDetails = (ticketId) => {
-      router.push(`/support/ticket/${ticketId}`);
-    };
-    
-    const loadMoreTickets = () => {
-      // In a real app, this would fetch more tickets from the server
-      console.log('Loading more support tickets');
-    };
-    
-    const downloadManual = (manualId) => {
-      console.log(`Downloading manual: ${manualId}`);
-      alert('Manual download started');
-    };
-    
-    const viewManualOnline = (manualId) => {
-      router.push(`/manuals/view/${manualId}`);
-    };
-    
-    const viewInstallationDetails = (installationId) => {
-      router.push(`/installations/${installationId}`);
-    };
-    
-    const downloadInstallationCertificate = (installationId) => {
-      console.log(`Downloading installation certificate: ${installationId}`);
-      alert('Certificate download started');
-    };
-    
-    const viewWarrantyDetails = (warrantyId) => {
-      router.push(`/warranty/${warrantyId}`);
-    };
-    
-    const extendWarranty = (warrantyId) => {
-      router.push(`/warranty/extend/${warrantyId}`);
-    };
-    
-    // Returns & Exchanges actions
-    const initiateNewReturn = () => {
-      router.push('/returns/initiate');
-    };
-    
-    const viewReturnDetails = (returnId) => {
-      router.push(`/returns/${returnId}`);
-    };
-    
-    const downloadReturnLabel = (returnId) => {
-      console.log(`Downloading return label: ${returnId}`);
-      alert('Return label download started');
-    };
-    
-    const confirmShipment = (returnId) => {
-      console.log(`Confirming shipment for return: ${returnId}`);
-      // In a real app, this would update the return status and add tracking
-      alert('Return shipment confirmed');
-    };
-    
     // Lifecycle hooks
     onMounted(() => {
       // Initialize personal info form with user data
@@ -2166,7 +1900,6 @@ export default {
       stats,
       activeOrders,
       upcomingReturns,
-      recommendations,
       upcomingPayments,
       personalInfo,
       addresses,
@@ -2233,30 +1966,13 @@ export default {
       downloadInvoice,
       reorderItems,
       loadMoreTransactions,
-      addPaymentMethod,
-      editPaymentMethod,
-      savePaymentMethod,
-      deletePaymentMethod,
-      setDefaultPayment,
-      downloadTaxStatement,
-      loadMoreBillingHistory,
-      createNewTicket,
-      viewTicketDetails,
-      loadMoreTickets,
-      downloadManual,
-      viewManualOnline,
-      viewInstallationDetails,
-      downloadInstallationCertificate,
-      viewWarrantyDetails,
-      extendWarranty,
-      initiateNewReturn,
-      viewReturnDetails,
-      downloadReturnLabel,
-      confirmShipment
+      logout
     };
   }
 };
 </script>
+
+
 
 <style scoped>
 /* Base Styles */
@@ -2411,6 +2127,25 @@ export default {
 .member-since {
   font-size: 14px;
   color: #666;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f0f0f0;
+  color: #e53935;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #ffebee;
 }
 
 .quick-stats {
@@ -2608,9 +2343,9 @@ export default {
   color: #333;
 }
 
-
-  /* Dashboard specific styles */
+/* Dashboard specific styles */
 .dashboard-grid {
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-bottom: 30px;
@@ -2750,48 +2485,6 @@ export default {
   font-size: 16px;
   color: #0066cc;
   font-weight: 600;
-}
-
-.recommendation-slider {
-  display: flex;
-  gap: 15px;
-  overflow-x: auto;
-  padding: 10px 0;
-}
-
-.recommendation-item {
-  min-width: 220px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.recommendation-image {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-
-.recommendation-content {
-  padding: 12px;
-}
-
-.recommendation-content h4 {
-  margin: 0 0 8px;
-  font-size: 16px;
-  color: #333;
-}
-
-.recommendation-price {
-  font-weight: 600;
-  color: #0066cc;
-  margin: 0 0 12px;
-}
-
-.recommendation-buttons {
-  display: flex;
-  gap: 8px;
 }
 
 .quick-actions {
@@ -3716,7 +3409,4 @@ input:checked + .slider:before {
     width: 100%;
   }
 }
-/* userStyle: Normal */
-
 </style>
-

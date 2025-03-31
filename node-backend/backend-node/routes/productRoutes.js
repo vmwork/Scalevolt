@@ -1,6 +1,7 @@
 // routes/productRoutes.js
 import { Router } from 'express';
 import { pool } from '../db/pool.js'; // or wherever you export your pg pool
+import { translateText, translateProduct } from '../utils/translationService.js'; // Add this import
 const router = Router();
 
 // Helper function to build searchable text
@@ -20,22 +21,45 @@ router.post('/', async (req, res) => {
   const { 
     name, price, description,
     name_uk, name_pl,
-    description_uk, description_pl 
+    description_uk, description_pl,
+    auto_translate = true // New parameter to control auto-translation
   } = req.body;
   
   try {
+    let productData = {
+      name, price, description,
+      name_uk, name_pl,
+      description_uk, description_pl
+    };
+    
+    // Auto-translate if requested and translation fields are missing
+    if (auto_translate) {
+      try {
+        productData = await translateProduct(productData);
+      } catch (error) {
+        console.error('Auto-translation failed:', error);
+        // Continue with original data if translation fails
+      }
+    }
+    
     // Build searchable text for full-text search
-    const searchable_text = buildSearchableText({
-      name, name_uk, name_pl, 
-      description, description_uk, description_pl
-    });
+    const searchable_text = buildSearchableText(productData);
     
     const result = await pool.query(
       `INSERT INTO products 
        (name, price, description, name_uk, name_pl, description_uk, description_pl, searchable_text) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
        RETURNING *`,
-      [name, price, description, name_uk, name_pl, description_uk, description_pl, searchable_text]
+      [
+        productData.name, 
+        price, 
+        productData.description, 
+        productData.name_uk, 
+        productData.name_pl, 
+        productData.description_uk, 
+        productData.description_pl, 
+        searchable_text
+      ]
     );
     res.json(result.rows[0]);
   } catch (err) {
@@ -89,7 +113,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// NEW: Search products endpoint
+// Search products endpoint
 router.get('/search', async (req, res) => {
   const query = req.query.q || '';
   const lang = req.query.lang || 'en';
@@ -207,7 +231,8 @@ router.put('/:id', async (req, res) => {
   const { 
     name, price, description,
     name_uk, name_pl,
-    description_uk, description_pl 
+    description_uk, description_pl,
+    auto_translate = false // Add auto-translate option to updates too
   } = req.body;
   const { id } = req.params;
   
@@ -220,16 +245,45 @@ router.put('/:id', async (req, res) => {
     }
     
     // Combine existing product data with new data
-    const product = {
+    let product = {
       ...existingProduct.rows[0],
-      name: name || existingProduct.rows[0].name,
-      price: price || existingProduct.rows[0].price,
-      description: description || existingProduct.rows[0].description,
-      name_uk: name_uk || existingProduct.rows[0].name_uk,
-      name_pl: name_pl || existingProduct.rows[0].name_pl,
-      description_uk: description_uk || existingProduct.rows[0].description_uk,
-      description_pl: description_pl || existingProduct.rows[0].description_pl
+      name: name !== undefined ? name : existingProduct.rows[0].name,
+      price: price !== undefined ? price : existingProduct.rows[0].price,
+      description: description !== undefined ? description : existingProduct.rows[0].description,
+      name_uk: name_uk !== undefined ? name_uk : existingProduct.rows[0].name_uk,
+      name_pl: name_pl !== undefined ? name_pl : existingProduct.rows[0].name_pl,
+      description_uk: description_uk !== undefined ? description_uk : existingProduct.rows[0].description_uk,
+      description_pl: description_pl !== undefined ? description_pl : existingProduct.rows[0].description_pl
     };
+    
+    // Auto-translate if requested and the name or description has changed
+    if (auto_translate && (name !== undefined || description !== undefined)) {
+      try {
+        // Only translate the fields that need translation
+        const fieldsToTranslate = {
+          name: product.name,
+          description: product.description
+        };
+        
+        const translatedFields = await translateProduct(fieldsToTranslate);
+        
+        // Only update missing translations or if original content changed
+        if (name !== undefined && !name_uk) {
+          product.name_uk = translatedFields.name_uk;
+        }
+        if (name !== undefined && !name_pl) {
+          product.name_pl = translatedFields.name_pl;
+        }
+        if (description !== undefined && !description_uk) {
+          product.description_uk = translatedFields.description_uk;
+        }
+        if (description !== undefined && !description_pl) {
+          product.description_pl = translatedFields.description_pl;
+        }
+      } catch (error) {
+        console.error('Auto-translation failed during update:', error);
+      }
+    }
     
     // Build searchable text
     const searchable_text = buildSearchableText(product);
@@ -237,17 +291,27 @@ router.put('/:id', async (req, res) => {
     // Update the product
     const result = await pool.query(
       `UPDATE products SET 
-         name = COALESCE($1, name), 
-         price = COALESCE($2, price),
-         description = COALESCE($3, description),
-         name_uk = COALESCE($4, name_uk),
-         name_pl = COALESCE($5, name_pl),
-         description_uk = COALESCE($6, description_uk),
-         description_pl = COALESCE($7, description_pl),
+         name = $1, 
+         price = $2,
+         description = $3,
+         name_uk = $4,
+         name_pl = $5,
+         description_uk = $6,
+         description_pl = $7,
          searchable_text = $8
        WHERE id = $9 
        RETURNING *`,
-      [name, price, description, name_uk, name_pl, description_uk, description_pl, searchable_text, id]
+      [
+        product.name, 
+        product.price, 
+        product.description,
+        product.name_uk,
+        product.name_pl,
+        product.description_uk,
+        product.description_pl, 
+        searchable_text, 
+        id
+      ]
     );
     
     res.json(result.rows[0]);
@@ -272,7 +336,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// ADD: Translation-specific endpoint
+// Translation-specific endpoint
 router.patch('/:id/translations', async (req, res) => {
   const { id } = req.params;
   const { name_uk, name_pl, description_uk, description_pl } = req.body;
@@ -300,6 +364,46 @@ router.patch('/:id/translations', async (req, res) => {
     // Update only translation fields
     const result = await pool.query(
       `UPDATE products SET 
+         name_uk = $1,
+         name_pl = $2,
+         description_uk = $3,
+         description_pl = $4,
+         searchable_text = $5
+       WHERE id = $6 
+       RETURNING *`,
+      [product.name_uk, product.name_pl, product.description_uk, product.description_pl, searchable_text, id]
+    );
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating translations');
+  }
+});
+
+// Auto-translate missing fields for a product
+router.post('/:id/auto-translate', async (req, res) => {
+  const { id } = req.params;
+  const { targetLanguages = ['uk', 'pl'], sourceLanguage = 'en' } = req.body;
+  
+  try {
+    // Get current product data
+    const currentProduct = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+    
+    if (currentProduct.rows.length === 0) {
+      return res.status(404).send('Product not found');
+    }
+    
+    // Auto-translate missing fields
+    const product = currentProduct.rows[0];
+    const translatedProduct = await translateProduct(product, targetLanguages, sourceLanguage);
+    
+    // Build searchable text
+    const searchable_text = buildSearchableText(translatedProduct);
+    
+    // Update only translation fields
+    const result = await pool.query(
+      `UPDATE products SET 
          name_uk = COALESCE($1, name_uk),
          name_pl = COALESCE($2, name_pl),
          description_uk = COALESCE($3, description_uk),
@@ -307,13 +411,73 @@ router.patch('/:id/translations', async (req, res) => {
          searchable_text = $5
        WHERE id = $6 
        RETURNING *`,
-      [name_uk, name_pl, description_uk, description_pl, searchable_text, id]
+      [
+        translatedProduct.name_uk, 
+        translatedProduct.name_pl, 
+        translatedProduct.description_uk, 
+        translatedProduct.description_pl, 
+        searchable_text, 
+        id
+      ]
     );
     
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error updating translations');
+    res.status(500).send('Error auto-translating product');
+  }
+});
+
+// Batch auto-translate multiple products
+router.post('/batch-translate', async (req, res) => {
+  const { productIds = [], targetLanguages = ['uk', 'pl'], sourceLanguage = 'en' } = req.body;
+  
+  try {
+    const results = [];
+    
+    // Process each product
+    for (const id of productIds) {
+      // Get current product data
+      const currentProduct = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+      
+      if (currentProduct.rows.length === 0) {
+        results.push({ id, success: false, message: 'Product not found' });
+        continue;
+      }
+      
+      // Auto-translate missing fields
+      const product = currentProduct.rows[0];
+      const translatedProduct = await translateProduct(product, targetLanguages, sourceLanguage);
+      
+      // Build searchable text
+      const searchable_text = buildSearchableText(translatedProduct);
+      
+      // Update translation fields
+      await pool.query(
+        `UPDATE products SET 
+           name_uk = COALESCE($1, name_uk),
+           name_pl = COALESCE($2, name_pl),
+           description_uk = COALESCE($3, description_uk),
+           description_pl = COALESCE($4, description_pl),
+           searchable_text = $5
+         WHERE id = $6`,
+        [
+          translatedProduct.name_uk, 
+          translatedProduct.name_pl, 
+          translatedProduct.description_uk, 
+          translatedProduct.description_pl, 
+          searchable_text, 
+          id
+        ]
+      );
+      
+      results.push({ id, success: true });
+    }
+    
+    res.json({ results });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error batch translating products');
   }
 });
 

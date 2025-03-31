@@ -11,7 +11,7 @@
 
     <!-- Conditionally show brand if not empty -->
     <div v-if="brand" class="product-brand">
-      Brand: {{ brand }}
+      {{ $t('product.brand') }}: {{ brand }}
     </div>
 
     <!-- Pricing Display -->
@@ -44,7 +44,7 @@
         class="add-to-cart" 
         @click.stop.prevent="handleAddToCart"
       >
-        {{ isRentalItem ? 'Орендувати' : 'Додати в кошик' }}
+        {{ isRentalItem ? $t('product.rent') : $t('product.addToCart') }}
       </button>
     </transition>
   </div> 
@@ -53,6 +53,7 @@
 <script>
 import { computed, ref } from 'vue';
 import { useCartStore } from '@/stores/cart';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'ProductCard',
@@ -91,6 +92,7 @@ export default {
   },
   setup(props) {
     const cartStore = useCartStore();
+    const { t, locale } = useI18n();
 
     // State for rental duration
     const selectedDuration = ref('day');
@@ -108,14 +110,16 @@ export default {
         : 'N/A';
     };
 
-    // Method to format duration display
+    // Method to format duration display based on current language
     const formatDurationDisplay = (duration) => {
-      const durationMap = {
-        'day': 'День',
-        'week': 'Тиждень',
-        'month': 'Місяць'
+      // Use translations for durations
+      const durationKeys = {
+        'day': 'product.durations.day',
+        'week': 'product.durations.week',
+        'month': 'product.durations.month'
       };
-      return durationMap[duration] || duration.charAt(0).toUpperCase() + duration.slice(1);
+      
+      return durationKeys[duration] ? t(durationKeys[duration]) : duration.charAt(0).toUpperCase() + duration.slice(1);
     };
 
     // Method to select rental duration
@@ -174,7 +178,8 @@ export default {
       selectedDuration,
       selectRentalDuration,
       formatRentalPrice,
-      formatDurationDisplay
+      formatDurationDisplay,
+      $t: t
     };
   },
 };

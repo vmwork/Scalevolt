@@ -1,6 +1,6 @@
 <template>
   <div class="cart-view">
-    <h1>Your Cart</h1>
+    <h1 class="page-title">{{ $t('cart.yourCart') }}</h1>
 
     <div v-if="cartItems.length > 0" class="cart-container">
       <div class="cart-items">
@@ -9,12 +9,13 @@
           <div class="product-details">
             <h3>{{ item.name }}</h3>
             <p class="product-price">
-              Price: {{ formatPrice(item.price) }} грн
+              {{ $t('product.price') }}: {{ formatPrice(item.price) }} грн
             </p>
             <div class="quantity-controls">
               <button
                 @click="decreaseQuantity(item.uniqueKey)"
                 aria-label="Decrease quantity"
+                class="quantity-button"
               >
                 −
               </button>
@@ -23,22 +24,25 @@
                 :value="item.quantity"
                 @input="updateQuantity(item.uniqueKey, $event.target.value)"
                 class="quantity-input"
+                min="1"
               />
               <button
                 @click="increaseQuantity(item.uniqueKey)"
                 aria-label="Increase quantity"
+                class="quantity-button"
               >
                 +
               </button>
             </div>
             <p class="product-subtotal">
-              Subtotal: {{ formatPrice(item.price * item.quantity) }} грн
+              {{ $t('cart.subtotal') }}: {{ formatPrice(item.price * item.quantity) }} грн
             </p>
             <button
               @click="removeFromCart(item.uniqueKey)"
               class="remove-button"
             >
-              Remove
+              <span class="remove-icon">×</span>
+              {{ $t('common.remove') }}
             </button>
           </div>
         </div>
@@ -46,39 +50,48 @@
 
       <!-- Cart Summary -->
       <div class="cart-summary">
-        <h2>Order Summary</h2>
+        <h2>{{ $t('cart.orderSummary') }}</h2>
         <div class="summary-item">
-          <span>Items:</span>
+          <span>{{ $t('cart.items') }}:</span>
           <span>{{ totalQuantity }}</span>
         </div>
         <div class="summary-item">
-          <span>Subtotal:</span>
+          <span>{{ $t('cart.subtotal') }}:</span>
           <span>{{ formatPrice(totalPrice) }} грн</span>
         </div>
         <div class="summary-item">
-          <span>Tax (20%):</span>
+          <span>{{ $t('cart.tax') }} (20%):</span>
           <span>{{ formatPrice(tax) }} грн</span>
         </div>
         <div class="summary-item">
-          <span>Shipping:</span>
+          <span>{{ $t('cart.shipping') }}:</span>
           <span>{{ formatPrice(shipping) }} грн</span>
+          <span v-if="totalPrice > 5000" class="free-shipping-badge">{{ $t('cart.free') }}</span>
         </div>
         <hr />
         <div class="summary-total">
-          <span>Total:</span>
+          <span>{{ $t('cart.total') }}:</span>
           <span>{{ formatPrice(total) }} грн</span>
         </div>
         <button @click="proceedToCheckout" class="checkout-button">
-          Proceed to Checkout
+          <span class="checkout-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          {{ $t('cart.checkout') }}
+        </button>
+        <button @click="continueShopping" class="continue-shopping-button">
+          {{ $t('cart.continueShopping') }}
         </button>
       </div>
     </div>
 
     <div v-else class="empty-cart">
       <img src="/images/Cart/empty-cart.png" alt="Empty Cart" />
-      <p>Your cart is empty.</p>
-      <button @click="continueShopping" class="continue-shopping-button">
-        Continue Shopping
+      <p>{{ $t('cart.empty') }}</p>
+      <button @click="continueShopping" class="continue-shopping-button primary">
+        {{ $t('cart.continueShopping') }}
       </button>
     </div>
   </div>
@@ -87,16 +100,20 @@
 <script>
 import { computed } from 'vue'
 import { useCartStore } from '@/stores/cart'
+import { useAuthStore } from '@/stores/auth' // Added auth store import
 import { useRouter } from 'vue-router'
 import { loadStripe } from '@stripe/stripe-js'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'CartView',
   setup() {
     const cartStore = useCartStore()
+    const authStore = useAuthStore() // Added auth store
     const router = useRouter()
     const toast = useToast()
+    const { t } = useI18n()
 
     // Computed properties
     const cartItems = computed(() => cartStore.cartItems)
@@ -111,7 +128,7 @@ export default {
     // Methods
     const removeFromCart = uniqueKey => {
       cartStore.removeFromCart(uniqueKey)
-      toast.success('Item removed from cart.')
+      toast.success(t('cart.itemRemoved'))
     }
 
     const increaseQuantity = uniqueKey => {
@@ -120,6 +137,7 @@ export default {
       )
       if (item) {
         cartStore.updateQuantity(uniqueKey, item.quantity + 1)
+        toast.success(t('cart.quantityUpdated'))
       }
     }
 
@@ -129,6 +147,7 @@ export default {
       )
       if (item && item.quantity > 1) {
         cartStore.updateQuantity(uniqueKey, item.quantity - 1)
+        toast.success(t('cart.quantityUpdated'))
       }
     }
 
@@ -143,43 +162,15 @@ export default {
       return price.toLocaleString('en-US')
     }
 
-    const proceedToCheckout = async () => {
+    // Updated checkout method with proper route handling
+    const proceedToCheckout = () => {
       if (cartStore.cartItems.length === 0) {
-        toast.error('Your cart is empty.')
+        toast.error(t('cart.emptyCartError'))
         return
       }
 
-      // Initialize Stripe
-      const stripe = await loadStripe(
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-      )
-
-      // Create a Checkout Session on the server
-      try {
-        const response = await fetch(
-          'http://localhost:4242/create-checkout-session',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ items: cartItems.value }),
-          }
-        )
-
-        const session = await response.json()
-
-        if (session.url) {
-          // Redirect to Stripe Checkout
-          window.location.href = session.url
-          toast.success('Redirecting to checkout...')
-        } else {
-          toast.error('Unable to proceed to checkout. Please try again later.')
-        }
-      } catch (error) {
-        console.error('Error creating checkout session:', error)
-        toast.error('An error occurred. Please try again.')
-      }
+      // Route to checkout and let the route guard handle authentication check
+      router.push({ name: 'Checkout' })
     }
 
     const continueShopping = () => {
@@ -200,6 +191,7 @@ export default {
       formatPrice,
       proceedToCheckout,
       continueShopping,
+      $t: t,
     }
   },
 }
@@ -215,11 +207,12 @@ export default {
   color: #333;
 }
 
-h1 {
+.page-title {
   text-align: center;
-  margin-bottom: 40px;
+  margin: 80px 0 40px; /* Increased top margin to prevent header overlap */
   font-size: 2rem;
   font-weight: 600;
+  position: relative;
 }
 
 /* Cart Container */
@@ -232,6 +225,9 @@ h1 {
 /* Cart Items */
 .cart-items {
   flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Add spacing between cart items */
 }
 
 .cart-item {
@@ -241,14 +237,21 @@ h1 {
   background-color: #fafafa;
   border-radius: 12px;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cart-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
 }
 
 .product-image {
   width: 120px;
   height: 120px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .product-details {
@@ -259,69 +262,95 @@ h1 {
   margin: 0 0 10px 0;
   font-size: 1.25rem;
   font-weight: 500;
+  color: #222;
 }
 
 .product-price,
 .product-subtotal {
   font-size: 1rem;
   margin: 5px 0;
+  color: #555;
+}
+
+.product-subtotal {
+  font-weight: 500;
+  color: #333;
 }
 
 .quantity-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px; /* Reduce gap to make buttons look aligned */
+  justify-content: flex-start; /* Align to left for better UX */
+  gap: 8px;
   margin: 15px 0;
 }
 
-/* Fixing the shadowed circle effect */
-.quantity-controls button {
-  width: 40px; /* Slightly increased width */
-  height: 40px; /* Ensures a perfect circle */
-  background-color: #f5f5f5;
+/* Improved quantity buttons */
+.quantity-button {
+  width: 36px;
+  height: 36px;
+  background-color: #f8f8f8;
   color: #333;
-  border: 1px solid #ddd; /* Added a subtle border */
-  border-radius: 50%; /* Makes it perfectly circular */
+  border: 1px solid #e0e0e0;
+  border-radius: 50%; 
   cursor: pointer;
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Softer shadow */
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Hover Effect */
-.quantity-controls button:hover {
-  background-color: #e0e0e0;
-  transform: scale(1.05); /* Slight zoom effect */
+.quantity-button:hover {
+  background-color: #eee;
+  transform: scale(1.05);
+}
+
+.quantity-button:active {
+  transform: scale(0.98);
 }
 
 .quantity-input {
-  width: 60px;
+  width: 50px;
   height: 36px;
   text-align: center;
   font-size: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
+  padding: 0 8px;
 }
 
+.quantity-input:focus {
+  outline: none;
+  border-color: #52c41a;
+  box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.1);
+}
+
+/* Improved remove button */
 .remove-button {
   margin-top: 10px;
-  padding: 8px 16px;
-  background-color: #ff4d4f;
-  color: #ffffff;
-  border: none;
+  padding: 8px 14px;
+  background-color: #fff;
+  color: #ff4d4f;
+  border: 1px solid #ff4d4f;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background-color 0.2s ease;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .remove-button:hover {
-  background-color: #d9363e;
+  background-color: #fff1f0;
+}
+
+.remove-icon {
+  font-size: 16px;
+  font-weight: bold;
 }
 
 /* Cart Summary */
@@ -330,7 +359,11 @@ h1 {
   padding: 30px;
   background-color: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 100px; /* Keep summary visible when scrolling */
+  max-height: calc(100vh - 120px);
+  align-self: flex-start;
 }
 
 .cart-summary h2 {
@@ -338,6 +371,7 @@ h1 {
   font-size: 1.5rem;
   font-weight: 600;
   text-align: center;
+  color: #222;
 }
 
 .summary-item {
@@ -345,6 +379,21 @@ h1 {
   justify-content: space-between;
   margin-bottom: 15px;
   font-size: 1rem;
+  color: #555;
+  position: relative;
+}
+
+.free-shipping-badge {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  background-color: #52c41a;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .summary-total {
@@ -352,6 +401,7 @@ h1 {
   justify-content: space-between;
   font-size: 1.25rem;
   font-weight: 600;
+  color: #222;
   margin: 20px 0;
 }
 
@@ -361,9 +411,10 @@ h1 {
   margin: 20px 0;
 }
 
+/* Improved checkout button */
 .checkout-button {
   width: 100%;
-  padding: 15px;
+  padding: 14px 20px;
   background-color: #52c41a;
   color: #ffffff;
   border: none;
@@ -371,43 +422,82 @@ h1 {
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 6px rgba(82, 196, 26, 0.2);
 }
 
 .checkout-button:hover {
-  background-color: #41a516;
+  background-color: #46b314;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(82, 196, 26, 0.25);
+}
+
+.checkout-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(82, 196, 26, 0.2);
+}
+
+.checkout-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* Improved continue shopping button */
+.continue-shopping-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 20px;
+  background-color: transparent;
+  color: #1890ff;
+  border: 1px solid #1890ff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.continue-shopping-button:hover {
+  background-color: #e6f7ff;
+}
+
+.continue-shopping-button.primary {
+  background-color: #1890ff;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 6px rgba(24, 144, 255, 0.2);
+}
+
+.continue-shopping-button.primary:hover {
+  background-color: #096dd9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(24, 144, 255, 0.25);
 }
 
 /* Empty Cart */
 .empty-cart {
   text-align: center;
   margin-top: 100px;
+  padding: 40px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .empty-cart img {
-  width: 200px;
+  width: 180px;
   margin-bottom: 30px;
+  opacity: 0.8;
 }
 
 .empty-cart p {
   font-size: 1.5rem;
   color: #666;
-}
-
-.continue-shopping-button {
-  margin-top: 20px;
-  padding: 12px 24px;
-  background-color: #1890ff;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s ease;
-}
-
-.continue-shopping-button:hover {
-  background-color: #146bb2;
+  margin-bottom: 20px;
 }
 
 /* Responsive Styles */
@@ -418,6 +508,8 @@ h1 {
 
   .cart-summary {
     width: 100%;
+    position: static;
+    max-height: none;
   }
 
   .cart-item {
@@ -427,17 +519,16 @@ h1 {
 
   .product-image {
     width: 100%;
+    max-width: 200px;
     height: auto;
-  }
-
-  .quantity-controls {
-    justify-content: flex-start;
+    margin-bottom: 10px;
   }
 }
 
 @media (max-width: 576px) {
-  h1 {
+  .page-title {
     font-size: 1.75rem;
+    margin-top: 70px;
   }
 
   .cart-summary {
@@ -446,6 +537,14 @@ h1 {
 
   .checkout-button {
     padding: 12px;
+  }
+  
+  .cart-item {
+    padding: 15px;
+  }
+  
+  .product-details h3 {
+    font-size: 1.1rem;
   }
 }
 </style>

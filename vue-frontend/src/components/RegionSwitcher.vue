@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 
@@ -62,12 +62,14 @@ export default {
       }
     };
     
-    // Handle locale selection
+    // Enhanced locale selection with forced page reload
     const selectLocale = (newLocale) => {
       if (newLocale === currentLocale.value) {
         dropdownVisible.value = false;
         return;
       }
+      
+      console.log('RegionSwitcher changing locale to:', newLocale);
       
       // Update locale
       locale.value = newLocale;
@@ -78,25 +80,34 @@ export default {
       // Update document language
       document.documentElement.setAttribute('lang', newLocale);
       
-      // Update route with new locale
-      const currentPath = route.fullPath;
-      const newPath = currentPath.replace(/^\/[^\/]+/, `/${newLocale}`);
-      
-      // Navigate to new path
-      router.push(newPath);
-      
       // Close dropdown
       dropdownVisible.value = false;
+      
+      // IMPORTANT: Force a page reload to ensure all components display correctly in the new language
+      window.location.reload();
     };
     
     // Set up event listeners on mount
     onMounted(() => {
+      console.log('RegionSwitcher mounted with locale:', locale.value);
       document.addEventListener('click', closeDropdownOnOutsideClick);
+      
+      // If locale from localStorage doesn't match current locale, update it
+      const savedLocale = localStorage.getItem('userLocale');
+      if (savedLocale && savedLocale !== locale.value) {
+        console.log('Updating locale from localStorage:', savedLocale);
+        locale.value = savedLocale;
+      }
     });
     
     // Clean up event listeners before unmount
     onBeforeUnmount(() => {
       document.removeEventListener('click', closeDropdownOnOutsideClick);
+    });
+    
+    // Watch for direct i18n locale changes
+    watch(() => locale.value, (newLocale) => {
+      console.log('RegionSwitcher detected i18n locale change to:', newLocale);
     });
     
     return {

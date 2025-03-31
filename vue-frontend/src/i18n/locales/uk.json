@@ -14,7 +14,34 @@
     "navigation": "Навігація",
     "force_refresh": "Оновити сторінку",
     "ukrainian": "Українська",
-    "polish": "Польська"
+    "polish": "Польська",
+    "loading": "Завантаження продуктів...",
+    "noProductsFound": "У цій категорії не знайдено товарів.",
+    "category": "Категорія",
+    "remove": "Видалити"
+  },
+  "homeView": {
+    "residentialCommercialSolar": "Житлова та комерційна сонячна система",
+    "evChargersComponents": "Зарядні пристрої та компоненти для електромобілів",
+    "exploreNewCategories": "Досліджуйте нові категорії",
+    "solarPanels": "Сонячні Панелі",
+    "batteries": "Батареї",
+    "inverters": "Інвертори",
+    "solarSets": "Комплекти сонячних електростанцій",
+    "mountingSystems": "Система монтажу сонячних панелей",
+    "dcChargingStations": "Швидкі Зарядні Станції (DC)",
+    "acChargingStations": "Зарядні Станції Рівня 2 (AC)",
+    "portableChargingDevices": "Портативні/Мобільні Зарядні Пристрої",
+    "portablePowerStation": "Портативна електростанції",
+    "solarGenerators": "Cонячні генератори",
+    "portableSolarPanels": "Портативні сонячні панелі",
+    "cablesAndWires": "Кабелі електричні та дроти",
+    "generators": "Генератори",
+    "industrialGenerators": "Промислові генератори для важких навантажень (100 кВт+)",
+    "solarLightingTowers": "Освітлювальні вежі на сонячних батареях",
+    "liftsAndCranes": "Підйомники та Крани",
+    "rental": "Оренда",
+    "seeAll": "Переглянути всі"
   },
   "product": {
     "section_title": "Інформація про товар",
@@ -25,7 +52,23 @@
     "addToCart": "Додати в кошик",
     "specifications": "Характеристики",
     "description": "Опис",
-    "relatedProducts": "Схожі товари"
+    "relatedProducts": "Схожі товари",
+    "reviews": "Відгуки",
+    "off": "знижки",
+    "taxInfo": "включаючи всі податки",
+    "fastDelivery": "Швидка доставка",
+    "daysExchange": "{days} днів на обмін",
+    "brand": "Бренд",
+    "model": "Модель",
+    "rent": "Орендувати",
+    "duration": {
+      "day": "День",
+      "week": "Тиждень",
+      "month": "Місяць"
+    },
+    "loadingDetails": "Завантаження деталей продукту...",
+    "notFound": "Товар не знайдено.",
+    "productImage": "Зображення товару"
   },
   "cart": {
     "yourCart": "Ваш кошик",
@@ -34,14 +77,46 @@
     "subtotal": "Проміжний підсумок",
     "shipping": "Доставка",
     "total": "Разом",
-    "checkout": "Оформити замовлення"
+    "checkout": "Оформити замовлення",
+    "items": "Товари",
+    "tax": "Податок",
+    "free": "Безкоштовно",
+    "orderSummary": "Підсумок замовлення",
+    "itemRemoved": "Товар видалено з кошика.",
+    "quantityUpdated": "Кількість оновлено.",
+    "emptyCartError": "Ваш кошик порожній."
+  },
+  "auth": {
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "confirmPassword": "Підтвердіть пароль",
+    "rememberMe": "Запам'ятати мене",
+    "forgotPassword": "Забули пароль?",
+    "firstName": "Ім'я",
+    "lastName": "Прізвище",
+    "phone": "Телефон",
+    "acceptTerms": "Я приймаю",
+    "termsLink": "умови використання та політику конфіденційності",
+    "loginSuccess": "Вхід успішний",
+    "loginFailed": "Помилка входу. Перевірте ваші дані",
+    "registerSuccess": "Реєстрація успішна",
+    "registerFailed": "Помилка реєстрації",
+    "passwordsMustMatch": "Паролі повинні збігатися"
   },
   "checkout": {
     "shippingAddress": "Адреса доставки",
     "billingAddress": "Платіжна адреса",
     "paymentMethod": "Спосіб оплати",
     "orderSummary": "Підсумок замовлення",
-    "placeOrder": "Замовити"
+    "placeOrder": "Замовити",
+    "authenticateToCheckout": "Вхід або реєстрація для оформлення замовлення",
+    "authenticateDescription": "Щоб продовжити оформлення замовлення, увійдіть у свій обліковий запис або створіть новий",
+    "orContinueAs": "або продовжіть як",
+    "continueAsGuest": "Гість",
+    "viewCart": "Переглянути кошик",
+    "loginRequired": "Для оформлення замовлення потрібно увійти в систему",
+    "loginRequiredForCheckout": "Для оформлення замовлення необхідно мати обліковий запис",
+    "emptyCartError": "Ваш кошик порожній. Неможливо оформити замовлення"
   },
   "profile": {
     "account_details": "Інформація про акаунт",
@@ -74,6 +149,22 @@
     "accept": "Так, дозволити",
     "reject": "Ні, дякую"
   },
+
+  login: {
+    title: 'Ласкаво просимо назад',
+    subtitle: 'Будь ласка, увійдіть, щоб продовжити.',
+    googleBtn: 'Продовжити з Google',
+    appleBtn: 'Продовжити з Apple',
+    emailBtn: 'Увійти за допомогою Email',
+    emailPlaceholder: 'Електронна пошта',
+    passwordPlaceholder: 'Пароль',
+    noAccount: 'Не маєте облікового запису?',
+    signUp: 'Зареєструватися',
+    terms: 'Продовжуючи, ви погоджуєтеся з нашими',
+    termsLink: 'Умовами використання',
+    privacyLink: 'Політикою конфіденційності',
+    and: 'та'
+  },
   "solar_components": {
     "section_title": "Сонячні компоненти",
     "solar_panels": "Сонячні панелі",
@@ -92,8 +183,22 @@
     "contact": "Контакти",
     "terms": "Умови використання",
     "privacy": "Політика конфіденційності",
-    "copyright": "© 2025 ScaleVolt. Всі права захищені.",
-    "cases": "Кейси клієнтів"
+    "copyright": "© {year} ScaleVolt. Всі права захищені.",
+    "cases": "Кейси клієнтів",
+    "products": "Продукти",
+    "sale": "Розпродаж",
+    "solarSets": "Сонячні набори",
+    "batteries": "Акумулятори",
+    "inverters": "Інвертори",
+    "customerSupport": "Підтримка клієнтів",
+    "aboutUs": "Про Нас",
+    "ourTeam": "Наша Команда",
+    "contactUs": "Зв'яжіться з нами",
+    "support": "Підтримка",
+    "faq": "Запитання й відповіді",
+    "career": "Кар'єра",
+    "jobs": "Вакансії",
+    "followUs": "Слідкуйте за нами"
   },
   "delivery": {
     "pageTitle": "Доставка, Гарантія та Повернення",
@@ -118,7 +223,8 @@
     "remoteAreas": "Віддалені райони",
     "remoteAreasCost": "Розраховується індивідуально",
     "trackingTitle": "Відстеження замовлення",
-    "trackingDesc": "Після відправлення замовлення ви отримаєте електронний лист з номером для відстеження. Ви також можете перевірити статус вашого замовлення в <a href='/account'>особистому кабінеті</a>."
+    "trackingDesc": "Після відправлення замовлення ви отримаєте електронний лист з номером для відстеження. Ви також можете перевірити статус вашого замовлення в <a href='/account'>особистому кабінеті</a>.",
+    "seeAll": "Переглянути всі"
   },
   "warranty": {
     "warrantyTitle": "Гарантія",
@@ -260,5 +366,59 @@
     "contactDesc": "Якщо у вас є запитання щодо цієї політики або обробки ваших даних, зв'яжіться з нами:",
     "addressTitle": "Адреса",
     "addressValue": "Київ, Україна"
+  },
+  "header": {
+    "menu": {
+      "solarSystem": "Сонячна система",
+      "evChargers": "Зарядні пристрої для електромобілів",
+      "portablePower": "Портативна енергія",
+      "generators": "Генератори",
+      "electricalComponents": "Електричні компоненти"
+    },
+    "featured": {
+      "solar": "Популярні сонячні рішення",
+      "ev": "Топові зарядні станції",
+      "portable": "Портативні рішення для енергії",
+      "generators": "Генератори для будь-яких потреб",
+      "electrical": "Електричні компоненти та кабелі"
+    },
+    "categories": {
+      "solarPanels": "Сонячні Панелі",
+      "batteries": "Батареї",
+      "inverters": "Інвертори",
+      "solarSets": "Комплекти сонячних електростанцій",
+      "mountingSystems": "Система монтажу сонячних панелей",
+      "evChargers": "Зарядні пристрої для електромобілів",
+      "cablesAdapters": "Кабелі та адаптери",
+      "chargingStations": "Зарядні станції",
+      "portablePowerStations": "Портативна електростанції",
+      "solarGenerators": "Cонячні генератори",
+      "portableSolarPanels": "Портативні сонячні панелі",
+      "industrialGenerators": "Промислові генератори для важких навантажень (100 кВт+)",
+      "solarLightingTowers": "Освітлювальні вежі на сонячних батареях",
+      "automaticSwitches": "Автоматичні вимикачі",
+      "cablesWires": "Кабелі електричні та дроти"
+    }
+  },
+  "products": {
+    "solarPanels": {
+      "longi410Black": "Сонячна Панель Longi-410-Black",
+      "longi420Black": "Сонячна Панель Longi-420-Black",
+      "longi425Black": "Сонячна Панель Longi-425-Black",
+      "longi530Black": "Сонячна Панель Longi-530-Black",
+      "longi630Bifacial": "Сонячна Панель Longi-630-Bifacial",
+      "longi430": "Сонячна Панель Longi-430",
+      "longi580": "Сонячна Панель Longi-580",
+      "longi585": "Сонячна Панель Longi-585",
+      "longi440": "Сонячна Панель Longi-440",
+      "longi455": "Сонячна Панель Longi-455"
+    },
+    "batteries": {
+      "deyeRWM61B1": "АКБ Deye RW-M6.1-B-1",
+      "rwM53Pro1": "RW-M5.3-Pro_1",
+      "deyeRWF106": "Deye-RW-F10.6-51.2V-208AH-10.64KWH-1",
+      "pylontechUS5000": "АКБ-Pylontech-US5000",
+      "dyness48V50Ah": "АКБ-Dyness-48V-50Ah-1"
+    }
   }
 }

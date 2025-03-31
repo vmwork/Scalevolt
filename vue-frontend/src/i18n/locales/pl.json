@@ -14,7 +14,34 @@
     "navigation": "Nawigacja",
     "force_refresh": "Odśwież stronę",
     "ukrainian": "Ukraiński",
-    "polish": "Polski"
+    "polish": "Polski",
+    "loading": "Ładowanie produktów...",
+    "noProductsFound": "Nie znaleziono produktów w tej kategorii.",
+    "category": "Kategoria",
+    "remove": "Usuń"
+  },
+  "homeView": {
+    "residentialCommercialSolar": "Domowe i komercyjne systemy słoneczne",
+    "evChargersComponents": "Ładowarki i komponenty do pojazdów elektrycznych",
+    "exploreNewCategories": "Odkryj nowe kategorie",
+    "solarPanels": "Panele słoneczne",
+    "batteries": "Akumulatory",
+    "inverters": "Falowniki",
+    "solarSets": "Zestawy elektrowni słonecznych",
+    "mountingSystems": "Systemy montażowe paneli słonecznych",
+    "dcChargingStations": "Szybkie stacje ładowania (DC)",
+    "acChargingStations": "Stacje ładowania poziomu 2 (AC)",
+    "portableChargingDevices": "Przenośne/mobilne urządzenia ładujące",
+    "portablePowerStation": "Przenośne elektrownie",
+    "solarGenerators": "Generatory słoneczne",
+    "portableSolarPanels": "Przenośne panele słoneczne",
+    "cablesAndWires": "Kable elektryczne i przewody",
+    "generators": "Generatory",
+    "industrialGenerators": "Przemysłowe generatory do dużych obciążeń (100 kW+)",
+    "solarLightingTowers": "Wieże oświetleniowe zasilane energią słoneczną",
+    "liftsAndCranes": "Podnośniki i dźwigi",
+    "rental": "Wynajem",
+    "seeAll": "Zobacz wszystko"
   },
   "product": {
     "section_title": "Informacje o produkcie",
@@ -25,7 +52,23 @@
     "addToCart": "Dodaj do koszyka",
     "specifications": "Specyfikacje",
     "description": "Opis",
-    "relatedProducts": "Podobne produkty"
+    "relatedProducts": "Podobne produkty",
+    "reviews": "Opinie",
+    "off": "zniżki",
+    "taxInfo": "w tym wszystkie podatki",
+    "fastDelivery": "Szybka dostawa",
+    "daysExchange": "{days} dni na wymianę",
+    "brand": "Marka",
+    "model": "Model",
+    "rent": "Wynajmij",
+    "duration": {
+      "day": "Dzień",
+      "week": "Tydzień",
+      "month": "Miesiąc"
+    },
+    "loadingDetails": "Ładowanie szczegółów produktu...",
+    "notFound": "Nie znaleziono produktu.",
+    "productImage": "Zdjęcie produktu"
   },
   "cart": {
     "yourCart": "Twój koszyk",
@@ -34,15 +77,50 @@
     "subtotal": "Suma częściowa",
     "shipping": "Dostawa",
     "total": "Razem",
-    "checkout": "Do kasy"
+    "checkout": "Do kasy",
+    "items": "Produkty",
+    "tax": "Podatek",
+    "free": "Bezpłatnie",
+    "orderSummary": "Podsumowanie zamówienia",
+    "itemRemoved": "Produkt został usunięty z koszyka.",
+    "quantityUpdated": "Ilość została zaktualizowana.",
+    "emptyCartError": "Twój koszyk jest pusty."
   },
+
+  "auth": {
+      "email": "Email",
+      "password": "Hasło",
+      "confirmPassword": "Potwierdź hasło",
+      "rememberMe": "Zapamiętaj mnie",
+      "forgotPassword": "Zapomniałeś hasła?",
+      "firstName": "Imię",
+      "lastName": "Nazwisko",
+      "phone": "Telefon",
+      "acceptTerms": "Akceptuję",
+      "termsLink": "warunki użytkowania i politykę prywatności",
+      "loginSuccess": "Logowanie pomyślne",
+      "loginFailed": "Błąd logowania. Sprawdź swoje dane",
+      "registerSuccess": "Rejestracja pomyślna",
+      "registerFailed": "Błąd rejestracji",
+      "passwordsMustMatch": "Hasła muszą się zgadzać"
+
+    },
   "checkout": {
     "shippingAddress": "Adres dostawy",
     "billingAddress": "Adres rozliczeniowy",
     "paymentMethod": "Metoda płatności",
     "orderSummary": "Podsumowanie zamówienia",
-    "placeOrder": "Złóż zamówienie"
-  },
+    "placeOrder": "Złóż zamówienie",
+    "authenticateToCheckout": "Zaloguj się lub zarejestruj, aby przejść do kasy",
+      "authenticateDescription": "Aby kontynuować proces składania zamówienia, zaloguj się na swoje konto lub utwórz nowe",
+      "orContinueAs": "lub kontynuuj jako",
+      "continueAsGuest": "Gość",
+      "viewCart": "Zobacz koszyk",
+      "loginRequired": "Aby przejść do kasy, musisz się zalogować",
+      "loginRequiredForCheckout": "Aby złożyć zamówienie, potrzebujesz konta",
+      "emptyCartError": "Twój koszyk jest pusty. Nie można kontynuować do kasy"
+    },
+
   "profile": {
     "account_details": "Szczegóły konta",
     "account_settings": "Ustawienia konta",
@@ -92,8 +170,22 @@
     "contact": "Kontakt",
     "terms": "Warunki korzystania",
     "privacy": "Polityka prywatności",
-    "copyright": "© 2025 ScaleVolt. Wszelkie prawa zastrzeżone.",
-    "cases": "Przypadki klientów"
+    "copyright": "© {year} ScaleVolt. Wszelkie prawa zastrzeżone.",
+    "cases": "Przypadki klientów",
+    "products": "Produkty",
+    "sale": "Wyprzedaż",
+    "solarSets": "Zestawy słoneczne",
+    "batteries": "Akumulatory",
+    "inverters": "Falowniki",
+    "customerSupport": "Obsługa klienta",
+    "aboutUs": "O Nas",
+    "ourTeam": "Nasz Zespół",
+    "contactUs": "Skontaktuj się z nami",
+    "support": "Wsparcie",
+    "faq": "Pytania i odpowiedzi",
+    "career": "Kariera",
+    "jobs": "Oferty pracy",
+    "followUs": "Obserwuj nas"
   },
   "delivery": {
     "pageTitle": "Dostawa, Gwarancja i Zwroty",
@@ -118,7 +210,8 @@
     "remoteAreas": "Obszary odległe",
     "remoteAreasCost": "Wyceniane indywidualnie",
     "trackingTitle": "Śledzenie zamówienia",
-    "trackingDesc": "Po wysyłce zamówienia otrzymasz e-mail z numerem do śledzenia. Możesz również sprawdzić status swojego zamówienia w <a href='/account'>panelu klienta</a>."
+    "trackingDesc": "Po wysyłce zamówienia otrzymasz e-mail z numerem do śledzenia. Możesz również sprawdzić status swojego zamówienia w <a href='/account'>panelu klienta</a>.",
+    "seeAll": "Zobacz wszystkie"
   },
   "warranty": {
     "warrantyTitle": "Gwarancja",
@@ -260,5 +353,59 @@
     "contactDesc": "Jeśli masz pytania dotyczące tej polityki lub przetwarzania Twoich danych, skontaktuj się z nami:",
     "addressTitle": "Adres",
     "addressValue": "Warszawa, Polska"
+  },
+  "header": {
+    "menu": {
+      "solarSystem": "System solarny",
+      "evChargers": "Ładowarki do pojazdów elektrycznych",
+      "portablePower": "Przenośna energia",
+      "generators": "Generatory",
+      "electricalComponents": "Komponenty elektryczne"
+    },
+    "featured": {
+      "solar": "Popularne rozwiązania solarne",
+      "ev": "Najlepsze stacje ładowania",
+      "portable": "Przenośne rozwiązania energetyczne",
+      "generators": "Generatory do każdych potrzeb",
+      "electrical": "Komponenty elektryczne i kable"
+    },
+    "categories": {
+      "solarPanels": "Panele słoneczne",
+      "batteries": "Akumulatory",
+      "inverters": "Falowniki",
+      "solarSets": "Zestawy elektrowni słonecznych",
+      "mountingSystems": "Systemy montażowe paneli słonecznych",
+      "evChargers": "Ładowarki do pojazdów elektrycznych",
+      "cablesAdapters": "Kable i adaptery",
+      "chargingStations": "Stacje ładowania",
+      "portablePowerStations": "Przenośne elektrownie",
+      "solarGenerators": "Generatory słoneczne",
+      "portableSolarPanels": "Przenośne panele słoneczne",
+      "industrialGenerators": "Przemysłowe generatory do dużych obciążeń (100 kW+)",
+      "solarLightingTowers": "Wieże oświetleniowe zasilane energią słoneczną",
+      "automaticSwitches": "Wyłączniki automatyczne",
+      "cablesWires": "Kable elektryczne i przewody"
+    }
+  },
+  "products": {
+    "solarPanels": {
+      "longi410Black": "Panel słoneczny Longi-410-Black",
+      "longi420Black": "Panel słoneczny Longi-420-Black",
+      "longi425Black": "Panel słoneczny Longi-425-Black",
+      "longi530Black": "Panel słoneczny Longi-530-Black",
+      "longi630Bifacial": "Panel słoneczny Longi-630-Bifacial",
+      "longi430": "Panel słoneczny Longi-430",
+      "longi580": "Panel słoneczny Longi-580",
+      "longi585": "Panel słoneczny Longi-585",
+      "longi440": "Panel słoneczny Longi-440",
+      "longi455": "Panel słoneczny Longi-455"
+    },
+    "batteries": {
+      "deyeRWM61B1": "Akumulator Deye RW-M6.1-B-1",
+      "rwM53Pro1": "RW-M5.3-Pro_1",
+      "deyeRWF106": "Deye-RW-F10.6-51.2V-208AH-10.64KWH-1",
+      "pylontechUS5000": "Akumulator Pylontech-US5000",
+      "dyness48V50Ah": "Akumulator Dyness-48V-50Ah-1"
+    }
   }
 }

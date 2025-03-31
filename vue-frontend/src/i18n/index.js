@@ -1,206 +1,138 @@
-// src/i18n/index.js
 import { createI18n } from 'vue-i18n';
 
-// Import locale files
-// Update these paths if your JSON files are stored elsewhere
-const ukLocale = {
-  "common": {
-    "home": "Головна",
-    "products": "Товари",
-    "categories": "Категорії",
-    "cart": "Кошик",
-    "profile": "Профіль",
-    "login": "Увійти",
-    "logout": "Вийти",
-    "register": "Зареєструватися",
-    "search": "Пошук"
+// ✅ Configure the i18n (Multi-language)
+const savedLocale = localStorage.getItem('userLocale') || 'uk';
+console.log('Initializing with locale:', savedLocale);
+
+// Define Ukrainian translations
+const ukTranslations = {
+  hello: 'Привіт',
+  welcome: 'Ласкаво просимо',
+  login: {
+    title: 'Ласкаво просимо назад',
+    subtitle: 'Будь ласка, увійдіть, щоб продовжити.',
+    tabLabel: 'Вхід',
+    googleBtn: 'Продовжити з Google',
+    appleBtn: 'Продовжити з Apple',
+    emailBtn: 'Увійти за допомогою Email',
+    emailPlaceholder: 'Електронна пошта',
+    passwordPlaceholder: 'Пароль',
+    forgotPassword: 'Забули пароль?',
+    enterEmailForReset: 'Введіть вашу електронну пошту для скидання паролю',
+    resetEmailSent: 'Лист з інструкціями надіслано на вашу пошту',
+    noAccount: 'Не маєте облікового запису?',
+    signUp: 'Зареєструватися',
+    terms: 'Продовжуючи, ви погоджуєтеся з нашими',
+    termsLink: 'Умовами використання',
+    privacyLink: 'Політикою конфіденційності',
+    and: 'та'
   },
-  "product": {
-    "price": "Ціна",
-    "quantity": "Кількість",
-    "available": "В наявності",
-    "outOfStock": "Немає в наявності",
-    "addToCart": "Додати в кошик",
-    "specifications": "Характеристики",
-    "description": "Опис",
-    "relatedProducts": "Схожі товари"
+  register: {
+    title: 'Створити обліковий запис',
+    subtitle: 'Зареєструйтеся, щоб почати користуватися.',
+    tabLabel: 'Реєстрація',
+    googleBtn: 'Продовжити з Google',
+    appleBtn: 'Продовжити з Apple',
+    nameLabel: 'Ім\'я',
+    namePlaceholder: 'Введіть ваше ім\'я',
+    confirmPasswordLabel: 'Підтвердіть пароль',
+    confirmPasswordPlaceholder: 'Введіть пароль ще раз',
+    submitBtn: 'Зареєструватися',
+    hasAccount: 'Вже маєте обліковий запис?',
+    signIn: 'Увійти',
+    passwordMismatch: 'Паролі не співпадають'
   },
-  "cart": {
-    "yourCart": "Ваш кошик",
-    "empty": "Ваш кошик порожній",
-    "continueShopping": "Продовжити покупки",
-    "subtotal": "Проміжний підсумок",
-    "shipping": "Доставка",
-    "total": "Разом",
-    "checkout": "Оформити замовлення"
+  common: {
+    or: 'або',
+    emailLabel: 'Електронна пошта',
+    passwordLabel: 'Пароль'
   },
-  "checkout": {
-    "shippingAddress": "Адреса доставки",
-    "billingAddress": "Платіжна адреса",
-    "paymentMethod": "Спосіб оплати",
-    "orderSummary": "Підсумок замовлення",
-    "placeOrder": "Замовити"
-  },
-  "profile": {
-    "account_details": "Інформація про акаунт",
-    "account_settings": "Налаштування акаунту",
-    "email": "Електронна пошта",
-    "joined_date": "Дата реєстрації",
-    "email_notifications": "Сповіщення на пошту",
-    "dark_mode": "Темна тема",
-    "update_profile": "Оновити профіль",
-    "logout": "Вийти",
-    "order_history": "Історія замовлень",
-    "no_orders_yet": "У вас ще немає замовлень",
-    "start_shopping": "Почати покупки",
-    "order_number": "Номер замовлення",
-    "order_status_pending": "Очікує обробки",
-    "order_status_processing": "Обробляється",
-    "order_status_shipped": "Відправлено",
-    "order_status_delivered": "Доставлено",
-    "order_status_cancelled": "Скасовано",
-    "quantity": "Кількість",
-    "subtotal": "Проміжний підсумок",
-    "shipping": "Доставка",
-    "total": "Разом",
-    "view_details": "Деталі",
-    "reorder": "Замовити знову",
-    "load_more_orders": "Завантажити більше замовлень"
-  },
-  "solar_components": {
-    "solar_panels": "Сонячні панелі",
-    "batteries": "Акумулятори",
-    "inverters": "Інвертори",
-    "mounting_systems": "Системи кріплення",
-    "charging_stations": "Зарядні станції",
-    "cables_wires": "Кабелі та дроти",
-    "power_plants": "Комплекти сонячних електростанцій",
-    "portable_stations": "Портативні електростанції",
-    "portable_panels": "Портативні сонячні панелі"
-  },
-  "footer": {
-    "company": "Компанія",
-    "about": "Про нас",
-    "contact": "Контакти",
-    "terms": "Умови використання",
-    "privacy": "Політика конфіденційності",
-    "copyright": "© 2025 ScaleVolt. Всі права захищені."
+  product: {
+    brand: 'Бренд',
+    addToCart: 'Додати в кошик',
+    rent: 'Орендувати',
+    durations: {
+      day: 'День',
+      week: 'Тиждень',
+      month: 'Місяць'
+    }
   }
 };
 
-const plLocale = {
-  "common": {
-    "home": "Strona główna",
-    "products": "Produkty",
-    "categories": "Kategorie",
-    "cart": "Koszyk",
-    "profile": "Profil",
-    "login": "Zaloguj się",
-    "logout": "Wyloguj się",
-    "register": "Zarejestruj się",
-    "search": "Szukaj"
+// Define Polish translations
+const plTranslations = {
+  hello: 'Cześć',
+  welcome: 'Witamy',
+  login: {
+    title: 'Witamy ponownie',
+    subtitle: 'Zaloguj się, aby kontynuować.',
+    tabLabel: 'Logowanie',
+    googleBtn: 'Kontynuuj z Google',
+    appleBtn: 'Kontynuuj z Apple',
+    emailBtn: 'Zaloguj się za pomocą Email',
+    emailPlaceholder: 'Email',
+    passwordPlaceholder: 'Hasło',
+    forgotPassword: 'Zapomniałeś hasła?',
+    enterEmailForReset: 'Wprowadź swój adres email, aby zresetować hasło',
+    resetEmailSent: 'Email z instrukcjami został wysłany',
+    noAccount: 'Nie masz konta?',
+    signUp: 'Zarejestruj się',
+    terms: 'Kontynuując, zgadzasz się na nasze',
+    termsLink: 'Warunki korzystania z usługi',
+    privacyLink: 'Politykę prywatności',
+    and: 'i'
   },
-  "product": {
-    "price": "Cena",
-    "quantity": "Ilość",
-    "available": "Dostępny",
-    "outOfStock": "Niedostępny",
-    "addToCart": "Dodaj do koszyka",
-    "specifications": "Specyfikacje",
-    "description": "Opis",
-    "relatedProducts": "Podobne produkty"
+  register: {
+    title: 'Utwórz konto',
+    subtitle: 'Zarejestruj się, aby rozpocząć korzystanie.',
+    tabLabel: 'Rejestracja',
+    googleBtn: 'Kontynuuj z Google',
+    appleBtn: 'Kontynuuj z Apple',
+    nameLabel: 'Imię',
+    namePlaceholder: 'Wprowadź swoje imię',
+    confirmPasswordLabel: 'Potwierdź hasło',
+    confirmPasswordPlaceholder: 'Wprowadź hasło ponownie',
+    submitBtn: 'Zarejestruj się',
+    hasAccount: 'Masz już konto?',
+    signIn: 'Zaloguj się',
+    passwordMismatch: 'Hasła nie są zgodne'
   },
-  "cart": {
-    "yourCart": "Twój koszyk",
-    "empty": "Twój koszyk jest pusty",
-    "continueShopping": "Kontynuuj zakupy",
-    "subtotal": "Suma częściowa",
-    "shipping": "Dostawa",
-    "total": "Razem",
-    "checkout": "Do kasy"
+  common: {
+    or: 'lub',
+    emailLabel: 'Email',
+    passwordLabel: 'Hasło'
   },
-  "checkout": {
-    "shippingAddress": "Adres dostawy",
-    "billingAddress": "Adres rozliczeniowy",
-    "paymentMethod": "Metoda płatności",
-    "orderSummary": "Podsumowanie zamówienia",
-    "placeOrder": "Złóż zamówienie"
-  },
-  "profile": {
-    "account_details": "Szczegóły konta",
-    "account_settings": "Ustawienia konta",
-    "email": "Email",
-    "joined_date": "Data dołączenia",
-    "email_notifications": "Powiadomienia email",
-    "dark_mode": "Tryb ciemny",
-    "update_profile": "Aktualizuj profil",
-    "logout": "Wyloguj się",
-    "order_history": "Historia zamówień",
-    "no_orders_yet": "Nie masz jeszcze żadnych zamówień",
-    "start_shopping": "Rozpocznij zakupy",
-    "order_number": "Numer zamówienia",
-    "order_status_pending": "Oczekujące",
-    "order_status_processing": "W trakcie realizacji",
-    "order_status_shipped": "Wysłane",
-    "order_status_delivered": "Dostarczone",
-    "order_status_cancelled": "Anulowane",
-    "quantity": "Ilość",
-    "subtotal": "Suma częściowa",
-    "shipping": "Dostawa",
-    "total": "Suma",
-    "view_details": "Szczegóły",
-    "reorder": "Zamów ponownie",
-    "load_more_orders": "Załaduj więcej zamówień"
-  },
-  "solar_components": {
-    "solar_panels": "Panele słoneczne",
-    "batteries": "Akumulatory",
-    "inverters": "Falowniki",
-    "mounting_systems": "Systemy montażowe",
-    "charging_stations": "Stacje ładowania",
-    "cables_wires": "Kable i przewody",
-    "power_plants": "Zestawy elektrowni słonecznych",
-    "portable_stations": "Przenośne elektrownie",
-    "portable_panels": "Przenośne panele słoneczne"
-  },
-  "footer": {
-    "company": "Firma",
-    "about": "O nas",
-    "contact": "Kontakt",
-    "terms": "Warunki korzystania",
-    "privacy": "Polityka prywatności",
-    "copyright": "© 2025 ScaleVolt. Wszelkie prawa zastrzeżone."
+  product: {
+    brand: 'Marka',
+    addToCart: 'Dodaj do koszyka',
+    rent: 'Wypożycz',
+    durations: {
+      day: 'Dzień',
+      week: 'Tydzień',
+      month: 'Miesiąc'
+    }
   }
 };
 
-// Get user's saved locale or use browser language as fallback
-const savedLocale = localStorage.getItem('userLocale');
-const browserLang = navigator.language.split('-')[0];
-const defaultLocale = savedLocale || (browserLang === 'pl' ? 'pl' : 'uk');
+// Combine translations
+const messages = {
+  uk: ukTranslations,
+  pl: plTranslations
+};
 
-export const i18n = createI18n({
-  legacy: false, // You must set `false`, to use Composition API
-  locale: defaultLocale,
+// Create i18n instance
+const i18n = createI18n({
+  legacy: false,
+  locale: savedLocale,
   fallbackLocale: 'uk',
-  messages: {
-    uk: ukLocale,
-    pl: plLocale
-  },
+  messages,
+  warnHtmlMessage: false,
   numberFormats: {
     'uk': {
       currency: {
         style: 'currency',
         currency: 'UAH',
         notation: 'standard'
-      },
-      decimal: {
-        style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      },
-      percent: {
-        style: 'percent',
-        useGrouping: false
       }
     },
     'pl': {
@@ -208,53 +140,28 @@ export const i18n = createI18n({
         style: 'currency', 
         currency: 'PLN',
         notation: 'standard'
-      },
-      decimal: {
-        style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      },
-      percent: {
-        style: 'percent',
-        useGrouping: false
-      }
-    }
-  },
-  datetimeFormats: {
-    'uk': {
-      short: {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      },
-      long: {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long',
-        hour: 'numeric',
-        minute: 'numeric'
       }
     },
-    'pl': {
-      short: {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      },
-      long: {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long',
-        hour: 'numeric',
-        minute: 'numeric'
+    'ua': {
+      currency: {
+        style: 'currency',
+        currency: 'UAH',
+        notation: 'standard'
       }
     }
   }
 });
 
-// Set document language attribute
-document.documentElement.setAttribute('lang', defaultLocale);
+// Set document language attribute based on saved locale
+document.documentElement.setAttribute('lang', savedLocale);
 
-export default i18n;
+// Helper function to debug i18n issues
+const debugI18n = () => {
+  console.log('Current locale:', i18n.global.locale.value);
+  console.log('Available messages:', Object.keys(messages));
+  console.log('Sample UK translation:', i18n.global.t('login.title', [], { locale: 'uk' }));
+  console.log('Sample PL translation:', i18n.global.t('login.title', [], { locale: 'pl' }));
+};
+
+// Export i18n for use in main.js
+export { i18n, debugI18n };

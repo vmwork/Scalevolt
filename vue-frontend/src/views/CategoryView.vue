@@ -3,7 +3,7 @@
     <h1>{{ displayCategoryName }}</h1>
 
     <!-- Show Loading Indicator -->
-    <div v-if="loading" class="loading-indicator">Loading products...</div>
+    <div v-if="loading" class="loading-indicator">{{ $t('common.loading') }}</div>
 
     <!-- Show Products Only When Data is Loaded -->
     <div v-else-if="filteredProducts.length > 0" class="products-container">
@@ -22,7 +22,7 @@
     
     <!-- No products found message -->
     <div v-else class="no-products">
-      <p>No products found in this category.</p>
+      <p>{{ $t('common.noProductsFound') }}</p>
     </div>
   </div>
 </template>
@@ -30,6 +30,7 @@
 <script>
 import { ref, computed, watchEffect, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n'; // Import the i18n composable
 import ProductCard from '@/components/ProductCard.vue';
 import productService from '@/services/productService';
 import mockProducts from '@/data/mockProducts';  // Import the mock products
@@ -47,68 +48,90 @@ export default {
   },
   setup(props) {
     const route = useRoute();
+    const { t } = useI18n(); // Get the translation function
     const products = ref([]);
     const loading = ref(true);
     const categoryName = ref('');
     
-    // Expanded route to type mapping
-    const routeToType = {
-      '/generators': 'Генератори',
-      '/industrial-generators': 'Промислові генератори для важких навантажень (100 кВт+)',
-      '/solar-lighting-towers': 'Освітлювальні вежі на сонячних батареях',
-      '/lifts-and-cranes': 'Підйомники та Крани',
-      '/dc-charging-stations': 'Швидкі Зарядні Станції (DC)',
-      '/ac-charging-stations': 'Зарядні Станції Рівня 2 (AC)',
-      '/portable-charging-devices': 'Портативні/Мобільні Зарядні Пристрої',
-      '/solar-panels': 'Сонячні Панелі',
-      '/batteries': 'Батареї',
-      '/inverters': 'Інвертори',
-      '/solar-sets': 'SolarSets',
-      '/mounting-systems': 'Система монтажу сонячних панелей'
+    // Map routes to translation keys instead of hardcoded strings
+    const routeToTypeKey = {
+      '/generators': 'homeView.generators',
+      '/industrial-generators': 'homeView.industrialGenerators',
+      '/solar-lighting-towers': 'homeView.solarLightingTowers',
+      '/lifts-and-cranes': 'homeView.liftsAndCranes',
+      '/dc-charging-stations': 'homeView.dcChargingStations',
+      '/ac-charging-stations': 'homeView.acChargingStations',
+      '/portable-charging-devices': 'homeView.portableChargingDevices',
+      '/solar-panels': 'homeView.solarPanels',
+      '/batteries': 'homeView.batteries',
+      '/inverters': 'homeView.inverters',
+      '/solar-sets': 'homeView.solarSets',
+      '/mounting-systems': 'homeView.mountingSystems'
     };
 
-    // Rental categories that should use rental item display
-    const rentalCategories = [
-      'Генератори', 
-      'Промислові генератори для важких навантажень (100 кВт+)', 
-      'Освітлювальні вежі на сонячних батареях',
-      'Підйомники та Крани'
+    // Map for untranslated type values that need to match the database
+    const typeMapping = {
+      'homeView.generators': 'Генератори',
+      'homeView.industrialGenerators': 'Промислові генератори для важких навантажень (100 кВт+)',
+      'homeView.solarLightingTowers': 'Освітлювальні вежі на сонячних батареях',
+      'homeView.liftsAndCranes': 'Підйомники та Крани',
+      'homeView.dcChargingStations': 'Швидкі Зарядні Станції (DC)',
+      'homeView.acChargingStations': 'Зарядні Станції Рівня 2 (AC)',
+      'homeView.portableChargingDevices': 'Портативні/Мобільні Зарядні Пристрої',
+      'homeView.solarPanels': 'Сонячні Панелі',
+      'homeView.batteries': 'Батареї',
+      'homeView.inverters': 'Інвертори',
+      'homeView.solarSets': 'SolarSets',
+      'homeView.mountingSystems': 'Система монтажу сонячних панелей'
+    };
+
+    // Rental categories that should use rental item display (using translation keys)
+    const rentalCategoryKeys = [
+      'homeView.generators', 
+      'homeView.industrialGenerators', 
+      'homeView.solarLightingTowers',
+      'homeView.liftsAndCranes'
     ];
 
     // Determine if we should use API or mock data based on route
     const isCustomRoute = computed(() => {
-      return Object.keys(routeToType).includes(route.path);
+      return Object.keys(routeToTypeKey).includes(route.path);
     });
 
-    // Get display name - from props or route mapping
+    // Get display name - from props or route mapping (now translated)
     const displayCategoryName = computed(() => {
       if (props.categoryName) {
         return props.categoryName;
       }
       
       if (isCustomRoute.value) {
-        return routeToType[route.path] || categoryName.value;
+        const translationKey = routeToTypeKey[route.path];
+        return translationKey ? t(translationKey) : categoryName.value;
       }
       
       return categoryName.value;
     });
 
     // Fetch products by type
-    const fetchProductsByType = async (type) => {
+    const fetchProductsByType = async (typeKey) => {
       loading.value = true;
+      
+      // Get the database type from the translation key
+      const databaseType = typeMapping[typeKey];
+      
       try {
         // First, try API
         try {
           const response = await productService.getProducts({ 
             filters: { 
-              type: { $eq: type } 
+              type: { $eq: databaseType } 
             },
             populate: ['general_information.images', 'pricing_and_inventory']
           });
           
           if (response.data && response.data.length > 0) {
             products.value = response.data.map(product => {
-              const isRental = rentalCategories.includes(type);
+              const isRental = rentalCategoryKeys.includes(typeKey);
               return {
                 id: product.id,
                 name: product.attributes?.name || product.name,
@@ -133,11 +156,11 @@ export default {
         // Fallback to mock data with rental information
         products.value = mockProducts
           .filter(product => 
-            product.type === type || 
-            product.type?.toLowerCase() === type.toLowerCase()
+            product.type === databaseType || 
+            product.type?.toLowerCase() === databaseType.toLowerCase()
           )
           .map(product => {
-            const isRental = rentalCategories.includes(type);
+            const isRental = rentalCategoryKeys.includes(typeKey);
             return {
               ...product,
               isRentalItem: isRental,
@@ -177,7 +200,7 @@ export default {
           brand: product.attributes.general_information.brand || 'No Brand',
         }));
 
-        categoryName.value = products.value.length > 0 ? products.value[0].attributes.categoryName : 'Категорія';
+        categoryName.value = products.value.length > 0 ? products.value[0].attributes.categoryName : t('common.category');
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -188,9 +211,9 @@ export default {
     // Watch for route changes and fetch appropriate products
     watchEffect(() => {
       if (isCustomRoute.value) {
-        const type = routeToType[route.path];
-        if (type) {
-          fetchProductsByType(type);
+        const typeKey = routeToTypeKey[route.path];
+        if (typeKey) {
+          fetchProductsByType(typeKey);
         }
       } else {
         const categoryId = route.params.id;
@@ -219,36 +242,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.category-view {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 130px; /* Adjust based on your header height */
-}
-
-h1 {
-  margin-bottom: 30px;
-  font-size: 24px;
-  color: #333;
-}
-
-.products-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-.loading-indicator {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-}
-
-.no-products {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-}
-</style>
