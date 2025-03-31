@@ -5,7 +5,7 @@
     <div class="page-container">
       <section class="product-segment">
         <div class="section-header">
-          <h2>Житлова та комерційна сонячна система</h2>
+          <h2>{{ $t('homeView.residentialCommercialSolar') }}</h2>
         </div>
         <div class="product-segment-grid">
           <router-link
@@ -25,7 +25,7 @@
     <div class="page-container">
       <section class="product-segment">
         <div class="section-header">
-          <h2>Зарядні пристрої та компоненти для електромобілів</h2>
+          <h2>{{ $t('homeView.evChargersComponents') }}</h2>
         </div>
         <div class="product-segment-grid">
           <router-link
@@ -84,7 +84,7 @@
     <div class="page-container">
       <section class="new-category-section">
         <div class="section-header">
-          <h2>Досліджуйте нові категорії</h2>
+          <h2>{{ $t('homeView.exploreNewCategories') }}</h2>
         </div>
         <div class="new-category-grid">
           <router-link
@@ -104,10 +104,10 @@
     <div class="page-container">
       <section class="category-section">
         <div class="section-header">
-          <h2>Оренда</h2>
-          <router-link to="/categories" class="see-all-button"
-            >See All</router-link
-          >
+          <h2>{{ $t('homeView.rental') }}</h2>
+          <router-link to="/categories" class="see-all-button">
+            {{ $t('homeView.seeAll') }}
+          </router-link>
         </div>
         <div class="categories-grid">
   <div v-if="categories.length === 0">No categories found</div>
@@ -128,7 +128,7 @@
 
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 
@@ -151,219 +151,213 @@ export default {
     AdBox,
     CategoryPromotionBox,
   },
-  data() {
+  setup() {
+    const ads = ref([]);
+    const promotionCategories = ref([]);
+    const products = ref([]);
+    const loading = ref(true);
+    
     return {
       Navigation,
       Pagination,
       Autoplay,
-      // Define the arrays here
-      solarSystemItems: [
+      ads,
+      promotionCategories,
+      products,
+      loading
+    }
+  },
+  computed: {
+    // Convert static arrays to computed properties that update with language changes
+    solarSystemItems() {
+      return [
         {
           id: 1,
-          name: 'Сонячні Панелі',
+          name: this.$t('homeView.solarPanels'),
           slug: 'solar-panels',
           image: '/images/HomeView/solar-farm.png',
         },
         {
           id: 2,
-          name: 'Батареї',
+          name: this.$t('homeView.batteries'),
           slug: 'batteries',
           image: '/images/HomeView/solar-battery.png',
         },
         {
           id: 3,
-          name: 'Інвертори',
+          name: this.$t('homeView.inverters'),
           slug: 'inverters',
           image: '/images/HomeView/інвертер.png',
         },
         {
           id: 4,
-          name: 'Комплекти сонячних електростанцій',
+          name: this.$t('homeView.solarSets'),
           slug: 'Sets-of-solar-power-plants',
           image: '/images/HomeView/комплект-сонячних.png',
         },
         {
           id: 6,
-          name: 'Система монтажу сонячних панелей',
+          name: this.$t('homeView.mountingSystems'),
           slug: 'mounting-systems',
           image: '/images/HomeView/solar-mount-system.png',
         },
-      ],
-      evChargerItems: [
-      {
-    id: 1,
-    name: 'Швидкі Зарядні Станції (DC)',
-    slug: 'dc-charging-stations',
-    image: '/images/HomeView/ev-charger-city.png',
-  },
-  {
-    id: 2,
-    name: 'Зарядні Станції Рівня 2 (AC)',
-    slug: 'ac-charging-stations',
-    image:'/images/HomeView/otcta-стійка-02.png',
-  },
-  {
-    id: 3,
-    name: 'Портативні/Мобільні Зарядні Пристрої',
-    slug: 'portable-charging-devices',
-    image: '/images/HomeView/ev-charger-city.png',
-  },
-],
-      ads: [],
-      promotionCategories: [],
-      carouselSlides: [
-      {
-    type: 'gif',
-    src: '/videos/carousel/Self-Sustaining-Smart-Home.gif',
-    title: 'Сонячні Панелі',
-    description: 'Живіть своє життя від чистої сонячної енергії. Зменшуйте рахунки та захищайте довкілля за допомогою наших високоефективних панелей'
-
-  },
-  {
-    type: 'gif',
-    src: '/videos/carousel/ev.chargers.gif',
-    title: 'Зарядні Пристрої для Електромобілів',
-    description: 'Заряджайте свій електромобіль швидко та ефективно. Наші розумні зарядні пристрої забезпечують надійне живлення, коли вам це потрібно'
-  },
-  {
-    type: 'gif',
-    src: '/videos/carousel/portable.panels.gif',
-    title: 'Портативні Сонячні Панелі',
-    description: 'Беріть енергію з собою будь-куди. Наші портативні сонячні панелі ідеальні для кемпінгу, автофургонів та пригод поза мережею'
-  },
-       
-      ],
-      newCategories: [
+      ];
+    },
+    evChargerItems() {
+      return [
         {
           id: 1,
-          name: 'Портативна електростанції',
+          name: this.$t('homeView.dcChargingStations'),
+          slug: 'dc-charging-stations',
+          image: '/images/HomeView/ev-charger-city.png',
+        },
+        {
+          id: 2,
+          name: this.$t('homeView.acChargingStations'),
+          slug: 'ac-charging-stations',
+          image:'/images/HomeView/otcta-стійка-02.png',
+        },
+        {
+          id: 3,
+          name: this.$t('homeView.portableChargingDevices'),
+          slug: 'portable-charging-devices',
+          image: '/images/HomeView/ev-charger-city.png',
+        },
+      ];
+    },
+    newCategories() {
+      return [
+        {
+          id: 1,
+          name: this.$t('homeView.portablePowerStation'),
           slug: 'Портативна електростанція',
           image: '/images/HomeView/solar-panel.png',
         },
         {
           id: 2,
-          name: 'Cонячні генератори',
+          name: this.$t('homeView.solarGenerators'),
           slug: 'charging',
           image: '/images/HomeView/Charging-station-ND-EVC-UR40.jpg',
         },
         {
           id: 3,
-          name: 'Портативні сонячні панелі',
+          name: this.$t('homeView.portableSolarPanels'),
           slug: 'portable-solar-panels',
           image: '/images/Categories/portable.solar.panels/Портативні-Сонячні-панелі-Jackery-SolarSaga-100W.png',
         },
         {
           id: 4,
-          name: 'Кабелі електричні та дроти',
+          name: this.$t('homeView.cablesAndWires'),
           slug: 'cables-wires',
           image: '/images/HomeView/Electrical-cables-and-wires.jpg',
         },
-      ],
-      categories: [
-      {
+      ];
+    },
+    categories() {
+      return [
+        {
           id: 1,
-          name: 'Генератори',
+          name: this.$t('homeView.generators'),
           slug: 'generators',
           image: '/images/HomeView/генератори.png',
         },
         {
           id: 2,
-          name: 'Промислові генератори для важких навантажень (100 кВт+)',
+          name: this.$t('homeView.industrialGenerators'),
           slug: 'industrial-generators',
           image: '/images/HomeView/Промислові-генератори-для-важких-навантажень.png',     
         },
         {
           id: 3,
-          name: 'Освітлювальні вежі на сонячних батареях',
+          name: this.$t('homeView.solarLightingTowers'),
           slug: 'solar-lighting-towers',
           image: '/images/HomeView/Освітлювальні-вежі-на-сонячних-батареях.png',     
         },
         {
           id: 4,
-          name: 'Підйомники та Крани',
+          name: this.$t('homeView.liftsAndCranes'),
           slug: 'lifts-and-cranes',
-          image: '/images/Categories/rent/lifts.png',// You'll need to add this image
+          image: '/images/Categories/rent/lifts.png',
         }
-      ],
-      products: [],
-      loading: true,
+      ];
+    },
+    carouselSlides() {
+      return [
+        {
+          type: 'gif',
+          src: '/videos/carousel/Self-Sustaining-Smart-Home.gif',
+          title: this.$t('homeView.solarPanels'),
+          description: 'Живіть своє життя від чистої сонячної енергії. Зменшуйте рахунки та захищайте довкілля за допомогою наших високоефективних панелей'
+        },
+        {
+          type: 'gif',
+          src: '/videos/carousel/ev.chargers.gif',
+          title: this.$t('homeView.evChargersComponents'),
+          description: 'Заряджайте свій електромобіль швидко та ефективно. Наші розумні зарядні пристрої забезпечують надійне живлення, коли вам це потрібно'
+        },
+        {
+          type: 'gif',
+          src: '/videos/carousel/portable.panels.gif',
+          title: this.$t('homeView.portableSolarPanels'),
+          description: 'Беріть енергію з собою будь-куди. Наші портативні сонячні панелі ідеальні для кемпінгу, автофургонів та пригод поза мережею'
+        },
+      ];
     }
   },
   methods: {
     getCategoryRoute(slug) {
       return `/${slug.toLowerCase().replace(/ /g, '-')}`;
-},
-async fetchAds() {
-  try {
-        const response = await adService.getAds({ populate: '*' })
+    },
+    async fetchAds() {
+      try {
+        const response = await adService.getAds({ populate: '*' });
         this.ads = response.data.data.map(ad => ({
           id: ad.id,
           title: ad.attributes?.title || 'No title',
           description: ad.attributes?.description || '',
           image: ad.attributes?.image?.data?.attributes?.url || '/images/default-ad.jpg',
-        }))
+        }));
       } catch (error) {
-        console.error('Error fetching ads:', error)
+        console.error('Error fetching ads:', error);
       }
     },
     async fetchPromotionCategories() {
       this.promotionCategories = [
-        { id: 1, name: 'Сонячні Панелі' },
-        { id: 2, name: 'Зарядні станції' },
-        { id: 3, name: 'Батареї' },
-        { id: 4, name: 'Кабеля' },
-      ]
+        { id: 1, name: this.$t('homeView.solarPanels') },
+        { id: 2, name: this.$t('homeView.dcChargingStations') },
+        { id: 3, name: this.$t('homeView.batteries') },
+        { id: 4, name: this.$t('homeView.cablesAndWires') },
+      ];
     },
     async fetchProducts() {
       try {
         const response = await productService.getProducts({
           populate: ['general_information.images', 'pricing_and_inventory'],
-        })
-        this.products = response.data.data
+        });
+        this.products = response.data.data;
       } catch (error) {
-        console.error('Error fetching products:', error)
+        console.error('Error fetching products:', error);
       } finally {
-        this.loading = false
-      }
-    },
-    async fetchCarouselSlides() {
-      try {
-        const response = await productService.getProducts({
-          populate: ['general_information.images', 'pricing_and_inventory'],
-        })
-        this.products = response.data.data
-      } catch (error) {
-        console.error('Error fetching products:', error)
-      } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     async fetchCarouselSlides() {
       try {
         // Optional: If you want to fetch slides dynamically from an API
-        const response = await axios.get('/api/carousel-slides')
-        // Merge or replace existing slides if needed
-        this.carouselSlides = [
-          {
-            type: 'video',
-            src: '/videos/sustainable-home-energy-flow.mp4',
-            title: 'Renewable Energy Ecosystem',
-            description: 'Explore how solar energy powers a sustainable home'
-          },
-          ...response.data
-        ]
+        const response = await axios.get('/api/carousel-slides');
+        // This would need to be modified to handle translations properly
       } catch (error) {
-        console.error('Error fetching carousel slides:', error)
+        console.error('Error fetching carousel slides:', error);
       }
     },
   },
-  mmounted() {
-  console.log('Categories:', this.categories);
-  this.fetchAds()
-  this.fetchPromotionCategories()
-  this.fetchProducts()
-  this.fetchCarouselSlides()
-},
+  mounted() {
+    console.log('Categories:', this.categories);
+    this.fetchAds();
+    this.fetchPromotionCategories();
+    this.fetchProducts();
+    this.fetchCarouselSlides();
+  }
 }
 
 import Intercom from '@intercom/messenger-js-sdk'
@@ -374,6 +368,7 @@ Intercom({
 </script>
 
 <style scoped>
+/* Style section remains unchanged */
 .home-view {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: white;

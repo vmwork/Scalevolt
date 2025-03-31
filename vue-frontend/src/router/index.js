@@ -15,6 +15,7 @@ import SignUpView from '@/views/SignUpView.vue';
 import CheckoutView from '@/views/CheckoutView.vue';
 import CheckoutSuccess from '@/views/CheckoutSuccess.vue';
 import CheckoutCancel from '@/views/CheckoutCancel.vue';
+import CheckoutAuthView from '@/views/CheckoutAuthView.vue'; // Added checkout auth view
 import CategoryView from '@/views/CategoryView.vue';
 import ProductPage from '@/views/ProductPage.vue';
 import PortableSolarPanelsView from '@/views/PortableSolarPanelsView.vue';
@@ -23,12 +24,15 @@ import PortablePowerStationView from '@/views/PortablePowerStationView.vue';
 import UserProfileView from '@/views/UserProfileView.vue';
 // Import the layout component
 import Layout from '@/components/Layout.vue';
-import DeliveryWarrantyReturnsView from '@/views/DeliveryWarrantyReturnsView.vue'
+import DeliveryWarrantyReturnsView from '@/views/DeliveryWarrantyReturnsView.vue';
 import CompanyView from '@/views/CompanyView.vue';
-import LiftsAndCranesCategory from '@/views/LiftsAndCranesCategory.vue'
-import PrivacyView from '@/views/PrivacyView.vue'
-import ErrorView from '@/views/ErrorView.vue'
-import LegalTermsView from '@/views/LegalTermsView.vue'
+import LiftsAndCranesCategory from '@/views/LiftsAndCranesCategory.vue';
+import PrivacyView from '@/views/PrivacyView.vue';
+import ErrorView from '@/views/ErrorView.vue';
+import LegalTermsView from '@/views/LegalTermsView.vue';
+import { translateText, translateProduct } from '../utils/translationService.js';
+import { checkoutGuard } from './guards/checkoutGuard'; // Import the checkout guard
+import AuthView from '@/views/AuthView.vue';
 
 
 // Define your routes for use within the region layout
@@ -43,19 +47,40 @@ const productRoutes = [
     component: SolarMountSystemView
   },
   {
-    path: '/dc-charging-stations',
+    path: 'dc-charging-stations',
     name: 'DCChargingStations',
     component: () => import('../views/CategoryView.vue')
   },
   {
-    path: '/ac-charging-stations',
+    path: 'ac-charging-stations',
     name: 'ACChargingStations',
     component: () => import('../views/CategoryView.vue')
   },
   {
-    path: '/portable-charging-devices',
+    path: 'portable-charging-devices',
     name: 'PortableChargingDevices',
     component: () => import('../views/CategoryView.vue')
+  },
+  {
+    path: 'lifts-and-cranes',
+    name: 'LiftsAndCranes',
+    component: LiftsAndCranesCategory
+  },
+  {
+    path: 'lifts-and-cranes/scissor-lifts',
+    name: 'ScissorLifts',
+    component: LiftsAndCranesCategory
+  },
+  {
+    path: 'lifts-and-cranes/boom-lifts',
+    name: 'BoomLifts',
+    component: LiftsAndCranesCategory
+  },
+  {
+    path: 'admin/translations',
+    name: 'TranslationManager',
+    component: () => import('../views/admin/TranslationManager.vue'),
+    meta: { requiresAuth: true }
   },
   { path: 'cables-wires', name: 'CablesWires', component: CablesWiresView },
   {
@@ -69,12 +94,38 @@ const productRoutes = [
     name: 'portable-power-station',
     component: PortablePowerStationView
   },
-  { path: 'login', name: 'Login', component: LoginView },
+  // Updated auth routes to use the new AuthView component
+  { path: 'auth', name: 'Auth', component: AuthView },
+  { path: 'login', redirect: 'auth' },
+  { path: 'signup', redirect: 'auth' },
+  
   { path: 'cart', name: 'Cart', component: CartView },
-  { path: 'signup', name: 'SignUp', component: SignUpView },
-  { path: 'checkout', name: 'Checkout', component: CheckoutView },
-  { path: 'checkout-success', name: 'CheckoutSuccess', component: CheckoutSuccess },
-  { path: 'checkout-cancel', name: 'CheckoutCancel', component: CheckoutCancel },
+  
+  // Updated Checkout routes with checkout guard
+  { 
+    path: 'checkout', 
+    name: 'Checkout', 
+    component: CheckoutView, 
+    beforeEnter: checkoutGuard 
+  },
+  { 
+    path: 'checkout/success', 
+    name: 'CheckoutSuccess', 
+    component: CheckoutSuccess, 
+    beforeEnter: checkoutGuard 
+  },
+  { 
+    path: 'checkout/cancel', 
+    name: 'CheckoutCancel', 
+    component: CheckoutCancel 
+  },
+  // New checkout authentication route
+  { 
+    path: 'checkout/auth', 
+    name: 'CheckoutAuth', 
+    component: CheckoutAuthView 
+  },
+  
   { path: 'category/:id', name: 'Category', component: CategoryView, props: true },
   { path: 'product/:id', name: 'Product', component: ProductPage, props: true },
   {
@@ -112,29 +163,10 @@ const productRoutes = [
     name: 'SolarLightingTowers',
     component: CategoryView
   },
-  {
-    path: '/lifts-and-cranes',
-    name: 'LiftsAndCranes',
-    component: LiftsAndCranesCategory
-  },
-  // Potential sub-routes for specific lift types
-  {
-    path: '/lifts-and-cranes/scissor-lifts',
-    name: 'ScissorLifts',
-    component: LiftsAndCranesCategory
-  },
-  {
-    path: '/lifts-and-cranes/boom-lifts',
-    name: 'BoomLifts',
-    component: LiftsAndCranesCategory
-  },
-
-  {
-    path: '/admin/translations',
-    name: 'TranslationManager',
-    component: () => import('../views/admin/TranslationManager.vue'),
-    meta: { requiresAuth: true } // Optional - if you have authentication
-  },
+  // Removed duplicate LiftsAndCranes route
+  // Removed duplicate ScissorLifts route
+  // Removed duplicate BoomLifts route
+  // Removed duplicate TranslationManager route
   {
     path: 'company',
     name: 'Company',
