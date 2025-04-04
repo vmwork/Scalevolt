@@ -9,6 +9,8 @@ import { auth } from '@/firebase';
 import './style.css';
 import { getUserCurrencyPreference } from '@/services/currency';
 import { useAuthStore } from './stores/auth';
+import claudePlugin from './plugins/claude';
+
 
 // ✅ Add favicon programmatically to prevent 404 errors
 function addFavicon() {
@@ -122,6 +124,8 @@ function initializeApp() {
     app.use(router);
     app.use(i18n);
     app.use(Toast, toastOptions);
+    app.use(claudePlugin); // Add this line to register the plugin
+
     
     // ✅ Add a global error handler
     app.config.errorHandler = globalErrorHandler;

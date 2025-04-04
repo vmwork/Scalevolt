@@ -149,22 +149,7 @@
     "accept": "Так, дозволити",
     "reject": "Ні, дякую"
   },
-
-  login: {
-    title: 'Ласкаво просимо назад',
-    subtitle: 'Будь ласка, увійдіть, щоб продовжити.',
-    googleBtn: 'Продовжити з Google',
-    appleBtn: 'Продовжити з Apple',
-    emailBtn: 'Увійти за допомогою Email',
-    emailPlaceholder: 'Електронна пошта',
-    passwordPlaceholder: 'Пароль',
-    noAccount: 'Не маєте облікового запису?',
-    signUp: 'Зареєструватися',
-    terms: 'Продовжуючи, ви погоджуєтеся з нашими',
-    termsLink: 'Умовами використання',
-    privacyLink: 'Політикою конфіденційності',
-    and: 'та'
-  },
+  
   "solar_components": {
     "section_title": "Сонячні компоненти",
     "solar_panels": "Сонячні панелі",
