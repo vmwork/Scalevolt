@@ -88,11 +88,30 @@
     </div>
 
     <div v-else class="empty-cart">
-      <img src="/images/Cart/empty-cart.png" alt="Empty Cart" />
-      <p>{{ $t('cart.empty') }}</p>
-      <button @click="continueShopping" class="continue-shopping-button primary">
-        {{ $t('cart.continueShopping') }}
-      </button>
+      <div class="empty-cart-content">
+        <div class="empty-cart-icon">
+          <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="#CCCCCC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 6H21" stroke="#CCCCCC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="#CCCCCC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="empty-cart-title">{{ $t('cart.empty') }}</h2>
+        <p class="empty-cart-message">{{ $t('cart.emptyMessage') || 'Your shopping cart is waiting to be filled with amazing products.' }}</p>
+        <div class="empty-cart-actions">
+          <button @click="continueShopping" class="continue-shopping-button primary">
+            <span class="shopping-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            {{ $t('cart.continueShopping') }}
+          </button>
+          <button @click="goToFeaturedProducts" class="featured-products-button">
+            {{ $t('cart.viewFeatured') || 'View Featured Products' }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -177,6 +196,14 @@ export default {
       router.push({ name: 'Home' })
     }
 
+    const goToFeaturedProducts = () => {
+  // Change this to your featured products route or category
+  router.push({ name: 'Products', query: { featured: true } })
+  // Alternative options:
+  // router.push('/products/featured')
+  // or router.push({ name: 'Category', params: { slug: 'featured' } })
+}
+
     return {
       cartItems,
       totalPrice,
@@ -191,6 +218,7 @@ export default {
       formatPrice,
       proceedToCheckout,
       continueShopping,
+      goToFeaturedProducts, // Add this to your return statement
       $t: t,
     }
   },
@@ -478,26 +506,108 @@ export default {
   box-shadow: 0 6px 8px rgba(24, 144, 255, 0.25);
 }
 
-/* Empty Cart */
+/* Add these styles to your <style> section */
+
+/* Empty Cart - Updated Styles */
 .empty-cart {
   text-align: center;
-  margin-top: 100px;
-  padding: 40px;
-  background-color: #fafafa;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin: 60px auto;
+  max-width: 600px;
+  padding: 60px 40px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
 }
 
-.empty-cart img {
-  width: 180px;
-  margin-bottom: 30px;
-  opacity: 0.8;
+.empty-cart-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
-.empty-cart p {
-  font-size: 1.5rem;
+.empty-cart-icon {
+  margin-bottom: 10px;
+  opacity: 0.7;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.empty-cart-title {
+  font-size: 1.8rem;
+  color: #333;
+  margin: 0;
+  font-weight: 600;
+}
+
+.empty-cart-message {
+  font-size: 1.1rem;
   color: #666;
-  margin-bottom: 20px;
+  margin: 5px 0 20px;
+  line-height: 1.5;
+  max-width: 400px;
+}
+
+.empty-cart-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.shopping-icon {
+  display: flex;
+  align-items: center;
+}
+
+.continue-shopping-button.primary {
+  padding: 16px 20px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.featured-products-button {
+  padding: 14px 20px;
+  background-color: #ffffff;
+  color: #555;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.featured-products-button:hover {
+  background-color: #f9f9f9;
+  color: #333;
+  border-color: #ccc;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .empty-cart {
+    padding: 40px 20px;
+    margin: 40px 20px;
+  }
+  
+  .empty-cart-title {
+    font-size: 1.5rem;
+  }
+  
+  .empty-cart-message {
+    font-size: 1rem;
+  }
 }
 
 /* Responsive Styles */

@@ -11,7 +11,6 @@ import { getUserCurrencyPreference } from '@/services/currency';
 import { useAuthStore } from './stores/auth';
 import claudePlugin from './plugins/claude';
 
-
 // ✅ Add favicon programmatically to prevent 404 errors
 function addFavicon() {
   var link = document.createElement('link');
@@ -44,7 +43,7 @@ function globalErrorHandler(err, instance, info) {
 }
 
 // ✅ Initialize the Vue App with Plugins
-function initializeApp() {
+function startApp() {
   try {
     var app = createApp(App);
     var pinia = createPinia();
@@ -188,4 +187,7 @@ window.reloadApp = function() {
 
 // ✅ 👇 Start everything in the correct order
 addFavicon();
-initializeApp();
+startApp();
+
+// Export the startApp function for potential use in other modules
+export { startApp };
