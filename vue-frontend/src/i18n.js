@@ -532,8 +532,8 @@ const plLocale = {
 // Merge locale content
 // const ukMessages = { ...ukLocale, ...ukDeliveryContent };
 // const plMessages = { ...plLocale, ...plDeliveryContent };
-const ukMessages = ukLocale;
-const plMessages = plLocale;
+const ukMessages = { ...ukLocale };
+const plMessages = { ...plLocale };
 // Get user's saved locale or use browser language as fallback
 const savedLocale = localStorage.getItem("userLocale");
 const browserLang = navigator.language.split("-")[0];
