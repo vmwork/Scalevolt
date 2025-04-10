@@ -1,24 +1,11 @@
-// db/pool.js (ES Module version)
-import pkg from 'pg';
-const { Pool } = pkg;
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import path from 'path';
+// db/pool.js (CommonJS version)
+const { Pool } = require('pg');
+const dotenv = require('dotenv');
 
-// Get directory path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
-// Load environment variables
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
-
-// Create the pool
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  database: process.env.DB_NAME || 'scalevolt',
+  connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
@@ -135,46 +122,5 @@ const updateProduct = async (id, productData) => {
     
     // Build the update query dynamically based on the fields provided
     const fields = Object.keys(productData).filter(key => productData[key] !== undefined);
-    if (fields.length === 0) return existingProduct.rows[0]; // No fields to update
-    
-    // Prepare the SET clause and values array
-    let setClause = fields.map((field, index) => {
-      if (field === 'images' || field === 'offers') {
-        return `${field} = $${index + 1}::json`;
-      }
-      return `${field} = $${index + 1}`;
-    }).join(', ');
-    
-    // Add searchable_text to the SET clause
-    setClause += ', searchable_text = $' + (fields.length + 1);
-    
-    // Extract values in the same order as the fields
-    const values = fields.map(field => {
-      if (field === 'images' || field === 'offers') {
-        return JSON.stringify(product[field] || []);
-      }
-      return product[field];
-    });
-    
-    // Add searchable_text value
-    values.push(searchable_text);
-    
-    // Add the id as the last parameter
-    values.push(id);
-    
-    // Execute the update query
-    const result = await pool.query(
-      `UPDATE products SET ${setClause} WHERE id = $${values.length} RETURNING *`,
-      values
-    );
-    
-    return result.rows[0];
-  } catch (error) {
-    console.error('Error updating product:', error);
-    throw error;
-  }
+    if (fields.length === 0) return existingProduct.rows[0]; // No fields
 };
-
-// Export the pool and functions
-export { pool, getProducts, getProductById, createProduct, updateProduct };
-export default pool;

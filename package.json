@@ -1,20 +1,12 @@
 {
   "dependencies": {
     "@maxmind/geoip2-node": "^6.0.0",
-    "@medusajs/cache-redis": "^2.6.1",
-    "@medusajs/event-bus-redis": "^2.6.1",
-    "@medusajs/file-local": "^2.6.1",
-    "@medusajs/medusa": "^2.6.1",
     "axios": "^1.8.4",
     "cors": "^2.8.5",
     "dinero.js": "^1.9.1",
     "express": "^4.21.2",
     "geoip-lite": "^1.4.10",
-    "gsap": "^3.12.7",
-    "liqpay": "^0.0.1",
     "lucide-react": "^0.484.0",
-    "medusa-payment-stripe": "^6.0.11",
-    "path": "^0.12.7",
     "pg": "^8.14.0",
     "stripe": "^17.7.0"
   }
