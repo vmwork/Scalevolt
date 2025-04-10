@@ -1,130 +1,110 @@
+// src/i18n/index.js
 import { createI18n } from 'vue-i18n';
+import { ukCheckoutTranslations, plCheckoutTranslations } from './checkout-translations';
 
-// ✅ Configure the i18n (Multi-language)
-const savedLocale = localStorage.getItem('userLocale') || 'uk';
-console.log('Initializing with locale:', savedLocale);
-
-// Define Ukrainian translations
-const ukTranslations = {
-  hello: 'Привіт',
-  welcome: 'Ласкаво просимо',
-  login: {
-    title: 'Ласкаво просимо назад',
-    subtitle: 'Будь ласка, увійдіть, щоб продовжити.',
-    tabLabel: 'Вхід',
-    googleBtn: 'Продовжити з Google',
-    appleBtn: 'Продовжити з Apple',
-    emailBtn: 'Увійти за допомогою Email',
-    emailPlaceholder: 'Електронна пошта',
-    passwordPlaceholder: 'Пароль',
-    forgotPassword: 'Забули пароль?',
-    enterEmailForReset: 'Введіть вашу електронну пошту для скидання паролю',
-    resetEmailSent: 'Лист з інструкціями надіслано на вашу пошту',
-    noAccount: 'Не маєте облікового запису?',
-    signUp: 'Зареєструватися',
-    terms: 'Продовжуючи, ви погоджуєтеся з нашими',
-    termsLink: 'Умовами використання',
-    privacyLink: 'Політикою конфіденційності',
-    and: 'та'
-  },
-  register: {
-    title: 'Створити обліковий запис',
-    subtitle: 'Зареєструйтеся, щоб почати користуватися.',
-    tabLabel: 'Реєстрація',
-    googleBtn: 'Продовжити з Google',
-    appleBtn: 'Продовжити з Apple',
-    nameLabel: 'Ім\'я',
-    namePlaceholder: 'Введіть ваше ім\'я',
-    confirmPasswordLabel: 'Підтвердіть пароль',
-    confirmPasswordPlaceholder: 'Введіть пароль ще раз',
-    submitBtn: 'Зареєструватися',
-    hasAccount: 'Вже маєте обліковий запис?',
-    signIn: 'Увійти',
-    passwordMismatch: 'Паролі не співпадають'
-  },
+// Define translations directly in JS instead of importing JSON files
+const ukLocale = {
   common: {
-    or: 'або',
-    emailLabel: 'Електронна пошта',
-    passwordLabel: 'Пароль'
+    home: "Головна",
+    products: "Товари",
+    categories: "Категорії",
+    cart: "Кошик",
+    profile: "Профіль",
+    login: "Увійти",
+    logout: "Вийти",
+    register: "Зареєструватися",
+    search: "Пошук",
+    translation_test: "Тест перекладів",
+    current_locale: "Поточна мова",
+    navigation: "Навігація",
+    force_refresh: "Оновити сторінку",
+    ukrainian: "Українська",
+    polish: "Польська",
+    loading: "Завантаження продуктів...",
+    noProductsFound: "У цій категорії не знайдено товарів.",
+    category: "Категорія",
+    remove: "Видалити"
   },
-  product: {
-    brand: 'Бренд',
-    addToCart: 'Додати в кошик',
-    rent: 'Орендувати',
-    durations: {
-      day: 'День',
-      week: 'Тиждень',
-      month: 'Місяць'
-    }
-  }
+  // Include other UK translations here
 };
 
-// Define Polish translations
-const plTranslations = {
-  hello: 'Cześć',
-  welcome: 'Witamy',
-  login: {
-    title: 'Witamy ponownie',
-    subtitle: 'Zaloguj się, aby kontynuować.',
-    tabLabel: 'Logowanie',
-    googleBtn: 'Kontynuuj z Google',
-    appleBtn: 'Kontynuuj z Apple',
-    emailBtn: 'Zaloguj się za pomocą Email',
-    emailPlaceholder: 'Email',
-    passwordPlaceholder: 'Hasło',
-    forgotPassword: 'Zapomniałeś hasła?',
-    enterEmailForReset: 'Wprowadź swój adres email, aby zresetować hasło',
-    resetEmailSent: 'Email z instrukcjami został wysłany',
-    noAccount: 'Nie masz konta?',
-    signUp: 'Zarejestruj się',
-    terms: 'Kontynuując, zgadzasz się na nasze',
-    termsLink: 'Warunki korzystania z usługi',
-    privacyLink: 'Politykę prywatności',
-    and: 'i'
-  },
-  register: {
-    title: 'Utwórz konto',
-    subtitle: 'Zarejestruj się, aby rozpocząć korzystanie.',
-    tabLabel: 'Rejestracja',
-    googleBtn: 'Kontynuuj z Google',
-    appleBtn: 'Kontynuuj z Apple',
-    nameLabel: 'Imię',
-    namePlaceholder: 'Wprowadź swoje imię',
-    confirmPasswordLabel: 'Potwierdź hasło',
-    confirmPasswordPlaceholder: 'Wprowadź hasło ponownie',
-    submitBtn: 'Zarejestruj się',
-    hasAccount: 'Masz już konto?',
-    signIn: 'Zaloguj się',
-    passwordMismatch: 'Hasła nie są zgodne'
-  },
+const plLocale = {
   common: {
-    or: 'lub',
-    emailLabel: 'Email',
-    passwordLabel: 'Hasło'
+    home: "Strona główna",
+    products: "Produkty",
+    categories: "Kategorie",
+    cart: "Koszyk",
+    profile: "Profil",
+    login: "Zaloguj się",
+    logout: "Wyloguj się",
+    register: "Zarejestruj się",
+    search: "Szukaj",
+    translation_test: "Test tłumaczeń",
+    current_locale: "Aktualny język",
+    navigation: "Nawigacja",
+    force_refresh: "Odśwież stronę",
+    ukrainian: "Ukraiński",
+    polish: "Polski",
+    loading: "Ładowanie produktów...",
+    noProductsFound: "Nie znaleziono produktów w tej kategorii.",
+    category: "Kategoria",
+    remove: "Usuń"
   },
-  product: {
-    brand: 'Marka',
-    addToCart: 'Dodaj do koszyka',
-    rent: 'Wypożycz',
-    durations: {
-      day: 'Dzień',
-      week: 'Tydzień',
-      month: 'Miesiąc'
-    }
-  }
+  // Include other PL translations here
 };
 
-// Combine translations
+const enLocale = {
+  common: {
+    home: "Home",
+    products: "Products",
+    categories: "Categories",
+    cart: "Cart",
+    profile: "Profile",
+    login: "Login",
+    logout: "Logout",
+    register: "Register",
+    search: "Search",
+    translation_test: "Translation Test",
+    current_locale: "Current Language",
+    navigation: "Navigation",
+    force_refresh: "Refresh Page",
+    ukrainian: "Ukrainian",
+    polish: "Polish",
+    loading: "Loading products...",
+    noProductsFound: "No products found in this category.",
+    category: "Category",
+    remove: "Remove"
+  },
+  // Include other EN translations here
+};
+
+// Function to detect and set initial locale
+const detectLocale = () => {
+  // Check saved locale first
+  const savedLocale = localStorage.getItem('userLocale');
+  if (savedLocale && ['uk', 'pl', 'en'].includes(savedLocale)) {
+    return savedLocale;
+  }
+
+  // Detect browser language
+  const browserLang = navigator.language.split('-')[0];
+  if (browserLang === 'pl') return 'pl';
+  if (browserLang === 'en') return 'en';
+  return 'uk'; // Ukrainian as default
+};
+
+// Merge checkout translations with main locale data
 const messages = {
-  uk: ukTranslations,
-  pl: plTranslations
+  uk: { ...ukLocale, ...ukCheckoutTranslations },
+  pl: { ...plLocale, ...plCheckoutTranslations },
+  en: enLocale
 };
 
 // Create i18n instance
 const i18n = createI18n({
-  legacy: false,
-  locale: savedLocale,
-  fallbackLocale: 'uk',
+  legacy: false, // Composition API mode
+  locale: detectLocale(),
+  fallbackLocale: 'en', // Using English as fallback
   messages,
   warnHtmlMessage: false,
   numberFormats: {
@@ -142,26 +122,46 @@ const i18n = createI18n({
         notation: 'standard'
       }
     },
-    'ua': {
+    'en': {
       currency: {
-        style: 'currency',
-        currency: 'UAH',
+        style: 'currency', 
+        currency: 'USD',
         notation: 'standard'
       }
     }
   }
 });
 
-// Set document language attribute based on saved locale
-document.documentElement.setAttribute('lang', savedLocale);
+// Set document language attribute
+document.documentElement.setAttribute('lang', i18n.global.locale.value);
 
-// Helper function to debug i18n issues
-const debugI18n = () => {
-  console.log('Current locale:', i18n.global.locale.value);
-  console.log('Available messages:', Object.keys(messages));
-  console.log('Sample UK translation:', i18n.global.t('login.title', [], { locale: 'uk' }));
-  console.log('Sample PL translation:', i18n.global.t('login.title', [], { locale: 'pl' }));
+// Locale switching utility
+const setLocale = (locale) => {
+  if (!['uk', 'pl', 'en'].includes(locale)) {
+    console.error('Invalid locale:', locale);
+    return;
+  }
+  
+  i18n.global.locale.value = locale;
+  localStorage.setItem('userLocale', locale);
+  document.documentElement.setAttribute('lang', locale);
+  
+  // Dispatch locale change event
+  window.dispatchEvent(new CustomEvent('locale-changed', {
+    detail: { locale }
+  }));
 };
 
-// Export i18n for use in main.js
-export { i18n, debugI18n };
+// Debug function
+const debugI18n = () => {
+  console.log('Current locale:', i18n.global.locale.value);
+  console.log('Available locales:', Object.keys(messages));
+  
+  // Use path that exists in all locales for testing
+  console.log('Sample home (UK):', i18n.global.t('common.home', [], { locale: 'uk' }));
+  console.log('Sample home (PL):', i18n.global.t('common.home', [], { locale: 'pl' }));
+  console.log('Sample home (EN):', i18n.global.t('common.home', [], { locale: 'en' }));
+};
+
+export { i18n, setLocale, debugI18n };
+export default i18n;

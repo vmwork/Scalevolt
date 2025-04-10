@@ -1,13 +1,17 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
-import { i18n } from '@/i18n/index.js';
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
+import { i18n } from '@/i18n';
+import { createI18n } from 'vue-i18n';
+import { createPinia, defineStore } from 'pinia';
+import App from '@/App.vue';
+import { createApp } from 'vue';
 
-// View Imports
+
+// Import all your view components
 import HomeView from '@/views/HomeView.vue';
 import SolarPanelsView from '@/views/SolarPanelsView.vue';
 import BatteriesView from '@/views/BatteriesView.vue';
 import InvertersView from '@/views/InvertersView.vue';
 import SolarSetsView from '@/views/SolarSetsView.vue';
-import ChargingStationsView from '@/views/ChargingStationsView.vue';
 import CablesWiresView from '@/views/CablesWiresView.vue';
 import LoginView from '@/views/LoginView.vue';
 import CartView from '@/views/CartView.vue';
@@ -15,29 +19,35 @@ import SignUpView from '@/views/SignUpView.vue';
 import CheckoutView from '@/views/CheckoutView.vue';
 import CheckoutSuccess from '@/views/CheckoutSuccess.vue';
 import CheckoutCancel from '@/views/CheckoutCancel.vue';
-import CheckoutAuthView from '@/views/CheckoutAuthView.vue'; // Added checkout auth view
+import CheckoutAuthView from '@/views/CheckoutAuthView.vue';
 import CategoryView from '@/views/CategoryView.vue';
 import ProductPage from '@/views/ProductPage.vue';
 import PortableSolarPanelsView from '@/views/PortableSolarPanelsView.vue';
 import SolarMountSystemView from '@/views/SolarMountSystemView.vue';
 import PortablePowerStationView from '@/views/PortablePowerStationView.vue';
 import UserProfileView from '@/views/UserProfileView.vue';
-// Import the layout component
-import Layout from '@/components/Layout.vue';
 import DeliveryWarrantyReturnsView from '@/views/DeliveryWarrantyReturnsView.vue';
 import CompanyView from '@/views/CompanyView.vue';
 import LiftsAndCranesCategory from '@/views/LiftsAndCranesCategory.vue';
 import PrivacyView from '@/views/PrivacyView.vue';
 import ErrorView from '@/views/ErrorView.vue';
 import LegalTermsView from '@/views/LegalTermsView.vue';
-import { translateText, translateProduct } from '../utils/translationService.js';
-import { checkoutGuard } from './guards/checkoutGuard'; // Import the checkout guard
 import AuthView from '@/views/AuthView.vue';
+// Add these imports at the top of your router file with the other imports
+import RentalCategoryPage from '@/views/RentalCategoryPage.vue';
+import RentalProductPage from '@/views/RentalProductPage.vue';
+import Layout from '@/components/Layout.vue';
 
 
-// Define your routes for use within the region layout
+// Import route guards and utilities if needed
+import { checkoutGuard } from './guards/checkoutGuard';
+
+// Define routes for product-related pages
 const productRoutes = [
-  { path: '', name: 'Home', component: HomeView },
+  { 
+    path: '/', 
+    component: () => import('@/views/HomeView.vue')
+  },
   { path: 'solar-panels', name: 'SolarPanels', component: SolarPanelsView },
   { path: 'batteries', name: 'Batteries', component: BatteriesView },
   { path: 'inverters', name: 'Inverters', component: InvertersView },
@@ -94,14 +104,12 @@ const productRoutes = [
     name: 'portable-power-station',
     component: PortablePowerStationView
   },
-  // Updated auth routes to use the new AuthView component
   { path: 'auth', name: 'Auth', component: AuthView },
   { path: 'login', redirect: 'auth' },
   { path: 'signup', redirect: 'auth' },
   
   { path: 'cart', name: 'Cart', component: CartView },
   
-  // Updated Checkout routes with checkout guard
   { 
     path: 'checkout', 
     name: 'Checkout', 
@@ -109,17 +117,15 @@ const productRoutes = [
     beforeEnter: checkoutGuard 
   },
   { 
-    path: 'checkout/success', 
-    name: 'CheckoutSuccess', 
-    component: CheckoutSuccess, 
-    beforeEnter: checkoutGuard 
+    path: '/checkout/success',
+    name: 'CheckoutSuccess',
+    component: () => import('@/views/CheckoutSuccess.vue')
   },
-  { 
-    path: 'checkout/cancel', 
-    name: 'CheckoutCancel', 
-    component: CheckoutCancel 
+  {
+    path: '/checkout/cancel',
+    name: 'CheckoutCancel',
+    component: () => import('@/views/CheckoutCancel.vue')
   },
-  // New checkout authentication route
   { 
     path: 'checkout/auth', 
     name: 'CheckoutAuth', 
@@ -151,7 +157,7 @@ const productRoutes = [
   {
     path: 'generators',
     name: 'Generators',
-    component: CategoryView  // Use a generic CategoryView or create specific views
+    component: CategoryView
   },
   {
     path: 'industrial-generators',
@@ -163,10 +169,6 @@ const productRoutes = [
     name: 'SolarLightingTowers',
     component: CategoryView
   },
-  // Removed duplicate LiftsAndCranes route
-  // Removed duplicate ScissorLifts route
-  // Removed duplicate BoomLifts route
-  // Removed duplicate TranslationManager route
   {
     path: 'company',
     name: 'Company',
@@ -187,7 +189,6 @@ const productRoutes = [
     props: true
   },
   {
-    // Catch-all 404 route
     path: ':pathMatch(.*)*',
     name: 'NotFound',
     component: ErrorView,
@@ -200,44 +201,49 @@ const productRoutes = [
   }
 ];
 
-// Main routes array
+// Rental routes
+const rentalRoutes = [
+  { path: '/', component: HomeView },
+  {
+    path: '/:categorySlug',
+    component: RentalCategoryPage, 
+    props: true
+  },
+  {
+    path: '/product/:productId',
+    component: RentalProductPage,
+    props: true
+  }
+];
+
+// Main routes array for region-specific routing
 const routes = [
-  // Region-specific routing
   {
     path: '/:region?',
     component: Layout,
     beforeEnter: (to, from, next) => {
       const validRegions = ['uk', 'pl'];
       
-      // If valid region is specified
       if (to.params.region && validRegions.includes(to.params.region)) {
-        // Set the locale based on URL region
         i18n.global.locale.value = to.params.region;
         localStorage.setItem('userLocale', to.params.region);
         document.documentElement.setAttribute('lang', to.params.region);
         next();
       } 
-      // If no region specified (root path)
       else if (!to.params.region || to.path === '/') {
-        // No region specified, redirect to default or stored region
         const savedRegion = localStorage.getItem('userLocale') || 'uk';
-        // Avoid redirect loop on root path
         if (to.path === '/') {
           next({ path: `/${savedRegion}` });
         } else {
           next({ path: `/${savedRegion}${to.path}` });
         }
       } 
-      // If invalid region
       else {
-        // Invalid region, redirect to default
         next({ path: '/uk' });
       }
     },
     children: productRoutes
   },
-  
-  // Fallback route
   {
     path: '/:pathMatch(.*)*',
     redirect: () => {
@@ -247,7 +253,133 @@ const routes = [
   }
 ];
 
-const router = createRouter({
+// Internationalization messages
+const messages = {
+  en: {
+    common: {
+      loading: 'Loading',
+      previous: 'Previous',
+      next: 'Next'
+    },
+    product: {
+      addToCart: 'Add to Cart',
+      rentNow: 'Rent Now',
+      rent: 'Rent',
+      wishlist: 'Wishlist',
+      share: 'Share',
+      selectDate: 'Select Date',
+      applyDates: 'Apply Dates',
+      rentalDuration: 'Rental Duration',
+      rentalPeriod: 'Rental Period',
+      selectColor: 'Select Equipment Color',
+      specifications: 'Specifications',
+      youMayLike: 'You May Also Like',
+      durations: {
+        day: 'Day',
+        week: 'Week',
+        month: 'Month',
+        dayShort: 'day',
+        weekShort: 'week',
+        monthShort: 'month'
+      },
+      specs: {
+        nominalPower: 'Nominal Power (kW)',
+        maxPower: 'Maximum Power (kW)',
+        weight: 'Weight (kg)',
+        workTime: 'Work Time (hours)',
+        noiseLevel: 'Noise Level (dB)'
+      },
+      brand: 'Brand'
+    },
+    category: {
+      subcategories: 'Subcategories',
+      filterBy: 'Filter By',
+      sortBy: 'Sort By',
+      all: 'All',
+      brand: 'Brand',
+      price: 'Price',
+      priceLowToHigh: 'Price: Low to High',
+      priceHighToLow: 'Price: High to Low',
+      nameAToZ: 'Name: A to Z',
+      nameZToA: 'Name: Z to A',
+      noProductsFound: 'No products found'
+    },
+    homeView: {
+      rental: 'Equipment Rental',
+      generators: 'Generators',
+      industrialGenerators: 'Industrial Generators',
+      solarLightingTowers: 'Solar Lighting Towers',
+      liftsAndCranes: 'Lifts & Cranes',
+      seeAll: 'See All'
+    }
+  },
+  uk: {
+    // Ukrainian translations would be added here
+    common: {
+      loading: 'Завантаження',
+      previous: 'Попередній',
+      next: 'Наступний'
+    }
+    // Add other Ukrainian translations as needed
+  }
+};
+
+// Create i18n instance
+const i18nInstance = createI18n({
+  legacy: false,
+  locale: 'uk', // Default locale
+  messages
+});
+
+// Create cart store
+const createCartStore = () => {
+  return {
+    state: () => ({
+      cartItems: []
+    }),
+    getters: {
+      totalItems: (state) => state.cartItems.reduce((total, item) => total + item.quantity, 0),
+      totalPrice: (state) => state.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0),
+      getItemQuantity: (state) => (id) => {
+        const item = state.cartItems.find(item => item.id === id);
+        return item ? item.quantity : 0;
+      }
+    },
+    actions: {
+      addToCart(item) {
+        const existingItem = this.cartItems.find(i => i.id === item.id);
+        if (existingItem) {
+          existingItem.quantity += item.quantity || 1;
+        } else {
+          this.cartItems.push({...item, quantity: item.quantity || 1});
+        }
+      },
+      removeFromCart(id) {
+        this.cartItems = this.cartItems.filter(item => item.id !== id);
+      },
+      increaseQuantity(id) {
+        const item = this.cartItems.find(item => item.id === id);
+        if (item) {
+          item.quantity++;
+        }
+      },
+      decreaseQuantity(id) {
+        const item = this.cartItems.find(item => item.id === id);
+        if (item && item.quantity > 1) {
+          item.quantity--;
+        } else if (item) {
+          this.removeFromCart(id);
+        }
+      },
+      clearCart() {
+        this.cartItems = [];
+      }
+    }
+  };
+};
+
+// Create router instances
+const mainRouter = createRouter({
   history: createWebHashHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
@@ -259,9 +391,13 @@ const router = createRouter({
   }
 });
 
+const rentalRouter = createRouter({
+  history: createWebHistory(),
+  routes: rentalRoutes
+});
+
 // Navigation guard to set page title
-router.beforeEach((to, from, next) => {
-  // Set page title if available
+mainRouter.beforeEach((to, from, next) => {
   const title = to.meta.title;
   if (title) {
     document.title = title;
@@ -272,4 +408,39 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-export default router;
+// Create Pinia store
+const pinia = createPinia();
+
+// Define cart store
+pinia.use(({ store }) => {
+  if (store.$id === 'cart') {
+    // Add any cart-specific plugins or functionality
+  }
+});
+
+// Create and define cart store
+const useCartStore = defineStore('cart', createCartStore());
+
+// Initialization function for the app
+function initializeApp() {
+  const app = createApp(App);
+
+  // Register plugins
+  app.use(mainRouter);
+  app.use(pinia);
+  app.use(i18nInstance); // Use i18nInstance instead of i18n
+
+  // Mount app
+  app.mount('#app');
+}
+
+// Export router and other necessary exports
+export default mainRouter;
+
+// Export router and other necessary exports
+export { 
+  mainRouter, 
+  rentalRouter, 
+  useCartStore, 
+  i18nInstance 
+};

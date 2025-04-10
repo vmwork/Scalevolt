@@ -1,23 +1,22 @@
-<!-- src/views/CheckoutView.vue -->
 <template>
   <div class="checkout-view">
-    <h1>Checkout</h1>
+    <h1>{{ $t('checkout.checkout') }}</h1>
 
     <div class="checkout-container">
       <!-- Checkout Steps -->
       <div class="checkout-steps">
-        <div class="step" :class="{ active: currentStep === 1 }">1. Shipping</div>
-        <div class="step" :class="{ active: currentStep === 2 }">2. Payment</div>
-        <div class="step" :class="{ active: currentStep === 3 }">3. Review</div>
+        <div class="step" :class="{ active: currentStep === 1 }">{{ $t('checkout.steps.shipping') }}</div>
+        <div class="step" :class="{ active: currentStep === 2 }">{{ $t('checkout.steps.payment') }}</div>
+        <div class="step" :class="{ active: currentStep === 3 }">{{ $t('checkout.steps.review') }}</div>
       </div>
 
       <!-- Step 1: Shipping Information -->
       <div v-if="currentStep === 1" class="checkout-section shipping-info">
-        <h2>Shipping Information</h2>
+        <h2>{{ $t('checkout.shippingInfo') }}</h2>
         
         <!-- Saved Addresses Section -->
         <div class="saved-addresses" v-if="savedAddresses.length > 0">
-          <h3>Your Saved Addresses</h3>
+          <h3>{{ $t('checkout.yourSavedAddresses') }}</h3>
           <div class="address-selection">
             <div 
               v-for="(address, index) in savedAddresses" 
@@ -29,7 +28,7 @@
               <div class="address-info">
                 <div class="address-name">
                   {{ address.label }} 
-                  <span v-if="address.isDefault" class="default-badge">Default</span>
+                  <span v-if="address.isDefault" class="default-badge">{{ $t('checkout.defaultAddress') }}</span>
                 </div>
                 <p>{{ address.fullName }}</p>
                 <p>{{ address.street }}, {{ address.apartment }}</p>
@@ -48,14 +47,14 @@
             </div>
           </div>
           <div class="or-separator">
-            <span>or enter a new address</span>
+            <span>{{ $t('checkout.orEnterNewAddress') }}</span>
           </div>
         </div>
         
         <form @submit.prevent="nextStep" class="shipping-form">
           <div class="form-row">
             <div class="form-group">
-              <label for="firstName">First Name</label>
+              <label for="firstName">{{ $t('checkout.firstName') }}</label>
               <input 
                 type="text" 
                 id="firstName" 
@@ -64,7 +63,7 @@
               />
             </div>
             <div class="form-group">
-              <label for="lastName">Last Name</label>
+              <label for="lastName">{{ $t('checkout.lastName') }}</label>
               <input 
                 type="text" 
                 id="lastName" 
@@ -75,7 +74,7 @@
           </div>
 
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email">{{ $t('checkout.email') }}</label>
             <input 
               type="email" 
               id="email" 
@@ -85,7 +84,7 @@
           </div>
 
           <div class="form-group">
-            <label for="phone">Phone Number</label>
+            <label for="phone">{{ $t('checkout.phone') }}</label>
             <input 
               type="tel" 
               id="phone" 
@@ -95,7 +94,7 @@
           </div>
 
           <div class="form-group">
-            <label for="address">Address</label>
+            <label for="address">{{ $t('checkout.address') }}</label>
             <input 
               type="text" 
               id="address" 
@@ -106,7 +105,7 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="city">City</label>
+              <label for="city">{{ $t('checkout.city') }}</label>
               <input 
                 type="text" 
                 id="city" 
@@ -115,7 +114,7 @@
               />
             </div>
             <div class="form-group">
-              <label for="postalCode">Postal Code</label>
+              <label for="postalCode">{{ $t('checkout.postalCode') }}</label>
               <input 
                 type="text" 
                 id="postalCode" 
@@ -126,7 +125,7 @@
           </div>
 
           <div class="form-group">
-            <label for="country">Country</label>
+            <label for="country">{{ $t('checkout.country') }}</label>
             <select id="country" v-model="shippingInfo.country" required>
               <option value="Ukraine">Ukraine</option>
               <option value="Poland">Poland</option>
@@ -137,7 +136,7 @@
           </div>
 
           <div class="form-group shipping-options">
-            <h3>Shipping Method</h3>
+            <h3>{{ $t('checkout.shippingMethod') }}</h3>
             <div class="shipping-option">
               <input 
                 type="radio" 
@@ -147,8 +146,8 @@
               />
               <label for="standard">
                 <div class="shipping-option-details">
-                  <span class="option-name">Standard Shipping</span>
-                  <span class="option-time">3-5 Business Days</span>
+                  <span class="option-name">{{ $t('checkout.standardShipping') }}</span>
+                  <span class="option-time">3-5 {{ $t('checkout.businessDays') }}</span>
                 </div>
                 <span class="option-price">{{ formatPrice(standardShippingCost) }} грн</span>
               </label>
@@ -162,8 +161,8 @@
               />
               <label for="express">
                 <div class="shipping-option-details">
-                  <span class="option-name">Express Shipping</span>
-                  <span class="option-time">1-2 Business Days</span>
+                  <span class="option-name">{{ $t('checkout.expressShipping') }}</span>
+                  <span class="option-time">1-2 {{ $t('checkout.businessDays') }}</span>
                 </div>
                 <span class="option-price">{{ formatPrice(expressShippingCost) }} грн</span>
               </label>
@@ -171,15 +170,15 @@
           </div>
 
           <div class="form-buttons">
-            <button type="button" @click="goToCart" class="back-button">Back to Cart</button>
-            <button type="submit" class="next-button">Continue to Payment</button>
+            <button type="button" @click="goToCart" class="back-button">{{ $t('checkout.backToCart') }}</button>
+            <button type="submit" class="next-button">{{ $t('checkout.continueToPayment') }}</button>
           </div>
         </form>
       </div>
 
       <!-- Step 2: Payment Method -->
       <div v-if="currentStep === 2" class="checkout-section payment-info">
-        <h2>Payment Method</h2>
+        <h2>{{ $t('checkout.paymentMethod') }}</h2>
         <div class="payment-options">
           <div class="payment-option">
             <input 
@@ -189,7 +188,7 @@
               v-model="paymentMethod"
             />
             <label for="card-payment">
-              <span class="option-name">Credit/Debit Card</span>
+              <span class="option-name">{{ $t('checkout.creditDebitCard') }}</span>
               <div class="card-icons">
                 <span class="card-icon">Visa</span>
                 <span class="card-icon">Mastercard</span>
@@ -204,7 +203,7 @@
               v-model="paymentMethod"
             />
             <label for="bank-transfer">
-              <span class="option-name">Bank Transfer</span>
+              <span class="option-name">{{ $t('checkout.bankTransfer') }}</span>
             </label>
           </div>
           <div class="payment-option">
@@ -215,24 +214,23 @@
               v-model="paymentMethod"
             />
             <label for="pay-on-delivery">
-              <span class="option-name">Pay on Delivery</span>
+              <span class="option-name">{{ $t('checkout.payOnDelivery') }}</span>
               <span class="option-price">+50 грн</span>
             </label>
           </div>
         </div>
 
         <div class="form-buttons">
-          <button type="button" @click="prevStep" class="back-button">Back to Shipping</button>
-          <button type="button" @click="nextStep" class="next-button">Review Order</button>
+          <button type="button" @click="prevStep" class="back-button">{{ $t('checkout.backToShipping') }}</button>
         </div>
       </div>
 
       <!-- Step 3: Order Review -->
       <div v-if="currentStep === 3" class="checkout-section order-review">
-        <h2>Review Your Order</h2>
+        <h2>{{ $t('checkout.reviewYourOrder') }}</h2>
         
         <div class="review-section">
-          <h3>Shipping Information</h3>
+          <h3>{{ $t('checkout.shippingInfo') }}</h3>
           <div class="review-info">
             <p>{{ shippingInfo.firstName }} {{ shippingInfo.lastName }}</p>
             <p>{{ shippingInfo.email }}</p>
@@ -240,21 +238,21 @@
             <p>{{ shippingInfo.address }}</p>
             <p>{{ shippingInfo.city }}, {{ shippingInfo.postalCode }}</p>
             <p>{{ shippingInfo.country }}</p>
-            <p><strong>Shipping Method:</strong> {{ getShippingMethodName() }}</p>
+            <p><strong>{{ $t('checkout.shippingMethod') }}:</strong> {{ getShippingMethodName() }}</p>
           </div>
-          <button type="button" @click="editSection(1)" class="edit-button">Edit</button>
+          <button type="button" @click="editSection(1)" class="edit-button">{{ $t('checkout.edit') }}</button>
         </div>
         
         <div class="review-section">
-          <h3>Payment Method</h3>
+          <h3>{{ $t('checkout.paymentMethod') }}</h3>
           <div class="review-info">
             <p><strong>{{ getPaymentMethodName() }}</strong></p>
           </div>
-          <button type="button" @click="editSection(2)" class="edit-button">Edit</button>
+          <button type="button" @click="editSection(2)" class="edit-button">{{ $t('checkout.edit') }}</button>
         </div>
         
         <div class="review-section">
-          <h3>Order Items</h3>
+          <h3>{{ $t('checkout.orderItems') }}</h3>
           <div class="order-items">
             <div v-for="item in cartItems" :key="item.uniqueKey" class="review-item">
               <div class="item-image">
@@ -262,7 +260,7 @@
               </div>
               <div class="item-details">
                 <p class="item-name">{{ item.name }}</p>
-                <p class="item-quantity">Qty: {{ item.quantity }}</p>
+                <p class="item-quantity">{{ $t('checkout.qty') }}: {{ item.quantity }}</p>
               </div>
               <p class="item-price">{{ formatPrice(item.price * item.quantity) }} грн</p>
             </div>
@@ -270,39 +268,43 @@
         </div>
 
         <div class="form-buttons">
-          <button type="button" @click="prevStep" class="back-button">Back to Payment</button>
-          <button type="button" @click="handleCheckout" class="checkout-button">Place Order</button>
+          <button type="button" @click="prevStep" class="back-button">{{ $t('checkout.backToPayment') }}</button>
+          <button type="button" @click="handleCheckout" class="checkout-button">{{ $t('checkout.placeOrder') }}</button>
         </div>
       </div>
 
-      <!-- Order Summary -->
-      <div class="order-summary">
-        <h2>Order Summary</h2>
+       <!-- Order Summary -->
+       <div class="order-summary">
+        <h2>{{ $t('cart.orderSummary') }}</h2>
         <div class="summary-item">
-          <span>Items ({{ totalQuantity }}):</span>
+          <span>{{ $t('cart.items') }} ({{ totalQuantity }}):</span>
           <span>{{ formatPrice(totalPrice) }} грн</span>
         </div>
         <div class="summary-item">
-          <span>Tax (20%):</span>
+          <span>{{ $t('cart.tax') }} (20%):</span>
           <span>{{ formatPrice(tax) }} грн</span>
         </div>
         <div class="summary-item">
-          <span>Shipping:</span>
+          <span>{{ $t('cart.shipping') }}:</span>
           <span>{{ formatPrice(shippingCost) }} грн</span>
         </div>
         <div v-if="paymentMethod === 'pod'" class="summary-item">
-          <span>Pay on Delivery Fee:</span>
+          <span>{{ $t('checkout.payOnDelivery') }}:</span>
           <span>50 грн</span>
         </div>
         <hr />
         <div class="summary-total">
-          <span>Total:</span>
+          <span>{{ $t('cart.total') }}:</span>
           <span>{{ formatPrice(orderTotal) }} грн</span>
         </div>
+        <button @click="nextStep" class="next-button full-width">
+          {{ $t('checkout.continueToPayment') }}
+        </button>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import { ref, computed, onMounted } from 'vue';
@@ -312,6 +314,7 @@ import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { loadStripe } from '@stripe/stripe-js';
 import { getAuth } from 'firebase/auth';
+import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'CheckoutView',
@@ -321,6 +324,7 @@ export default {
     const router = useRouter();
     const toast = useToast();
     const auth = getAuth();
+    const { t } = useI18n();
     
     // Current step in checkout process
     const currentStep = ref(1);
@@ -424,21 +428,21 @@ export default {
     // Get shipping method display name
     const getShippingMethodName = () => {
       return shippingInfo.value.method === 'express' 
-        ? 'Express Shipping (1-2 Business Days)' 
-        : 'Standard Shipping (3-5 Business Days)';
+        ? t('checkout.expressShipping') + ' (1-2 ' + t('checkout.businessDays') + ')' 
+        : t('checkout.standardShipping') + ' (3-5 ' + t('checkout.businessDays') + ')';
     };
     
     // Get payment method display name
     const getPaymentMethodName = () => {
       switch (paymentMethod.value) {
         case 'card':
-          return 'Credit/Debit Card';
+          return t('checkout.creditDebitCard');
         case 'transfer':
-          return 'Bank Transfer';
+          return t('checkout.bankTransfer');
         case 'pod':
-          return 'Pay on Delivery';
+          return t('checkout.payOnDelivery');
         default:
-          return 'Credit/Debit Card';
+          return t('checkout.creditDebitCard');
       }
     };
     
@@ -448,81 +452,87 @@ export default {
     };
     
     // Handle checkout process with Stripe
-    const handleCheckout = async () => {
-      if (cartItems.value.length === 0) {
-        toast.error('Your cart is empty.');
-        return;
-      }
-      
-      try {
-        // Show loading notification
-        toast.info('Processing your order...');
-        
-        // Initialize Stripe
-        const stripe = await loadStripe('YOUR_PUBLISHABLE_KEY');
-        
-        // Prepare order data
-        const orderData = {
-          items: cartItems.value.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity
-          })),
-          shippingInfo: { ...shippingInfo.value },
-          paymentMethod: paymentMethod.value,
-          totals: {
-            subtotal: totalPrice.value,
-            tax: tax.value,
-            shipping: shippingCost.value,
-            total: orderTotal.value
-          }
-        };
-        
-        // Create a checkout session on the server
-        const response = await fetch('http://localhost:4242/create-checkout-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(orderData),
-        });
-        
-        const session = await response.json();
-        
-        if (session.id) {
-          // For card payments, redirect to Stripe
-          if (paymentMethod.value === 'card') {
-            const result = await stripe.redirectToCheckout({
-              sessionId: session.id,
-            });
-            
-            if (result.error) {
-              toast.error(result.error.message);
-            }
-          } else {
-            // For other payment methods, redirect to success page directly
-            // In a real implementation, you'd handle this differently
-            localStorage.setItem('orderData', JSON.stringify(orderData));
-            router.push({ name: 'CheckoutSuccess', query: { orderId: session.orderId } });
-          }
-        } else if (session.url) {
-          // Alternative Stripe redirect method
-          window.location.href = session.url;
-        } else {
-          toast.error('Unable to process your order. Please try again.');
-        }
-      } catch (error) {
-        console.error('Checkout error:', error);
-        toast.error('An error occurred during checkout. Please try again.');
+    // Handle checkout process with Stripe
+const handleCheckout = async () => {
+  if (cartItems.value.length === 0) {
+    toast.error(t('cart.emptyCartError'));
+    return;
+  }
+  
+  try {
+    // Show loading notification
+    toast.info(t('checkout.processingOrder'));
+    
+    // Initialize Stripe
+    const stripe = await loadStripe('pk_test_51RBew7FmKQI5mMPCjpSXReQoCkowIEgP76IVYWZ7gNEUcVysFcMZwMtsTVxmJXwvMO0YPxFE3QPB38UG8Kkhjeq5007MzNyxGn');
+    
+    // Create the items array for Stripe
+    const stripeItems = cartItems.value.map(item => ({
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image
+    }));
+    
+    // Store order data for success page
+    const orderData = {
+      items: cartItems.value,
+      shippingInfo: { ...shippingInfo.value },
+      paymentMethod: paymentMethod.value,
+      totals: {
+        subtotal: totalPrice.value,
+        tax: tax.value,
+        shipping: shippingCost.value,
+        total: orderTotal.value
       }
     };
+    
+    localStorage.setItem('orderData', JSON.stringify(orderData));
+    
+    // Send to your backend
+    const response = await fetch('http://localhost:1337/api/create-checkout-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        items: stripeItems,
+        customerEmail: shippingInfo.value.email,
+        locale: 'pl', // Polish language
+        currency: 'pln' // Polish złoty
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Could not create checkout session');
+    }
+    
+    const session = await response.json();
+    
+    if (session.id) {
+      // For card payments, redirect to Stripe
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
+      
+      if (result.error) {
+        toast.error(result.error.message);
+      }
+    } else {
+      toast.error('Unable to process your order. Please try again.');
+    }
+  } catch (error) {
+    console.error('Checkout error:', error);
+    toast.error(`An error occurred during checkout: ${error.message}`);
+  }
+};
     
     // Load user data on component mount
     onMounted(async () => {
       // Check if cart is empty
       if (cartItems.value.length === 0) {
-        toast.error('Your cart is empty.');
+        toast.error(t('cart.emptyCartError'));
         router.push({ name: 'Cart' });
         return;
       }
@@ -602,7 +612,8 @@ export default {
       getShippingMethodName,
       getPaymentMethodName,
       formatPrice,
-      handleCheckout
+      handleCheckout,
+      $t: t
     };
   }
 };

@@ -16,79 +16,105 @@ export const useCartStore = defineStore('cart', {
     // Calculate total quantity
     totalQuantity: (state) =>
       state.cartItems.reduce((total, item) => total + item.quantity, 0),
+      
+    // Total items (alias for totalQuantity for compatibility)
+    totalItems: (state) =>
+      state.cartItems.reduce((total, item) => total + item.quantity, 0),
+      
+    // Get quantity of specific item by ID or uniqueKey
+    getItemQuantity: (state) => (id) => {
+      const item = state.cartItems.find(item => 
+        // Support both id and uniqueKey for backward compatibility
+        item.id === id || item.uniqueKey === id
+      );
+      return item ? item.quantity : 0;
+    }
   },
   actions: {
     // Add item to cart
     addToCart(product) {
       console.log('Adding to cart:', product);
+      
+      // Generate uniqueKey if not provided
+      if (!product.uniqueKey) {
+        product.uniqueKey = product.id ? `product-${product.id}` : `product-${Date.now()}`;
+      }
+      
       const existingItem = this.cartItems.find(
-        (item) => item.uniqueKey === product.uniqueKey
+        (item) => (item.uniqueKey === product.uniqueKey) || (item.id === product.id && !item.uniqueKey)
       );
+      
       if (existingItem) {
-        existingItem.quantity += product.quantity;
+        existingItem.quantity += product.quantity || 1;
         console.log(
           `Increased quantity for ${product.uniqueKey} to ${existingItem.quantity}`
         );
       } else {
-        this.cartItems.push({ ...product });
+        this.cartItems.push({ 
+          ...product,
+          quantity: product.quantity || 1
+        });
         console.log(`Added new product to cart: ${product.uniqueKey}`);
       }
       this.saveCart();
     },
 
-    // Remove item from cart
-    removeFromCart(uniqueKey) {
-      console.log(`Removing product from cart: ${uniqueKey}`);
+    // Remove item from cart - support both id and uniqueKey
+    removeFromCart(idOrUniqueKey) {
+      console.log(`Removing product from cart: ${idOrUniqueKey}`);
       this.cartItems = this.cartItems.filter(
-        (item) => item.uniqueKey !== uniqueKey
+        (item) => item.uniqueKey !== idOrUniqueKey && item.id !== idOrUniqueKey
       );
       this.saveCart();
     },
 
     // Update item quantity directly
-    updateQuantity(uniqueKey, quantity) {
-      const item = this.cartItems.find((item) => item.uniqueKey === uniqueKey);
+    updateQuantity(idOrUniqueKey, quantity) {
+      const item = this.cartItems.find(
+        (item) => item.uniqueKey === idOrUniqueKey || item.id === idOrUniqueKey
+      );
+      
       if (item) {
         item.quantity = quantity;
         if (item.quantity <= 0) {
-          this.removeFromCart(uniqueKey);
+          this.removeFromCart(idOrUniqueKey);
         } else {
           this.saveCart();
           console.log(
-            `Updated quantity for ${uniqueKey} to ${item.quantity}`
+            `Updated quantity for ${idOrUniqueKey} to ${item.quantity}`
           );
         }
       }
     },
 
     // Increase quantity by 1
-    increaseQuantity(uniqueKey) {
-      const item = this.cartItems.find((item) => item.uniqueKey === uniqueKey);
+    increaseQuantity(idOrUniqueKey) {
+      const item = this.cartItems.find(
+        (item) => item.uniqueKey === idOrUniqueKey || item.id === idOrUniqueKey
+      );
+      
       if (item) {
         item.quantity += 1;
-        console.log(`Increased quantity for ${uniqueKey} to ${item.quantity}`);
+        console.log(`Increased quantity for ${idOrUniqueKey} to ${item.quantity}`);
         this.saveCart();
       }
     },
 
     // Decrease quantity by 1
-    decreaseQuantity(uniqueKey) {
-      const item = this.cartItems.find((item) => item.uniqueKey === uniqueKey);
+    decreaseQuantity(idOrUniqueKey) {
+      const item = this.cartItems.find(
+        (item) => item.uniqueKey === idOrUniqueKey || item.id === idOrUniqueKey
+      );
+      
       if (item) {
         item.quantity -= 1;
-        console.log(`Decreased quantity for ${uniqueKey} to ${item.quantity}`);
+        console.log(`Decreased quantity for ${idOrUniqueKey} to ${item.quantity}`);
         if (item.quantity <= 0) {
-          this.removeFromCart(uniqueKey);
+          this.removeFromCart(idOrUniqueKey);
         } else {
           this.saveCart();
         }
       }
-    },
-
-    // Get the quantity of a specific item
-    getItemQuantity(uniqueKey) {
-      const item = this.cartItems.find((item) => item.uniqueKey === uniqueKey);
-      return item ? item.quantity : 0;
     },
 
     // Clear the cart

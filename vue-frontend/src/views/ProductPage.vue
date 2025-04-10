@@ -1,4 +1,3 @@
-
 <template>
   <div class="product-page-container">
     <!-- Breadcrumb Navigation -->
@@ -13,6 +12,7 @@
     </nav>
 
     <div v-if="product" class="product-content">
+      <!-- Left side - Gallery -->
       <div class="product-gallery">
         <!-- Thumbnail Gallery -->
         <div class="thumbnail-list">
@@ -37,95 +37,157 @@
         </div>
       </div>
 
-      <!-- Product Details -->
-      <div class="product-details">
-        <h1 class="product-title">{{ product.title }}</h1>
+      <!-- Right side - Product Info -->
+      <div class="product-info-container">
+        <div class="product-info-sticky">
+          <div class="product-info-scrollable">
+            <!-- Product Details -->
+            <div class="product-details">
+              <h1 class="product-title">{{ product.title || product.name }}</h1>
 
-        <!-- Rating and Reviews -->
-        <div class="product-rating">
-          <div class="rating-stars">
-            <span class="star">★</span>
-            <span class="rating-value">4.7</span>
-          </div>
-          <span class="review-count">(157 Reviews)</span>
-        </div>
+              <!-- Rating and Reviews -->
+              <div class="product-rating">
+                <div class="rating-stars">
+                  <span class="star">★</span>
+                  <span class="rating-value">4.7</span>
+                </div>
+                <span class="review-count">(157 {{ $t('product.reviews') }})</span>
+              </div>
 
-        <!-- Pricing -->
-        <div class="pricing-section">
-          <div class="current-price">
-            <span class="price">₹{{ formatPrice(product.price) }}</span>
-            <span class="discount-tag">60% Off</span>
-          </div>
-          <div class="original-price">
-            <span>MRP ₹{{ formatPrice(product.originalPrice) }}</span>
-            <span class="tax-info">(incl. of all taxes)</span>
-          </div>
-        </div>
+              <!-- Pricing -->
+              <div class="pricing-section">
+                <div class="current-price">
+                  <span class="price">{{ formatPrice(product.price) }} ₴</span>
+                  <span v-if="product.originalPrice && product.originalPrice > product.price" class="discount-tag">
+                    {{ calculateDiscount(product.price, product.originalPrice) }}% {{ $t('product.off') }}
+                  </span>
+                </div>
+                <div v-if="product.originalPrice && product.originalPrice > product.price" class="original-price">
+                  <span>MRP {{ formatPrice(product.originalPrice) }} ₴</span>
+                  <span class="tax-info">({{ $t('product.taxInfo') }})</span>
+                </div>
+              </div>
 
-        <!-- Delivery Info -->
-        <div class="delivery-info">
-          <span class="delivery-icon">⚡</span>
-          <span>Get it in 13 minutes</span>
+              <!-- Delivery Info -->
+              <div class="delivery-info">
+                <span class="delivery-icon">⚡</span>
+                <span>{{ $t('delivery.fastDelivery') }}</span>
+              </div>
+
+              <!-- Offers Section -->
+              <div v-if="product.offers && product.offers.length > 0" class="offers-section">
+                <h3>{{ $t('product.availableOffers') }}</h3>
+                <div class="offer-list">
+                  <div v-for="offer in product.offers.slice(0, 2)" :key="offer.id" class="offer-item">
+                    <img :src="getOfferIcon(offer.bank)" alt="Bank Icon" class="offer-icon" />
+                    <div>
+                      <strong>{{ offer.bank }}</strong>
+                      <p>{{ offer.detail }}</p>
+                    </div>
+                  </div>
+                </div>
+                <a href="#" v-if="product.offers.length > 2" class="view-all-offers">{{ $t('delivery.seeAll') }}</a>
+              </div>
+
+              <!-- Product Specifications -->
+              <div class="product-specs">
+                <h3>{{ $t('product.specifications') }}</h3>
+                <table class="specs-table">
+                  <tr v-if="product.brand">
+                    <th>{{ $t('product.brand') }}</th>
+                    <td>{{ product.brand }}</td>
+                  </tr>
+                  <tr v-if="product.model">
+                    <th>{{ $t('product.model') }}</th>
+                    <td>{{ product.model }}</td>
+                  </tr>
+                  <tr v-if="product.quantity">
+                    <th>{{ $t('product.quantity') }}</th>
+                    <td>{{ product.quantity }}</td>
+                  </tr>
+                  <!-- Add more specifications as needed -->
+                </table>
+              </div>
+
+              <!-- Installation Option -->
+              <div v-if="product.installationAvailable" class="installation-section">
+                <div class="installation-toggle">
+                  <label class="toggle-label">
+                    <input type="checkbox" v-model="addInstallation" />
+                    {{ $t('product.addInstallation') }}
+                  </label>
+                </div>
+                
+                <div v-if="addInstallation" class="installation-options">
+                  <div class="form-group">
+                    <label for="company">{{ $t('product.companyName') }}</label>
+                    <input 
+                      type="text" 
+                      id="company" 
+                      v-model="installationDetails.companyName" 
+                      placeholder="Enter company name"
+                    />
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="address">{{ $t('product.installationAddress') }} <span class="required-indicator">*</span></label>
+                    <input 
+                      type="text" 
+                      id="address" 
+                      v-model="installationDetails.address" 
+                      placeholder="Enter installation address"
+                      required
+                    />
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="notes">{{ $t('product.additionalNotes') }}</label>
+                    <textarea 
+                      id="notes" 
+                      v-model="installationDetails.notes" 
+                      placeholder="Any special instructions?"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quantity and Cart Control -->
+              <div class="cart-control">
+                <div class="quantity-selector">
+                  <button 
+                    class="quantity-btn" 
+                    @click="decrementQuantity"
+                    :disabled="quantity <= 1"
+                  >-</button>
+                  <span class="quantity-value">{{ quantity }}</span>
+                  <button 
+                    class="quantity-btn" 
+                    @click="incrementQuantity"
+                  >+</button>
+                </div>
+                <button 
+                  class="add-to-cart-btn" 
+                  @click="addToCart"
+                >
+                  {{ $t('product.addToCart') }}
+                </button>
+              </div>
+
+              <!-- Extra Product Details -->
+              <div class="extra-details">
+                <div class="detail-icon">
+                  <img src="/images/ProductPage/return-icon.png" alt="7 Days Exchange" />
+                  <span>{{ $t('product.daysExchange', { days: 7 }) }}</span>
+                </div>
+                <div class="detail-icon">
+                  <img src="/images/ProductPage/delivery-icon.png" alt="Fast Delivery" />
+                  <span>{{ $t('product.fastDelivery') }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div>
-      <a href="#" class="view-all-offers">{{ $t('delivery.seeAll') }}</a>
-    
-
-      <!-- Quantity and Cart Control -->
-      <div class="cart-control">
-        <div class="quantity-selector">
-          <button 
-            class="quantity-btn" 
-            @click="decrementQuantity"
-            :disabled="quantity <= 1"
-          >-</button>
-          <span class="quantity-value">{{ quantity }}</span>
-          <button 
-            class="quantity-btn" 
-            @click="incrementQuantity"
-          >+</button>
-        </div>
-        <button 
-          class="add-to-cart-btn" 
-          @click="addToCart"
-        >
-          {{ $t('product.addToCart') }}
-        </button>
-      </div>
-
-      <!-- Extra Product Details -->
-      <div class="extra-details">
-        <div class="detail-icon">
-          <img src="/images/ProductPage/return-icon.png" alt="7 Days Exchange" />
-          <span>7 Days Exchange</span>
-        </div>
-        <div class="detail-icon">
-          <img src="/images/ProductPage/delivery-icon.png" alt="Fast Delivery" />
-          <span>Fast Delivery</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Product Highlights -->
-    <div v-if="product" class="product-highlights">
-      <h2>{{ $t('product.section_title') }}</h2>
-      <table class="highlights-table">
-        <tr>
-          <th>{{ $t('product.quantity') }}</th>
-          <td>{{ product.quantity }}</td>
-        </tr>
-        <tr>
-          <th>Brand</th>
-          <td>{{ product.brand }}</td>
-        </tr>
-        <tr>
-          <th>Model</th>
-          <td>{{ product.model }}</td>
-        </tr>
-      </table>
     </div>
 
     <div v-if="product && (product.type === 'Сонячні Панелі' || product.type === 'Швидкі Зарядні Станції (DC)')">
@@ -940,9 +1002,15 @@ export default {
       }
     });
 
-    // Methods
-    const formatPrice = (price) => {
+     // Methods
+     const formatPrice = (price) => {
       return price ? price.toLocaleString('en-IN') : 'N/A';
+    };
+
+    const calculateDiscount = (currentPrice, originalPrice) => {
+      if (!currentPrice || !originalPrice) return 0;
+      const discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+      return discount;
     };
 
     const getOfferIcon = (bank) => {
@@ -976,7 +1044,7 @@ export default {
           installation: addInstallation.value ? installationDetails.value : null
         };  
         
-        cartStore.addItem(cartItem);
+        cartStore.addToCart(cartItem);
         
         alert(`Added ${quantity.value} ${product.value.title || product.value.name} to cart${addInstallation.value ? ' with installation' : ''}`);
       }
@@ -1003,6 +1071,7 @@ export default {
       selectedImage,
       quantity,
       formatPrice,
+      calculateDiscount,
       getOfferIcon,
       incrementQuantity,
       decrementQuantity,
@@ -1016,282 +1085,308 @@ export default {
 };
 </script>
 
-  <style scoped>
-  .product-page-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    padding-top: 130px; /* Add padding to account for the fixed header height */
-  }
-
-  /* If you have a breadcrumb that needs to be visible */
-  .breadcrumb {
-    font-size: 14px;
-    margin-bottom: 20px;
-    color: #666;
-    margin-top: 20px; /* Add some margin at the top */
-  }
-
-  .breadcrumb a {
-    color: #666;
-    text-decoration: none;
-  }
-
-  .breadcrumb-separator {
-    margin: 0 5px;
-    color: #999;
-  }
-
-  .product-content {
-    display: flex;
-    gap: 40px;
-  }
-
-  .product-gallery {
-    display: flex;
-    gap: 20px;
-    width: 50%;
-  }
-
-  .thumbnail-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .thumbnail {
-    width: 60px;
-    height: 60px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .thumbnail.active {
-    border-color: #f26e9a;
-  }
-
-  .thumbnail img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-
-  .main-image-container {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #e0e0e0;
-    padding: 20px;
-  }
-
-  .main-image {
-    max-width: 100%;
-    max-height: 500px;
-    object-fit: contain;
-  }
-
-  .product-details {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .product-title {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
-
-  .product-rating {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-
-  .rating-stars {
-    display: flex;
-    align-items: center;
-    color: #ffc107;
-  }
-
-  .review-count {
-    color: #666;
-  }
-
-  .pricing-section {
-    margin-bottom: 15px;
-  }
-
-  .current-price {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .price {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-  }
-
-  .discount-tag {
-    background-color: #4285F4;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-
-  .original-price {
-    color: #666;
-    text-decoration: line-through;
-  }
-
-  .tax-info {
-    margin-left: 10px;
-    font-size: 12px;
-  }
-
-  .delivery-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #4caf50;
-    margin-bottom: 15px;
-  }
-
-  .coupons-section {
-    border: 1px solid #e0e0e0;
-    padding: 15px;
-    border-radius: 8px;
-  }
-
-  .offers-list {
-    margin-bottom: 10px;
-  }
-
-  .offer-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-
-  .offer-icon {
-    width: 30px;
-    height: 30px;
-  }
-
-  .view-all-offers {
-    color: #f26e9a;
-    text-decoration: none;
-    font-weight: 600;
-  }
-
-  .cart-control {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-
-  .quantity-selector {
-    display: flex;
-    align-items: center;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-  }
-
-  .quantity-btn {
-    width: 40px;
-    height: 40px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-
-  .quantity-value {
-    padding: 0 15px;
-    font-size: 16px;
-  }
-
-  .add-to-cart-btn {
-    background-color: #4285F4;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  .extra-details {
-    display: flex;
-    gap: 20px;
-  }
-
-  .detail-icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .detail-icon img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .product-highlights {
-    margin-top: 40px;
-  }
-
-  .highlights-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .highlights-table th,
-  .highlights-table td {
-    border: 1px solid #e0e0e0;
-    padding: 10px;
-    text-align: left;
-  }
-
-  .highlights-table th {
-    background-color: #f9f9f9;
-    width: 200px;
-  }
-
-  @media (max-width: 768px) {
-    .product-content {
-      flex-direction: column;
-    }
-
-    .product-gallery,
-    .product-details {
-      width: 100%;
-    }
-
-    .installation-section {
-  margin-top: 30px;
+<style scoped>
+.product-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  padding-top: 130px; /* Add padding to account for the fixed header height */
 }
 
-.installation-toggle {
+/* Breadcrumb Navigation */
+.breadcrumb {
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.breadcrumb a {
+  color: #666;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: #0066cc;
+}
+
+.breadcrumb-separator {
+  margin: 0 5px;
+  color: #999;
+}
+
+/* Product Content Layout */
+.product-content {
+  display: flex;
+  gap: 30px;
+}
+
+/* Gallery Section */
+.product-gallery {
+  width: 55%;
+  display: flex;
+  gap: 15px;
+}
+
+.thumbnail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.thumbnail {
+  width: 60px;
+  height: 60px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.thumbnail.active {
+  border-color: #0066cc;
+}
+
+.thumbnail img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.main-image-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.main-image {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+}
+
+/* Product Info Section */
+.product-info-container {
+  width: 45%;
+  position: relative;
+}
+
+.product-info-sticky {
+  position: sticky;
+  top: 150px; /* Adjust based on your header height */
+  max-height: calc(100vh - 170px); /* Adjust based on your header height */
+}
+
+.product-info-scrollable {
+  max-height: calc(100vh - 170px);
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.product-details {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.product-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Rating Section */
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.rating-stars {
+  display: flex;
+  align-items: center;
+  color: #ffc107;
+}
+
+.star {
+  font-size: 20px;
+}
+
+.rating-value {
+  margin-left: 5px;
+  font-weight: 500;
+}
+
+.review-count {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Pricing Section */
+.pricing-section {
   margin-bottom: 20px;
 }
 
+.current-price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
+
+.discount-tag {
+  background-color: #e53935;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.original-price {
+  color: #666;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.tax-info {
+  font-size: 12px;
+  color: #888;
+}
+
+/* Delivery Info */
+.delivery-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #4caf50;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.delivery-icon {
+  font-size: 20px;
+}
+
+/* Offers Section */
+.offers-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.offers-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.offer-list {
+  margin-bottom: 10px;
+}
+
+.offer-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.offer-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.offer-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.view-all-offers {
+  color: #0066cc;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  display: block;
+  text-align: right;
+}
+
+/* Product Specifications */
+.product-specs {
+  margin-bottom: 20px;
+}
+
+.product-specs h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.specs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.specs-table th, 
+.specs-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.specs-table th {
+  width: 40%;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Installation Section */
+.installation-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.installation-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
 .installation-options {
+  margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #eee;
 }
@@ -1306,32 +1401,147 @@ export default {
   font-weight: 500;
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
 }
 
 .required-indicator {
-  color: #f26e9a;
-  font-size: 12px;
-  margin-left: 5px;
+  color: #e53935;
 }
 
-.installation-provider {
+/* Quantity and Cart Control */
+.cart-control {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.quantity-selector {
   display: flex;
   align-items: center;
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #f9f9f9;
+  border: 1px solid #ddd;
   border-radius: 4px;
+  overflow: hidden;
 }
 
-.provider-logo {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
+.quantity-btn {
+  width: 36px;
+  height: 36px;
+  background: #f5f5f5;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.quantity-btn:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.quantity-value {
+  padding: 0 15px;
+  min-width: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.add-to-cart-btn {
+  flex: 1;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  padding: 0 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  transition: background-color 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #0052a3;
+}
+
+/* Extra Product Details */
+.extra-details {
+  display: flex;
+  gap: 20px;
+}
+
+.detail-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #666;
+}
+
+.detail-icon img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .product-content {
+    flex-direction: column;
   }
-  </style>
+
+  .product-gallery,
+  .product-info-container {
+    width: 100%;
+  }
+
+  .product-info-sticky {
+    position: static;
+    max-height: none;
+  }
+
+  .product-info-scrollable {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-page-container {
+    padding: 120px 15px 20px;
+  }
+
+  .product-gallery {
+    flex-direction: column-reverse;
+  }
+
+  .thumbnail-list {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+
+  .cart-control {
+    flex-direction: column;
+  }
+
+  .add-to-cart-btn {
+    height: 44px;
+  }
+}
+</style>

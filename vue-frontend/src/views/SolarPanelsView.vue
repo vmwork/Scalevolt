@@ -1,8 +1,8 @@
 <template>
   <div class="catalogue-view">
     <Breadcrumb :breadcrumbs="localizedBreadcrumbs" class="breadcrumb-spacing" />
-    <h1>{{ $t('categories.solarPanels') }}</h1>
-    
+    <h1>{{ $t('homeView.solarPanels') }}</h1>
+
     <div class="products-container">
       <div
         v-for="product in displayedProducts"
@@ -164,7 +164,7 @@ export default {
     const localizedBreadcrumbs = computed(() => [
       { name: t('common.home'), link: '/' },
       { name: t('common.categories'), link: '/catalogue' },
-      { name: t('categories.solarPanels') },
+      { name: t('homeView.solarPanels') },
     ]);
 
     return {

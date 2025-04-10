@@ -1,7 +1,8 @@
 <template>
   <div class="catalogue-view">
     <Breadcrumb :breadcrumbs="localizedBreadcrumbs" class="breadcrumb-spacing" />
-    <h1>{{ $t('categories.batteries') }}</h1>
+    <h1>{{ $t('homeView.batteries') }}</h1>
+    
     
     <div class="products-container">
       <div
@@ -116,11 +117,11 @@ export default {
     };
 
     // Define localized breadcrumbs
-    const localizedBreadcrumbs = computed(() => [
-      { name: t('common.home'), link: '/' },
-      { name: t('common.categories'), link: '/catalogue' },
-      { name: t('categories.batteries') },
-    ]);
+const localizedBreadcrumbs = computed(() => [
+  { name: t('common.home'), link: '/' },
+  { name: t('common.categories'), link: '/catalogue' },
+  { name: t('homeView.batteries') },  // Change this line from t('categories.batteries')
+]);
 
     return {
       displayedProducts,

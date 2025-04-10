@@ -11,6 +11,8 @@
   "dependencies": {
     "@intercom/messenger-js-sdk": "^0.0.14",
     "@stripe/stripe-js": "^6.1.0",
+    "@vue/cli-service": "^5.0.8",
+    "axios": "^1.8.4",
     "firebase": "^11.4.0",
     "lodash.debounce": "^4.0.8",
     "pinia": "^2.0.33",
