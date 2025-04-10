@@ -1,0 +1,10 @@
+{
+    "hello": "Привіт!",
+    "menu": {
+      "solarPanels": "Сонячні Панелі",
+      "charging": "Зарядки",
+      "automaticSwitches": "Автоматичні вимикачі",
+      "cablesWires": "Кабелі електричні та дроти"
+    }
+  }
+  

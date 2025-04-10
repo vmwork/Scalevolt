@@ -6,22 +6,22 @@
     </router-link>
 
     <router-link :to="productLink" class="product-name">
-      <h2>{{ title }}</h2>
+      <h2>{{ $t(title) }}</h2>
     </router-link>
 
     <!-- Conditionally show brand if not empty -->
     <div v-if="brand" class="product-brand">
-      {{ $t('product.brand') }}: {{ brand }}
+      {{ $t("product.brand") }}: {{ brand }}
     </div>
 
     <!-- Pricing Display -->
     <div v-if="isRentalItem" class="rental-pricing">
       <div class="rental-duration-options">
-        <button 
-          v-for="(price, duration) in rentalPrices" 
+        <button
+          v-for="(price, duration) in rentalPrices"
           :key="duration"
           @click="selectRentalDuration(duration)"
-          :class="{ 'selected': selectedDuration === duration }"
+          :class="{ selected: selectedDuration === duration }"
         >
           {{ formatDurationDisplay(duration) }}
         </button>
@@ -35,28 +35,28 @@
     <!-- Transition between Add-to-Cart and +/- controls -->
     <transition name="fade">
       <div v-if="cartCount > 0" class="quantity-controls">
-        <button @click.stop.prevent="decreaseCount" class="decrement-btn">-</button>
+        <button @click.stop.prevent="decreaseCount" class="decrement-btn">
+          -
+        </button>
         <span class="quantity-number">{{ cartCount }}</span>
-        <button @click.stop.prevent="increaseCount" class="increment-btn">+</button>
+        <button @click.stop.prevent="increaseCount" class="increment-btn">
+          +
+        </button>
       </div>
-      <button 
-        v-else 
-        class="add-to-cart" 
-        @click.stop.prevent="handleAddToCart"
-      >
-        {{ isRentalItem ? $t('product.rent') : $t('product.addToCart') }}
+      <button v-else class="add-to-cart" @click.stop.prevent="handleAddToCart">
+        {{ isRentalItem ? $t("product.rent") : $t("product.addToCart") }}
       </button>
     </transition>
-  </div> 
+  </div>
 </template>
 
 <script>
-import { computed, ref } from 'vue';
-import { useCartStore } from '@/stores/cart';
-import { useI18n } from 'vue-i18n';
+import { computed, ref } from "vue";
+import { useCartStore } from "@/stores/cart";
+import { useI18n } from "vue-i18n";
 
 export default {
-  name: 'ProductCard',
+  name: "ProductCard",
   props: {
     productId: {
       type: [Number, String],
@@ -77,7 +77,7 @@ export default {
     brand: {
       type: String,
       required: false,
-      default: '',
+      default: "",
     },
     // New prop for rental items
     rentalPrices: {
@@ -88,38 +88,42 @@ export default {
     isRentalItem: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   setup(props) {
     const cartStore = useCartStore();
     const { t, locale } = useI18n();
 
     // State for rental duration
-    const selectedDuration = ref('day');
+    const selectedDuration = ref("day");
 
     // Computed property to get the current quantity from the store
-    const cartCount = computed(() => cartStore.getItemQuantity(props.productId));
+    const cartCount = computed(() =>
+      cartStore.getItemQuantity(props.productId)
+    );
 
     // Computed property for the product link
     const productLink = computed(() => `/product/${props.productId}`);
 
     // Method to format rental price
     const formatRentalPrice = (duration) => {
-      return props.rentalPrices[duration] 
-        ? props.rentalPrices[duration].toLocaleString() 
-        : 'N/A';
+      return props.rentalPrices[duration]
+        ? props.rentalPrices[duration].toLocaleString()
+        : "N/A";
     };
 
     // Method to format duration display based on current language
     const formatDurationDisplay = (duration) => {
       // Use translations for durations
       const durationKeys = {
-        'day': 'product.durations.day',
-        'week': 'product.durations.week',
-        'month': 'product.durations.month'
+        day: "product.durations.day",
+        week: "product.durations.week",
+        month: "product.durations.month",
       };
-      
-      return durationKeys[duration] ? t(durationKeys[duration]) : duration.charAt(0).toUpperCase() + duration.slice(1);
+
+      return durationKeys[duration]
+        ? t(durationKeys[duration])
+        : duration.charAt(0).toUpperCase() + duration.slice(1);
     };
 
     // Method to select rental duration
@@ -139,7 +143,7 @@ export default {
           brand: props.brand,
           quantity: 1,
           rentalDuration: selectedDuration.value,
-          isRental: true
+          isRental: true,
         });
       } else {
         // Regular product add to cart
@@ -179,7 +183,7 @@ export default {
       selectRentalDuration,
       formatRentalPrice,
       formatDurationDisplay,
-      $t: t
+      $t: t,
     };
   },
 };
@@ -209,9 +213,8 @@ export default {
 
 /* Rental Mode Specific Styling */
 .product-card.rental-mode {
-  border: 2px solid #4CAF50;
+  border: 2px solid #4caf50;
 }
-
 
 .rental-pricing {
   display: flex;
@@ -235,9 +238,9 @@ export default {
 }
 
 .rental-duration-options button.selected {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
-  border-color: #4CAF50;
+  border-color: #4caf50;
 }
 
 .rental-duration-options button:hover {
@@ -304,7 +307,7 @@ export default {
 
 /* Add to Cart Button */
 .add-to-cart {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: #fff;
   border: none;
   padding: 12px;
@@ -318,11 +321,13 @@ export default {
 }
 
 /* Smooth Fade Transition */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
   transform: scale(0.9);
 }
@@ -346,8 +351,8 @@ export default {
 .increment-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid #4CAF50; /* Replace with your logo color */
-  color: #4CAF50; /* Replace with your logo color */
+  border: 1px solid #4caf50; /* Replace with your logo color */
+  color: #4caf50; /* Replace with your logo color */
   background: transparent;
   cursor: pointer;
   display: flex;
@@ -360,7 +365,7 @@ export default {
 
 .decrement-btn:hover,
 .increment-btn:hover {
-  background-color:  #4CAF50;
+  background-color: #4caf50;
   color: #fff;
 }
 

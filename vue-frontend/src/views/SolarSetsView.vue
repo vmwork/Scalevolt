@@ -7,13 +7,20 @@
 
     <!-- Product Listing -->
     <div class="products-container">
-      <div v-for="product in displayedProducts" :key="product.uniqueKey" class="product-card-wrapper">
+      <div
+        v-for="product in products"
+        :key="product.uniqueKey"
+        class="product-card-wrapper"
+      >
         <!-- Wrap ProductCard in <router-link> to /product/:id -->
-        <router-link :to="`/product/${product.id}`" style="text-decoration: none; color: inherit;">
+        <router-link
+          :to="`/product/${product.id}`"
+          style="text-decoration: none; color: inherit"
+        >
           <!-- ProductCard component -->
           <ProductCard
             :productId="product.id"
-            :title="product.name"
+            :title="getTranslatedProductName(product)"
             :price="product.price"
             :image-src="product.image"
             :brand="product.brand"
@@ -25,141 +32,58 @@
 </template>
 
 <script>
-import { ref, computed, watchEffect } from 'vue';
-import { useRoute } from 'vue-router';
-import ProductCard from '@/components/ProductCard.vue';
-import Breadcrumb from '@/components/Breadcrumb.vue';
-import { useCartStore } from '@/stores/cart';
+import { ref, computed } from "vue";
+import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+import ProductCard from "@/components/ProductCard.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import { useCartStore } from "@/stores/cart";
+import { useProductsStore } from "@/stores/products";
 
 export default {
-  name: 'SolarSets',
+  name: "SolarSets",
   components: {
     ProductCard,
     Breadcrumb,
   },
   setup() {
+    const { t, locale } = useI18n();
     const cartStore = useCartStore();
     const route = useRoute();
-    
-    // Get category ID from the route and ensure it's correctly parsed
-    const categoryId = computed(() => {
-      return route.params.id ? Number(route.params.id) : null;
-    });
 
-    const products = ref([
-      {
-        id: 40,
-        name: 'Гибридная солнечная электростанция на 30кВ з АКБ 60кВ',
-        price: 1000,
-        image: '/images/solar.set.hybrid.30kw.with.АКБ-60кВ.png',
-        brand: 'Longi',
-        categoryId: 4,
-      },
-      {
-        id: 41,
-        name: 'Сонячна Панель Longi-420-Black',
-        price: 1200,
-        image: '/images/Longi-420-Black.png',
-        brand: 'Longi',
-        categoryId: 4,
-      },
-      {
-        id: 42,
-        name: 'Сонячна Панель Longi-425-Black',
-        price: 1000,
-        image: '/images/Longi-425-Black.png',
-        brand: 'Longi',
-        categoryId: 4,
-      },
-      {
-        id: 43,
-        name: 'Сонячна Панель Longi-530-Black',
-        price: 1200,
-        image: '/images/Longi-530-Black.png',
-        brand: 'Longi',
-        categoryId: 4,
-      },
-      {
-        id: 44,
-        name: 'Сонячна Панель Longi-630-Bifacial',
-        price: 1000,
-        image: '/images/Longi-630-Bifacial.png',
-        brand: 'Longi',
-        categoryId: 4,
-      },
-      {
-        id: 45,
-        name: 'Сонячна Панель Longi-430',
-        price: 1200,
-        image: '/images/Longi-430.png',
-        brand: 'Longi',
-        categoryId: 4,
-      },
-      {
-        id: 46,
-        name: 'Сонячна Панель Longi-580',
-        price: 1000,
-        image: '/images/Longi-580.png',
-        brand: 'Longi',
-        categoryId: 4,
-      },
-      {
-        id: 47,
-        name: 'Сонячна Панель Longi-585',
-        price: 1200,
-        image: '/images/Longi-585.png', // Fixed missing .png extension
-        brand: 'Longi',
-        categoryId: 4,
-      },
-      {
-        id: 48,
-        name: 'Сонячна Панель Longi-440',
-        price: 1000,
-        image: '/images/Longi-440.png',
-        brand: 'Longi-440',
-        categoryId: 4,
-      },
-      {
-        id: 49,
-        name: 'Сонячна Панель Longi-455',
-        price: 1200,
-        image: '/images/Longi-455.png',
-        brand: 'Longi',
-        categoryId: 4,
-      },
-    ]);
+    // Get category ID from the route and ensure it's correctly parsed
+    const categoryId = 4;
+    const store = useProductsStore();
+
+    const products = computed(() => {
+      return store.getProducts.filter(
+        (product) => +product.categoryId === categoryId
+      );
+    });
 
     // Add uniqueKey to each product
     products.value.forEach((product) => {
       product.uniqueKey = product.id;
     });
-
-    // Filter products based on category ID
-    const displayedProducts = computed(() => {
-      if (categoryId.value !== null && categoryId.value !== undefined) {
-        return products.value.filter((product) => product.categoryId === categoryId.value);
-      }
-      return products.value; // If no category is selected, return all products
-    });
-
-    // Debugging: Log values to console
-    watchEffect(() => {
-      console.log("Category ID:", categoryId.value);
-      console.log("Filtered Products:", displayedProducts.value);
-    });
+    // Get translated product name based on current locale
+    const getTranslatedProductName = (product) => {
+      return t(product.nameKey, product.defaultName);
+    };
 
     // Define breadcrumbs
     const breadcrumbs = ref([
-      { name: 'Home', link: '/' },
-      { name: 'Каталог', link: '/catalogue' },
-      { name: 'SolarSets' },
+      { name: "Home", link: "/" },
+      { name: "Каталог", link: "/catalogue" },
+      { name: "SolarSets" },
     ]);
 
-    const pageTitle = 'SolarSets';
+    const pageTitle = "SolarSets";
 
     return {
-      displayedProducts,
+      products,
       pageTitle,
+      getTranslatedProductName,
+
       breadcrumbs,
     };
   },
@@ -176,7 +100,6 @@ export default {
   padding: 20px;
 }
 
-
 .catalogue-view {
   padding-top: 120px; /* Header height + 10px buffer */
   margin-top: 0 !important;
@@ -189,7 +112,6 @@ export default {
   padding: 20px;
   background-color: #f9fafb;
 }
-
 
 .product-item {
   border: 1px solid #e0e0e0;

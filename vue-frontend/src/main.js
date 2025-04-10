@@ -9,7 +9,6 @@ import { auth } from '@/firebase';
 import './style.css';
 import { getUserCurrencyPreference } from '@/services/currency';
 import { useAuthStore } from './stores/auth';
-import claudePlugin from './plugins/claude';
 
 // ✅ Add favicon programmatically to prevent 404 errors
 function addFavicon() {
@@ -43,7 +42,7 @@ function globalErrorHandler(err, instance, info) {
 }
 
 // ✅ Initialize the Vue App with Plugins
-function startApp() {
+function initializeApp() {
   try {
     var app = createApp(App);
     var pinia = createPinia();
@@ -123,8 +122,6 @@ function startApp() {
     app.use(router);
     app.use(i18n);
     app.use(Toast, toastOptions);
-    app.use(claudePlugin); // Add this line to register the plugin
-
     
     // ✅ Add a global error handler
     app.config.errorHandler = globalErrorHandler;
@@ -187,7 +184,4 @@ window.reloadApp = function() {
 
 // ✅ 👇 Start everything in the correct order
 addFavicon();
-startApp();
-
-// Export the startApp function for potential use in other modules
-export { startApp };
+initializeApp();

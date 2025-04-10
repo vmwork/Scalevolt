@@ -1,16 +1,19 @@
-// src/components/ProductCatalog.vue
-// This is a reusable component that can be used for all catalog pages
+// src/components/ProductCatalog.vue // This is a reusable component that can be
+used for all catalog pages
 
 <template>
   <div class="catalogue-view">
     <!-- Breadcrumb Component with same design classes -->
-    <Breadcrumb :breadcrumbs="localizedBreadcrumbs" class="breadcrumb-spacing" />
+    <Breadcrumb
+      :breadcrumbs="localizedBreadcrumbs"
+      class="breadcrumb-spacing"
+    />
 
     <h1>{{ $t(catalogTitle) }}</h1>
 
     <!-- Product Listing -->
     <div v-if="loading" class="loading-indicator">
-      {{ $t('common.loading') }}
+      {{ $t("common.loading") }}
     </div>
 
     <div v-else-if="displayedProducts.length > 0" class="products-container">
@@ -22,7 +25,7 @@
         <!-- Wrap ProductCard in <router-link> to /product/:id -->
         <router-link
           :to="`/product/${product.id}`"
-          style="text-decoration: none; color: inherit;"
+          style="text-decoration: none; color: inherit"
         >
           <!-- ProductCard component -->
           <ProductCard
@@ -39,20 +42,20 @@
     </div>
 
     <div v-else class="no-products">
-      <p>{{ $t('common.noProductsFound') }}</p>
+      <p>{{ $t("common.noProductsFound") }}</p>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import ProductCard from '@/components/ProductCard.vue';
-import Breadcrumb from '@/components/Breadcrumb.vue';
+import { ref, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+import ProductCard from "@/components/ProductCard.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
 
 export default {
-  name: 'ProductCatalog',
+  name: "ProductCatalog",
   components: {
     ProductCard,
     Breadcrumb,
@@ -61,28 +64,28 @@ export default {
     // Raw product data array
     products: {
       type: Array,
-      required: true
+      required: true,
     },
     // Type key used for translation ('solarPanels', 'batteries', etc.)
     catalogType: {
       type: String,
-      required: true
+      required: true,
     },
     // Whether products are rental items
     isRental: {
       type: Boolean,
-      default: false
+      default: false,
     },
     // Loading state
     loading: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   setup(props) {
     const { t } = useI18n();
     const route = useRoute();
-    
+
     // Get category ID from the route and ensure it's correctly parsed
     const categoryId = computed(() => {
       return route.params.id ? Number(route.params.id) : null;
@@ -93,22 +96,24 @@ export default {
 
     // Localized breadcrumbs
     const localizedBreadcrumbs = computed(() => [
-      { name: t('common.home'), link: '/' },
-      { name: t('common.categories'), link: '/catalogue' },
+      { name: t("common.home"), link: "/" },
+      { name: t("common.categories"), link: "/catalogue" },
       { name: t(catalogTitle.value) },
     ]);
 
     // Process products to add unique keys and translate names
     const processedProducts = computed(() => {
-      return props.products.map(product => {
+      return props.products.map((product) => {
         // Create translation key for the product
-        const nameKey = `products.${product.type || props.catalogType}.id_${product.id}.name`;
-        
+        const nameKey = `products.${product.type || props.catalogType}.id_${
+          product.id
+        }.name`;
+
         return {
           ...product,
           uniqueKey: product.id,
           name: t(nameKey, product.name), // Translate or fallback to original
-          isRentalItem: props.isRental || product.isRentalItem
+          isRentalItem: props.isRental || product.isRentalItem,
         };
       });
     });
@@ -126,7 +131,7 @@ export default {
     return {
       displayedProducts,
       localizedBreadcrumbs,
-      catalogTitle
+      catalogTitle,
     };
   },
 };

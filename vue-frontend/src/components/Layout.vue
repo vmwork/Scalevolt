@@ -1,37 +1,18 @@
 <template>
-  <div class="main-layout">
-    <Header />
-    <main class="content">
+    <div class="layout-container">
       <router-view />
-    </main>
-    <Footer />
-  </div>
-</template>
-
-<script>
-import { defineComponent } from 'vue';
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
-
-export default defineComponent({
-  name: 'MainLayout',
-  components: {
-    Header,
-    Footer
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    name: 'Layout'
   }
-});
-</script>
-
-<style scoped>
-.main-layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.content {
-  flex: 1;
-  margin-top: 180px; /* Match the header height to prevent content from hiding behind it */
-  padding: 20px;
-}
-</style>
+  </script>
+  
+  <style scoped>
+  .layout-container {
+    min-height: 100vh;
+    width: 100%;
+  }
+  </style>

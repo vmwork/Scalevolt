@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -11,7 +13,8 @@
   --font-size-body: 1em;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -50,10 +53,10 @@ body {
 
 #app {
   width: 100%;
-  flex-grow: 1; 
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* align-items: center; */
 }
 
 /* Full-width header */
@@ -112,10 +115,10 @@ button:hover {
   border-color: #646cff;
 }
 
-button:focus,
+/* button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
+} */
 
 .card {
   padding: 2em;
@@ -226,4 +229,19 @@ button:focus-visible {
   .energy-bar {
     height: 10px;
   }
+}
+
+.swiper-scrollbar-drag {
+  position: relative;
+  height: 4px;
+  background: rgba(18, 18, 18, 1);
+  border-radius: 35px;
+  width: 90%;
+}
+.swiper-horizontal > .swiper-scrollbar,
+.swiper-scrollbar.swiper-scrollbar-horizontal {
+  width: 90%;
+}
+.swiper-wrapper {
+  position: relative;
 }

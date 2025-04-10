@@ -83,114 +83,33 @@
   </div>
 </template>
 
-// Replace your current script section with this:
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCartStore } from '@/stores/cart';
 import { useToast } from 'vue-toastification';
 
-export default {
-  name: 'CheckoutSuccess',
+export  default {
+  name: 'CheckoutCancel',
   setup() {
-    const route = useRoute();
-    const router = useRouter();
     const cartStore = useCartStore();
-    const toast = useToast();
+    const router = useRouter();
     
-    const orderId = ref('');
-    const orderEmail = ref('');
-    const orderData = ref(null);
-    const isLoading = ref(true);
+    // Get cart items
+    const cartItems = computed(() => cartStore.cartItems);
+    
+    // Calculate total price
+    const totalPrice = computed(() => cartStore.totalPrice);
     
     // Format price with thousands separator
     const formatPrice = (price) => {
       return price.toLocaleString('en-US');
     };
     
-    // Get shipping method display name
-    const getShippingMethodName = (method) => {
-      return method === 'express' 
-        ? 'Express Shipping (1-2 business days)' 
-        : 'Standard Shipping (3-5 business days)';
-    };
-    
-    // Get payment method display name
-    const getPaymentMethodName = (method) => {
-      switch (method) {
-        case 'card':
-          return 'Credit/Debit Card';
-        case 'transfer':
-          return 'Bank Transfer';
-        case 'pod':
-          return 'Pay on Delivery';
-        default:
-          return 'Credit/Debit Card';
-      }
-    };
-    
-    // Track order function (placeholder for now)
-    const trackOrder = () => {
-      router.push({ name: 'OrderTracking', params: { id: orderId.value } });
-    };
-    
-    onMounted(async () => {
-      try {
-        isLoading.value = true;
-        
-        // Get the session_id from URL query params
-        const sessionId = route.query.session_id;
-        
-        if (!sessionId) {
-          toast.error('No session ID found. Redirecting to home page.');
-          setTimeout(() => router.push('/'), 3000);
-          return;
-        }
-        
-        // Try to get order data from localStorage first (for non-Stripe payments)
-        const storedOrderData = localStorage.getItem('orderData');
-        if (storedOrderData) {
-          orderData.value = JSON.parse(storedOrderData);
-          orderId.value = route.query.orderId || 'Unknown';
-          orderEmail.value = orderData.value.shippingInfo?.email || 'your email';
-        } else {
-          // Or fetch order details from backend using the session ID
-          const response = await fetch(`http://localhost:1337/api/orders/${route.query.orderId || 'latest'}?session_id=${sessionId}`);
-          
-          if (!response.ok) {
-            throw new Error('Could not retrieve order details');
-          }
-          
-          const data = await response.json();
-          orderData.value = data;
-          orderId.value = data.order_id || sessionId.slice(-8);
-          orderEmail.value = data.customer_email || 'your email';
-        }
-        
-        // Clear the cart
-        cartStore.clearCart();
-        
-        // Clear stored order data
-        localStorage.removeItem('orderData');
-        
-      } catch (error) {
-        console.error('Error retrieving order details:', error);
-        toast.error('Failed to retrieve order details');
-        orderId.value = route.query.session_id?.slice(-8) || 'Unknown';
-      } finally {
-        isLoading.value = false;
-      }
-    });
-    
     return {
-      orderId,
-      orderEmail,
-      orderData,
-      isLoading,
-      formatPrice,
-      getShippingMethodName,
-      getPaymentMethodName,
-      trackOrder
+      cartItems,
+      totalPrice,
+      formatPrice
     };
   }
 };
