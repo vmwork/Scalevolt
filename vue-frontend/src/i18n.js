@@ -300,7 +300,7 @@ const plLocale = {
   homeView: {
     residentialCommercialSolar: "Domowe i komercyjne systemy słoneczne",
     evChargersComponents: "Ładowarki i komponenty do pojazdów elektrycznych",
-    exploreNewCategories: "Odkryj nowe kategorie",
+    exploreNewCategories: "Odkryj  nowe kategorie",
     solarPanels: "Panele słoneczne",
     batteries: "Akumulatory",
     inverters: "Falowniki",

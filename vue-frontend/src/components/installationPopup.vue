@@ -3,7 +3,7 @@
     <div class="installation-popup absolute top-[20%] p-8">
       <div class="installation-popup-header flex justify-between items-center">
         <h3>Залишити заявку</h3>
-        <button><img src="/images/close.svg" alt="" width="20" /></button>
+        <!-- <button><img src="/images/close.svg" alt="" width="20" /></button> -->
       </div>
       <div class="popup-form">
         <div class="flex items-center justify-center mt-8">
@@ -60,7 +60,7 @@
   padding: 14px 20px;
   border: 1px solid #262626;
   border-radius: 12px;
-  background: url(/images/close.svg) no-repeat scroll 5px 5px;
+  /* background: url(/images/close.svg) no-repeat scroll 5px 5px; */
 }
 .installation input::placeholder {
   font-weight: 500;

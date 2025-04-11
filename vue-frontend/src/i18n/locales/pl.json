@@ -88,23 +88,22 @@
   },
 
   "auth": {
-      "email": "Email",
-      "password": "Hasło",
-      "confirmPassword": "Potwierdź hasło",
-      "rememberMe": "Zapamiętaj mnie",
-      "forgotPassword": "Zapomniałeś hasła?",
-      "firstName": "Imię",
-      "lastName": "Nazwisko",
-      "phone": "Telefon",
-      "acceptTerms": "Akceptuję",
-      "termsLink": "warunki użytkowania i politykę prywatności",
-      "loginSuccess": "Logowanie pomyślne",
-      "loginFailed": "Błąd logowania. Sprawdź swoje dane",
-      "registerSuccess": "Rejestracja pomyślna",
-      "registerFailed": "Błąd rejestracji",
-      "passwordsMustMatch": "Hasła muszą się zgadzać"
-
-    },
+    "email": "Email",
+    "password": "Hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "rememberMe": "Zapamiętaj mnie",
+    "forgotPassword": "Zapomniałeś hasła?",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "phone": "Telefon",
+    "acceptTerms": "Akceptuję",
+    "termsLink": "warunki użytkowania i politykę prywatności",
+    "loginSuccess": "Logowanie pomyślne",
+    "loginFailed": "Błąd logowania. Sprawdź swoje dane",
+    "registerSuccess": "Rejestracja pomyślna",
+    "registerFailed": "Błąd rejestracji",
+    "passwordsMustMatch": "Hasła muszą się zgadzać"
+  },
   "checkout": {
     "shippingAddress": "Adres dostawy",
     "billingAddress": "Adres rozliczeniowy",
@@ -112,14 +111,14 @@
     "orderSummary": "Podsumowanie zamówienia",
     "placeOrder": "Złóż zamówienie",
     "authenticateToCheckout": "Zaloguj się lub zarejestruj, aby przejść do kasy",
-      "authenticateDescription": "Aby kontynuować proces składania zamówienia, zaloguj się na swoje konto lub utwórz nowe",
-      "orContinueAs": "lub kontynuuj jako",
-      "continueAsGuest": "Gość",
-      "viewCart": "Zobacz koszyk",
-      "loginRequired": "Aby przejść do kasy, musisz się zalogować",
-      "loginRequiredForCheckout": "Aby złożyć zamówienie, potrzebujesz konta",
-      "emptyCartError": "Twój koszyk jest pusty. Nie można kontynuować do kasy"
-    },
+    "authenticateDescription": "Aby kontynuować proces składania zamówienia, zaloguj się na swoje konto lub utwórz nowe",
+    "orContinueAs": "lub kontynuuj jako",
+    "continueAsGuest": "Gość",
+    "viewCart": "Zobacz koszyk",
+    "loginRequired": "Aby przejść do kasy, musisz się zalogować",
+    "loginRequiredForCheckout": "Aby złożyć zamówienie, potrzebujesz konta",
+    "emptyCartError": "Twój koszyk jest pusty. Nie można kontynuować do kasy"
+  },
 
   "profile": {
     "account_details": "Szczegóły konta",

@@ -29,7 +29,9 @@ export default {
     ConsentBanner,
   },
   setup() {
-    const baseURL = import.meta.env.BASE_URL;
+    // const baseURL = import.meta.env.BASE_URL;
+    // const baseURL = localhost;
+    const baseURL = "http://localhost:3000";
     const { locale } = useI18n();
     const store = useProductsStore();
     const { autoLogin } = useUserStore();
